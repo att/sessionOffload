@@ -1,0 +1,138 @@
+// Copyright (C) 2020 AT&T Intellectual Property. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package sessions.v1;
+option go_package = "sessions";
+
+import "google/protobuf/timestamp.proto";
+
+enum IP_VERSION{
+   _IPV4 = 0;
+   _IPV6 = 1;
+}
+
+enum PROTOCOL_ID {
+  _HOPOPT = 0;
+  _TCP = 6;
+  _UDP = 17;
+  reserved 1 to 5, 7 to 16, 18 to 255 ;
+}
+
+enum SESSION_STATE {
+  _ESTABLISHED = 0;
+  _CLOSING_1   = 1;
+  _CLOSING_2   = 2;
+  _CLOSED      = 3;
+}
+ 
+enum SESSION_CLOSE_CODE {
+  _NOT_CLOSED = 0;
+  _FINACK     = 1;
+  _RST        = 2;
+  _TIMEOUT    = 3;
+}
+
+enum REQUEST_STATUS{
+   _ACCEPTED = 0;
+   _REJECTED = 1;
+   _REJECTED_SESSION_NONEXISTENT = 2;
+   _REJECTED_SESSION_TABLE_FULL = 3;
+   _REJECTED_SESSION_ALREADY_EXISTS = 4;
+}
+
+enum ACTION_TYPE{
+   _DROP = 0;
+   _FORWARD = 1;
+   _MIRROR = 2;
+   _SNOOP = 3;
+}
+
+
+service SessionTable {
+
+
+// Adds a session
+rpc addSession(sessionRequest) returns (sessionResponse) {}
+
+// Obtains the session 
+rpc getSession(sessionId) returns (sessionResponse) {}
+
+// Delete a session
+rpc deleteSession(sessionId) returns (sessionResponse) {}
+
+}
+
+
+service SessionStatisticsTable {
+// Stream back all current sessions
+rpc getAllSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
+
+// statistics as a outgoing session from the WB to Applications ?
+// grpc seems to need a request input streamId is a placeholder
+rpc getClosedSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
+
+
+}
+
+// should the Application assign the sessionID on AddSession and avoid conflicts
+// or have the applications have a mechanism to avoid duplicate sessionIDs across 
+// applications since there will be many applications instances to 1 switch
+message sessionId{
+  uint64 sessionId = 1;
+}
+
+// MIRROR and SNOOP require an actionNextHop
+// DROP and FORWARD do not have an actionNextHop
+message actionType{
+     ACTION_TYPE  actionType = 1;
+     string actionNextHop = 2;
+}
+
+// sessionId is returned by server side upon successful addSession
+// TODO versions of api's 
+message sessionRequest{
+  string inLif = 1;
+  string outLif = 2;
+  IP_VERSION ipVersion = 3;
+  bytes sourceIp = 4;
+  uint32 sourcePort = 5;
+  bytes destinationIp = 6;
+  uint32 destinationPort = 7;
+  PROTOCOL_ID protocolId = 8;
+  actionType action = 9;
+}
+
+// TODO versions of api's 
+message sessionResponse{
+  uint64  sessionId = 1 ;
+  uint64  inPackets = 2 ;
+  uint64  outPackets = 3 ;
+  uint64  inBytes  = 4 ;
+  uint64  outBytes = 5;
+  SESSION_STATE sessionState = 6 ;
+  SESSION_CLOSE_CODE sessionCloseCode = 7 ;
+  REQUEST_STATUS requestStatus = 8;
+  google.protobuf.Timestamp startTime = 9;
+  google.protobuf.Timestamp endTime = 10;
+}
+
+message statisticsRequestArgs{
+  //  pageSize = 0 will turn off paging
+  //  does paging make sense for a stream ?
+  //  the client should read/process each event on the stream anyway.
+  uint32  pageSize=1;
+  //  what other arguments make sense for retrieving or filtering streams 
+}
