@@ -110,7 +110,7 @@ Session endTime
 MAINTAINERS
 -----------
 
-Developed for AT&T by Brian Freeman (https://github.com/bdfreeman1421), May 2020
+Developed for AT&T by Brian Freeman and Richard Bowman, June 2020
 
 Current maintainers:
  * Brian Freeman (at&t)
