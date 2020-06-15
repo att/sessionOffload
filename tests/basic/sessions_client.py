@@ -42,6 +42,7 @@ def session_addSession(stub):
     sessionResponse =  stub.addSession( session)
     print("Adding Session")
     print(sessionResponse.sessionId)
+    return sessionResponse.sessionId
 
 def session_addSession_ipv6(stub):
     session=sessions_pb2.sessionRequest()
@@ -58,6 +59,7 @@ def session_addSession_ipv6(stub):
     sessionResponse =  stub.addSession( session)
     print("Adding Session")
     print(sessionResponse.sessionId)
+    return sessionResponse.sessionId
 
 def session_getSession(stub):
     sessionResponse =  stub.getSession( sessions_pb2.sessionId(sessionId=1001))
@@ -98,6 +100,7 @@ def session_addMirrorSession(stub):
     sessionResponse =  stub.addSession( session)
     print("Adding Session")
     print(sessionResponse.sessionId)
+    return sessionResponse.sessionId
 
 
 def session_getClosedSessions(stub):
@@ -127,6 +130,58 @@ def session_getAllSessions(stub):
         print("Session endTime",sessionResponse.endTime)
         print("##########################")
 
+def run_add_session_ipv4():
+    with open('ssl/server.crt', 'rb') as f:
+        creds = grpc.ssl_channel_credentials(f.read())
+        channel = grpc.secure_channel('localhost:3443', creds)
+        stub = sessions_pb2_grpc.SessionTableStub(channel)
+        print("-------------- Add IPv4 Session --------------")
+        result = session_addSession(stub)
+        print("SESSIONID=",result)
+def run_add_session_ipv6():
+    with open('ssl/server.crt', 'rb') as f:
+        creds = grpc.ssl_channel_credentials(f.read())
+        channel = grpc.secure_channel('localhost:3443', creds)
+        stub = sessions_pb2_grpc.SessionTableStub(channel)
+        print("-------------- Add IPv6 Session --------------")
+        result = session_addSession_ipv6(stub)
+        print("SESSIONID=",result)
+def run_get_session():
+    with open('ssl/server.crt', 'rb') as f:
+        creds = grpc.ssl_channel_credentials(f.read())
+        channel = grpc.secure_channel('localhost:3443', creds)
+        stub = sessions_pb2_grpc.SessionTableStub(channel)
+        print("-------------- Get Session --------------")
+        session_getSession(stub)
+def run_delete_session():
+    with open('ssl/server.crt', 'rb') as f:
+        creds = grpc.ssl_channel_credentials(f.read())
+        channel = grpc.secure_channel('localhost:3443', creds)
+        stub = sessions_pb2_grpc.SessionTableStub(channel)
+        print("-------------- Delete Session --------------")
+        session_deleteSession(stub)
+def run_add_mirror_session():
+    with open('ssl/server.crt', 'rb') as f:
+        creds = grpc.ssl_channel_credentials(f.read())
+        channel = grpc.secure_channel('localhost:3443', creds)
+        stub = sessions_pb2_grpc.SessionTableStub(channel)
+        print("-------------- Add Mirror Session --------------")
+        result=session_addMirrorSession(stub)
+        print("SESSIONID=",result)
+def run_get_closed_sessions():
+    with open('ssl/server.crt', 'rb') as f:
+        creds = grpc.ssl_channel_credentials(f.read())
+        statsChannel = grpc.secure_channel('localhost:3444', creds)
+        statsStub = sessions_pb2_grpc.SessionStatisticsTableStub(statsChannel)
+        print("-------------- Check for Closed Sessions --------------")
+        session_getClosedSessions(statsStub)
+def run_get_all_sessions():
+    with open('ssl/server.crt', 'rb') as f:
+        creds = grpc.ssl_channel_credentials(f.read())
+        statsChannel = grpc.secure_channel('localhost:3444', creds)
+        statsStub = sessions_pb2_grpc.SessionStatisticsTableStub(statsChannel)
+        print("-------------- Get All Sessions --------------")
+        session_getAllSessions(statsStub)
 def run():
     # NOTE(gRPC Python Team): sessions_pb2.close() is possible on a channel and should be
     # used in circumstances in which the with statement does not fit the needs
