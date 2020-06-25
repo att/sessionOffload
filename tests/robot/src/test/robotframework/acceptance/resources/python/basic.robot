@@ -24,6 +24,10 @@ Start Server 2
      [Documentation]    Start gRPC Stats Server 
      Start Process	python   	sessions_stats_server.py  	cwd=${projectRoot}/../buildBasic   alias=server2 
 
+Start Server 3
+     [Documentation]    Start gRPC Activation Server 
+     Start Process  python    activation_server.py      cwd=${projectRoot}/../buildBasic   alias=server2 
+
 Run Client
      [Documentation]    Start gRPC Client 
      Run Process	python   	sessions_client.py 	cwd=${projectRoot}/../buildBasic   alias=client

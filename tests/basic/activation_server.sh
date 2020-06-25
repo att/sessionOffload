@@ -1,5 +1,5 @@
 #============LICENSE_START=============================================================================================================
-# Copyright (C) 2020 AT&T Intellectual Property. All rights reserved.
+# Copyright (C) 2020 Palo Alto Networks Intellectual Property. All rights reserved.
 #===================================================================
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,18 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #============LICENSE_END===============================================================================================================
-targetdir=buildPythonSimulator
-if [ ! -d "$targetdir" ]; then
-    mkdir -p $targetdir/ssl
-fi
-cd $targetdir
-# copy the client and server python scripts
-cp ../pythonSimulator/*.py .
-# copy the client and server start scripts
-cp ../pythonSimulator/*.sh .
-# copy the ssl cert and key
-cd ssl
-cp ../../basic/ssl/* .
-# build the libraries from proto buf files
-cd ..
-python -m grpc_tools.protoc -I../../protos --python_out=. --grpc_python_out=. ../../protos/openoffload.proto
+python activation_server.py

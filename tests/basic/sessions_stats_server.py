@@ -25,11 +25,11 @@ import struct
 import grpc
 import google.protobuf.timestamp_pb2
 
-import sessions_pb2
-import sessions_pb2_grpc
+import openoffload_pb2
+import openoffload_pb2_grpc
 
 
-class SessionStatisticsTableServicer(sessions_pb2_grpc.SessionStatisticsTableServicer):
+class SessionStatisticsTableServicer(openoffload_pb2_grpc.SessionStatisticsTableServicer):
     """Provides methods that implement functionality of session statistics table server."""
     """ rpc getAllSessions(sessionStatisticsArgs) returns (sessionResponse) {}   """
     """ rpc getClosedSessions(sessionStatisticsArgs) returns (sessionResponse) {}   """
@@ -37,10 +37,10 @@ class SessionStatisticsTableServicer(sessions_pb2_grpc.SessionStatisticsTableSer
             print("############ GET CLOSED SESSIONS ##################");
             timestamp = google.protobuf.timestamp_pb2.Timestamp()
             timestamp.GetCurrentTime()
-            session1 = sessions_pb2.sessionResponse(sessionId=1001, sessionState=sessions_pb2._CLOSED,
-              requestStatus=sessions_pb2._ACCEPTED, inPackets=1000, outPackets=200000, startTime=timestamp);
-            session2 = sessions_pb2.sessionResponse(sessionId=1002, sessionState=sessions_pb2._CLOSED,
-              requestStatus=sessions_pb2._ACCEPTED, inPackets=2000, outPackets=400000, startTime=timestamp);
+            session1 = openoffload_pb2.sessionResponse(sessionId=1001, sessionState=openoffload_pb2._CLOSED,
+              requestStatus=openoffload_pb2._ACCEPTED, inPackets=1000, outPackets=200000, startTime=timestamp);
+            session2 = openoffload_pb2.sessionResponse(sessionId=1002, sessionState=openoffload_pb2._CLOSED,
+              requestStatus=openoffload_pb2._ACCEPTED, inPackets=2000, outPackets=400000, startTime=timestamp);
             yield session1
             yield session2
 
@@ -48,17 +48,17 @@ class SessionStatisticsTableServicer(sessions_pb2_grpc.SessionStatisticsTableSer
             print("############ GET ALL SESSIONS ##################");
             timestamp = google.protobuf.timestamp_pb2.Timestamp()
             timestamp.GetCurrentTime()
-            session1 = sessions_pb2.sessionResponse(sessionId=1001, sessionState=sessions_pb2._CLOSED,
-              requestStatus=sessions_pb2._ACCEPTED, inPackets=1000, outPackets=200000, startTime=timestamp);
-            session2 = sessions_pb2.sessionResponse(sessionId=1002, sessionState=sessions_pb2._CLOSED,
-              requestStatus=sessions_pb2._ACCEPTED, inPackets=2000, outPackets=400000, startTime=timestamp);
+            session1 = openoffload_pb2.sessionResponse(sessionId=1001, sessionState=openoffload_pb2._CLOSED,
+              requestStatus=openoffload_pb2._ACCEPTED, inPackets=1000, outPackets=200000, startTime=timestamp);
+            session2 = openoffload_pb2.sessionResponse(sessionId=1002, sessionState=openoffload_pb2._CLOSED,
+              requestStatus=openoffload_pb2._ACCEPTED, inPackets=2000, outPackets=400000, startTime=timestamp);
             yield session1
             yield session2
 
 
 def statsServe():
     statsServer = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
-    sessions_pb2_grpc.add_SessionStatisticsTableServicer_to_server(
+    openoffload_pb2_grpc.add_SessionStatisticsTableServicer_to_server(
         SessionStatisticsTableServicer(), statsServer)
     with open('ssl/server.key', 'rb') as fs:
          private_key = fs.read()

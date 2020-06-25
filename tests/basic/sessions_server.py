@@ -25,11 +25,11 @@ import struct
 import grpc
 import google.protobuf.timestamp_pb2
 
-import sessions_pb2
-import sessions_pb2_grpc
+import openoffload_pb2
+import openoffload_pb2_grpc
 
 
-class SessionTableServicer(sessions_pb2_grpc.SessionTableServicer):
+class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
     """Provides methods that implement functionality of session table server."""
     """ rpc addSession(sessionRequest) returns (sessionResponse) {} """
     """ rpc getSession(sessionId) returns (sessionResponse) {}      """
@@ -42,43 +42,43 @@ class SessionTableServicer(sessions_pb2_grpc.SessionTableServicer):
     def addSession(self, request, context):
             print("############ ADD SESSION ##################");
             print("protocolID 6=TCP,17=UDP:",request.protocolId);
-            print("IP Version:", sessions_pb2._IP_VERSION.values_by_number[request.ipVersion].name)
+            print("IP Version:", openoffload_pb2._IP_VERSION.values_by_number[request.ipVersion].name)
 
-            if request.ipVersion == sessions_pb2._IPV4:
+            if request.ipVersion == openoffload_pb2._IPV4:
               print("sourceIp:",socket.inet_ntop(socket.AF_INET, request.sourceIp));
             else:
               print("sourceIp:",socket.inet_ntop(socket.AF_INET6, request.sourceIp));
             print("sourcePort:", int(request.sourcePort));
-            if request.ipVersion == sessions_pb2._IPV4:
+            if request.ipVersion == openoffload_pb2._IPV4:
               print("destinationIp:",socket.inet_ntop(socket.AF_INET, request.destinationIp));
             else:
               print("destinationIp:",socket.inet_ntop(socket.AF_INET6, request.destinationIp));
             print("destinationPort:", int(request.destinationPort));
             print("ActionType 0=DROP,1=FORWARD,2=MIRROR,3=SNOOP:" , request.action.actionType)
             print("ActionNextHop:" , request.action.actionNextHop)
-            return sessions_pb2.sessionResponse(sessionId=1001, requestStatus=sessions_pb2._ACCEPTED);
+            return openoffload_pb2.sessionResponse(sessionId=1001, requestStatus=openoffload_pb2._ACCEPTED);
 
     def getSession(self, request, context):
             print("############ GET SESSION ##################");
             print("sessionId:",request.sessionId);
             timestamp = google.protobuf.timestamp_pb2.Timestamp()
             timestamp.GetCurrentTime()
-            return sessions_pb2.sessionResponse(sessionId=1001, sessionState=sessions_pb2._ESTABLISHED,
-              requestStatus=sessions_pb2._ACCEPTED, inPackets=1000, outPackets=200000,
+            return openoffload_pb2.sessionResponse(sessionId=1001, sessionState=openoffload_pb2._ESTABLISHED,
+              requestStatus=openoffload_pb2._ACCEPTED, inPackets=1000, outPackets=200000,
               startTime=timestamp);
     def deleteSession(self, request, context):
             print("############ DELETE SESSION ##################");
             print("sessionId:",request.sessionId);
             timestamp = google.protobuf.timestamp_pb2.Timestamp()
             timestamp.GetCurrentTime()
-            return sessions_pb2.sessionResponse(sessionId=1001, sessionState=sessions_pb2._CLOSING_1,
-              requestStatus=sessions_pb2._ACCEPTED, inPackets=2000, outPackets=400000,
+            return openoffload_pb2.sessionResponse(sessionId=1001, sessionState=openoffload_pb2._CLOSING_1,
+              requestStatus=openoffload_pb2._ACCEPTED, inPackets=2000, outPackets=400000,
               startTime=timestamp, endTime=timestamp);
 
 
 def sessionServe():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
-    sessions_pb2_grpc.add_SessionTableServicer_to_server(
+    openoffload_pb2_grpc.add_SessionTableServicer_to_server(
         SessionTableServicer(), server)
     with open('ssl/server.key', 'rb') as f:
          private_key = f.read()
