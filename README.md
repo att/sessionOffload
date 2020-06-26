@@ -19,15 +19,15 @@ $ ./builditBasic.sh
 
 # Testing the sample code
 
-Create three separate terminal windows a client and two server windows
+Create four separate terminal windows a client and three server windows
 
-## Server 1 Window (sessions)
+## Server 1  Window (Offload sessions)
 
-Start the sessions server in one window by going to the build directory and running the script below.
+Start the offload server in one window by going to the build directory and running the script below.
 
 ```bash
 $ cd buildBasic
-$ ./runServer1.sh
+$ ./runOffloadServer.sh
 ```
 ## Server 2 Window (statistics)
 
@@ -35,11 +35,21 @@ Start the statistics server in another window by going to the build directory an
 
 ```bash
 $ cd buildBasic
-$ ./runServer2.sh
+$ ./runStatsServer.sh
 ```
+
+## Server 3 Window (activation)
+
+Start the activation server in another window by going to the build directory and running the script below.
+
+```bash
+$ cd buildBasic
+$ ./runActivationServer.sh
+```
+
 ## Client window
 
-Start the client in the third window by going to the build directory and running the script below.
+Start the client in the fourth window by going to the build directory and running the script below.
 
 ```bash
 $ cd buildBasic
@@ -48,34 +58,38 @@ $ ./runClient.sh
 There should be results in the client window similar to the below:
 
 ```bash
--------------- Add Session --------------
+-------------- Add IPv4 Session --------------
+Adding Session
+1001
+-------------- Add IPv6 Session --------------
 Adding Session
 1001
 -------------- Get Session --------------
 Getting Session
 SessionId: 1001
-Session State 0=ESTABLISHED : 0
+Session State: _ESTABLISHED
 Session RequestStatus: 0
-Session ReasonCode: 0
+Session SessionCloseCode: 0
 Session InPackets 1000
 Session OutPackets 200000
-Session startTime seconds: 1587584225
-nanos: 580877000
+Session startTime seconds: 1593188883
+nanos: 978987000
 
 Session endTime
 -------------- Delete Session --------------
 Getting Session
 SessionId: 1001
-Session State 0=ESTABLISHED 1=CLOSING_1 : 1
 Session RequestStatus: 0
-Session ReasonCode: 0
+Session State: _CLOSING_1
+Session RequestStatus: 0
+Session SessionCloseCode: 0
 Session InPackets 2000
 Session OutPackets 400000
-Session startTime seconds: 1587584225
-nanos: 581815000
+Session startTime seconds: 1593188883
+nanos: 979860000
 
-Session endTime seconds: 1587584225
-nanos: 581815000
+Session endTime seconds: 1593188883
+nanos: 979860000
 
 -------------- Add Mirror and Forward Session --------------
 Adding Session
@@ -83,28 +97,84 @@ Adding Session
 -------------- Check for Closed Sessions --------------
 ### RECEIVED SESSION #####
 SessionId: 1001
-Session State 0=ESTABLISHED 1=CLOSING_1 : 3
+Session State: _CLOSED
 Session RequestStatus: 0
-Session ReasonCode: 0
+Session SessionCloseCode: 0
 Session InPackets 1000
 Session OutPackets 200000
-Session startTime seconds: 1587584225
-nanos: 583855000
+Session startTime seconds: 1593188883
+nanos: 989916000
 
 Session endTime
 ##########################
 ### RECEIVED SESSION #####
 SessionId: 1002
-Session State 0=ESTABLISHED 1=CLOSING_1 : 3
+Session State: _CLOSED
 Session RequestStatus: 0
-Session ReasonCode: 0
+Session SessionCloseCode: 0
 Session InPackets 2000
 Session OutPackets 400000
-Session startTime seconds: 1587584225
-nanos: 583855000
+Session startTime seconds: 1593188883
+nanos: 989916000
 
 Session endTime
 ##########################
+### RECEIVED SESSION #####
+SessionId: 1001
+Session State: _CLOSED
+Session RequestStatus: 0
+Session SessionCloseCode: 0
+Session InPackets 1000
+Session OutPackets 200000
+Session startTime seconds: 1593188883
+nanos: 992831000
+
+Session endTime
+##########################
+### RECEIVED SESSION #####
+SessionId: 1002
+Session State: _CLOSED
+Session RequestStatus: 0
+Session SessionCloseCode: 0
+Session InPackets 2000
+Session OutPackets 400000
+Session startTime seconds: 1593188883
+nanos: 992831000
+
+Session endTime
+##########################
+
+
+------------Creating new devices---------------------
+
+Adding Device Description:  Bluefield-1
+Status:  _DEVICE_REGISTERED
+Adding Device Description:  XDP
+Status:  _DEVICE_REGISTERED
+
+------------- Listing available Devices --------------------
+
+### Registered Device ####
+Name:  Bluefield-1
+Description:  Acme SmartNIC
+Type:  _SMARTNIC
+Session Capacity:  2000000
+Session Rate:  100000
+### Registered Device ####
+Name:  XDP
+Description:  Software Implementation
+Type:  _SOFTWARE
+Session Capacity:  200000
+Session Rate:  10000
+
+------------- Activating Device --------------------
+
+### Activating Device ####
+Activated Device:  Bluefield-1
+Status:  _DEVICE_ACTIVATED
+
+------------- Activation Tests Complete --------------------
+
 ```
 
 MAINTAINERS
