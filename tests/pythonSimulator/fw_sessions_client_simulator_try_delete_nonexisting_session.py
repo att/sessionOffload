@@ -28,26 +28,26 @@ import socket
 
 import grpc
 
-import sessions_pb2
-import sessions_pb2_grpc
+import openoffload_pb2
+import openoffload_pb2_grpc
 
 
 
 
 
 def run():
-    # NOTE(gRPC Python Team): sessions_pb2.close() is possible on a channel and should be
+    # NOTE(gRPC Python Team): openoffload_pb2.close() is possible on a channel and should be
     # used in circumstances in which the with statement does not fit the needs
     # of the code.
     with open('ssl/server.crt', 'rb') as f:
         creds = grpc.ssl_channel_credentials(f.read())
         channel = grpc.secure_channel('localhost:3443', creds)
-        stub = sessions_pb2_grpc.SessionTableStub(channel)
+        stub = openoffload_pb2_grpc.SessionTableStub(channel)
 
 
         print("\n\ntry to delete and send a int64 session id that does not exist...")
         try:
-          sessionDeleteResponse = stub.deleteSession( sessions_pb2.sessionId(sessionId=12333333))
+          sessionDeleteResponse = stub.deleteSession( openoffload_pb2.sessionId(sessionId=12333333))
         except grpc.RpcError as e:
           print(f"ERROR Exception Caught: {e}")
 
@@ -56,7 +56,7 @@ def run():
           print(f"exception status code: #{status_code.name}")
           print(f"exception status code value: #{status_code.value}")
         else:
-            if sessionDeleteResponse.requestStatus == sessions_pb2._REJECTED_SESSION_NONEXISTENT:
+            if sessionDeleteResponse.requestStatus == openoffload_pb2._REJECTED_SESSION_NONEXISTENT:
                 print("Delete failed as expected since that session id did not exist")
 
 if __name__ == '__main__':

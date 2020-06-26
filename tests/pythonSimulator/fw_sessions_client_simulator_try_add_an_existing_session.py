@@ -28,21 +28,21 @@ import socket
 
 import grpc
 
-import sessions_pb2
-import sessions_pb2_grpc
+import openoffload_pb2
+import openoffload_pb2_grpc
 
 
 def session_addSession(stub):
-    session=sessions_pb2.sessionRequest()
+    session=openoffload_pb2.sessionRequest()
     session.inLif="ge0/0/1"
     session.outLif="ge0/0/2"
-    session.ipVersion=sessions_pb2._IPV4
+    session.ipVersion=openoffload_pb2._IPV4
     session.sourceIp=socket.inet_pton(socket.AF_INET, '10.2.2.4')
     session.sourcePort=12345
     session.destinationIp=socket.inet_pton(socket.AF_INET, '172.16.2.3')
     session.destinationPort=443
-    session.protocolId=sessions_pb2._TCP
-    session.action.actionType=sessions_pb2._FORWARD
+    session.protocolId=openoffload_pb2._TCP
+    session.action.actionType=openoffload_pb2._FORWARD
     session.action.actionNextHop = "12.2.3.4"
 
     print("Adding Session to Offload Engine...")
@@ -56,9 +56,9 @@ def session_addSession(stub):
       print(f"exception status code value: #{status_code.value}")
 
     else:
-      if sessionResponse.requestStatus == sessions_pb2._REJECTED_SESSION_ALREADY_EXISTS:
+      if sessionResponse.requestStatus == openoffload_pb2._REJECTED_SESSION_ALREADY_EXISTS:
           print(f"ERROR session already exists")
-      elif sessionResponse.requestStatus == sessions_pb2._REJECTED_SESSION_TABLE_FULL:
+      elif sessionResponse.requestStatus == openoffload_pb2._REJECTED_SESSION_TABLE_FULL:
           print(f"WARNING session table is full")
       else:
           print(f"new offload session added id: {sessionResponse.sessionId}")
@@ -67,13 +67,13 @@ def session_addSession(stub):
 
 
 def run():
-    # NOTE(gRPC Python Team): sessions_pb2.close() is possible on a channel and should be
+    # NOTE(gRPC Python Team): openoffload_pb2.close() is possible on a channel and should be
     # used in circumstances in which the with statement does not fit the needs
     # of the code.
     with open('ssl/server.crt', 'rb') as f:
         creds = grpc.ssl_channel_credentials(f.read())
         channel = grpc.secure_channel('localhost:3443', creds)
-        stub = sessions_pb2_grpc.SessionTableStub(channel)
+        stub = openoffload_pb2_grpc.SessionTableStub(channel)
 
         print("adding session")
         session_addSession(stub)

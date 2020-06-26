@@ -133,7 +133,7 @@ def session_getAllSessions(stub):
 def activation_registerDevice(stub):
     register = openoffload_pb2.DeviceDescription()
     register.name="Bluefield-1"
-    register.description = "Mellanox SmartNIC"
+    register.description = "Acme SmartNIC"
     register.type= openoffload_pb2._SMARTNIC
     register.sessionCapacity = 2000000
     register.sessionRate = 100000
@@ -165,7 +165,7 @@ def activation_activateDevice(stub):
     register = openoffload_pb2.DeviceDescription()
     print("### Activating Device ####")
     register.name="Bluefield-1"
-    register.description = "Mellanox SmartNIC"
+    register.description = "Acme SmartNIC"
     register.type= openoffload_pb2._SMARTNIC
     register.sessionCapacity = 2000000
     register.sessionRate = 100000
