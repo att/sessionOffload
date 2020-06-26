@@ -1,4 +1,5 @@
 // Copyright (C) 2020 AT&T Intellectual Property. All rights reserved.
+// Copyright (C) 2020 Palo Alto Networks Intellectual Property. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,11 +12,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+
 
 syntax = "proto3";
 
-package sessions.v1;
-option go_package = "sessions";
+package openoffload;
+
+option go_package = "openoffload";
 
 import "google/protobuf/timestamp.proto";
 
@@ -91,7 +95,7 @@ rpc getClosedSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
 // or have the applications have a mechanism to avoid duplicate sessionIDs across 
 // applications since there will be many applications instances to 1 switch
 message sessionId{
-  uint64 sessionId = 1;
+  int64 sessionId = 1;
 }
 
 // MIRROR and SNOOP require an actionNextHop
@@ -117,11 +121,11 @@ message sessionRequest{
 
 // TODO versions of api's 
 message sessionResponse{
-  uint64  sessionId = 1 ;
-  uint64  inPackets = 2 ;
-  uint64  outPackets = 3 ;
-  uint64  inBytes  = 4 ;
-  uint64  outBytes = 5;
+  int64  sessionId = 1 ;
+  int64  inPackets = 2 ;
+  int64  outPackets = 3 ;
+  int64  inBytes  = 4 ;
+  int64  outBytes = 5;
   SESSION_STATE sessionState = 6 ;
   SESSION_CLOSE_CODE sessionCloseCode = 7 ;
   REQUEST_STATUS requestStatus = 8;
@@ -133,6 +137,93 @@ message statisticsRequestArgs{
   //  pageSize = 0 will turn off paging
   //  does paging make sense for a stream ?
   //  the client should read/process each event on the stream anyway.
-  uint32  pageSize=1;
+  int32  pageSize=1;
   //  what other arguments make sense for retrieving or filtering streams 
+}
+enum InterfaceType{
+	_NONE = 0;
+	_SOFTWARE = 1;
+	_SMARTNIC = 2;
+	_NOS	  = 3; 
+}
+
+//enum RequiredCapabilities {
+//	_CAPABILITY1 = 0;
+//}
+
+enum ActivationStatusType {
+	_DEVICE_ACTIVATED = 0;
+	_DEVICE_DEACTIVATED = 1;
+}
+
+enum RegistrationStatusType {
+	_DEVICE_REGISTERED = 0;
+	_DEVICE_DEREGISTERED = 1;
+}
+//
+// Empty message simulating void
+message Empty {
+
+}
+service Activation {
+	//
+	// Discover implementations of OpenOffload
+	//
+	rpc GetAllImplementations(Empty) returns (ListOfDevices) {}
+	//
+	// Get the capabilities of an offload implementation
+	//
+	//rpc getCapabilities(ImplementationItem) returns (listOfCapabilities) {}
+	//
+	// Register and deregister the offload device
+	//
+	rpc activateOffload(DeviceDescription) returns (ActivationStatus) {}
+	rpc deactivateOffload(DeviceDescription) returns (ActivationStatus) {}
+	rpc registerOffloadDevice(DeviceDescription) returns (RegistrationStatus){}
+	rpc deregisterOffloadDevice(DeviceDescription) returns (RegistrationStatus){}
+}
+//
+//
+message DeviceDescription {
+	string name = 1;
+	InterfaceType type = 2;
+	string description = 3;
+	int32  sessionCapacity = 4;
+	int32  sessionRate = 5;
+}
+
+//
+// List of Implementations available
+//
+message ListOfDevices {
+	repeated DeviceDescription devices = 1;
+}
+//
+//
+message RegistrationStatus {
+	RegistrationStatusType status = 1;
+}
+//
+// Status of registration de-registration
+// may want to expand to include reason for failures
+//
+message ActivationStatus {
+	ActivationStatusType status = 1;
+	DeviceDescription device = 2;
+}
+//
+// NGFW can ask for a specific set of capabilities
+//
+message RequiredCapabilities {
+	int32 memoryAvailable = 1;
+	int32 sessionCapacity = 2;
+	int32 sessionRate = 3;
+}
+//
+// Offload implementation must return list of capabilities
+//
+message listOfCapabilities {
+	int32 memoryAvailable = 1;
+	int32 sessionCapacity = 2;
+	int32 sessionRate = 3;
 }

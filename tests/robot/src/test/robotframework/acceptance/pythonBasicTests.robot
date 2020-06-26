@@ -5,8 +5,9 @@ Resource         ./resources/python/basic.robot
 *** Test Cases ***
 Setup gRPC Tests
     Run buildBasic Script
-    Start Server 1
-    Start Server 2
+    Start Offload Server 
+    Start Stats Server 
+    Start Activation Server 
 Full Client Tests
     Run Client
 Add IPv4 Session Test
@@ -23,3 +24,7 @@ Get Closed Sessions Test
     Run Get Closed Sessions
 Get All Closed Sessions Test
     Run Get All Sessions
+Suite Teardown
+    Stop Activation Server
+    Stop Stats Server
+    Stop Offload Server

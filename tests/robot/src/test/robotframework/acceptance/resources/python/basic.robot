@@ -16,13 +16,17 @@ Run buildBasic Script
      [Documentation]    Run scripts to create buildBasic directory 
      Start Process	bash     builditBasic.sh    cwd=${projectRoot}/..    
 
-Start Server 1
+Start Offload Server 
      [Documentation]    Start gRPC Sessions Server 
-     Start Process	python   	sessions_server.py 	cwd=${projectRoot}/../buildBasic   alias=server1 
+     Start Process	python   	sessions_server.py 	cwd=${projectRoot}/../buildBasic   alias=offload
 
-Start Server 2
+Start Stats Server
      [Documentation]    Start gRPC Stats Server 
-     Start Process	python   	sessions_stats_server.py  	cwd=${projectRoot}/../buildBasic   alias=server2 
+     Start Process	python   	sessions_stats_server.py  	cwd=${projectRoot}/../buildBasic   alias=stats
+
+Start Activation Server
+     [Documentation]    Start gRPC Activation Server 
+     Start Process  python    activation_server.py      cwd=${projectRoot}/../buildBasic   alias=activation 
 
 Run Client
      [Documentation]    Start gRPC Client 
@@ -94,3 +98,14 @@ Run Get All Sessions
      Should Contain   ${result.stdout}     SessionId: 1002    
      Should Contain   ${result.stdout}     CLOSED 
 
+Stop Offload Server
+   [Documentation]  Stop Offload Server
+   Terminate Process   offload 
+
+Stop Stats Server
+   [Documentation]  Stop Stats Server
+   Terminate Process   stats
+
+Stop Activation Server
+   [Documentation]  Stop Activation Server
+   Terminate Process   activation

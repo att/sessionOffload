@@ -27,18 +27,18 @@ from ipaddress import IPv4Network, IPv4Address
 
 import grpc
 
-import sessions_pb2
-import sessions_pb2_grpc
+import openoffload_pb2
+import openoffload_pb2_grpc
 
 
 def session_getAllSessions(stub):
     sessionCnt=0
-    for sessionResponse in stub.getAllSessions(sessions_pb2.sessionId(sessionId=0)):
+    for sessionResponse in stub.getAllSessions(openoffload_pb2.sessionId(sessionId=0)):
       sessionCnt=sessionCnt+1
       print(f"SessionId: {sessionResponse.sessionId}")
-      print(f"\tSession State: {sessions_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name}")
+      print(f"\tSession State: {openoffload_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name}")
       print(f"\tSession InPackets: {sessionResponse.inPackets} InBytes: {sessionResponse.inBytes} OutPackets: {sessionResponse.outPackets} OutBytes: {sessionResponse.outBytes}")
-      print(f"\tSession End Reason: {sessions_pb2._SESSION_CLOSE_CODE.values_by_number[sessionResponse.sessionCloseCode].name}")
+      print(f"\tSession End Reason: {openoffload_pb2._SESSION_CLOSE_CODE.values_by_number[sessionResponse.sessionCloseCode].name}")
     print(f"***Found {sessionCnt} sessions")
 
 
@@ -50,7 +50,7 @@ def run():
     with open('ssl/server.crt', 'rb') as f:
         creds = grpc.ssl_channel_credentials(f.read())
         channel = grpc.secure_channel('localhost:3443', creds)
-        statsStub = sessions_pb2_grpc.SessionStatisticsTableStub(channel)
+        statsStub = openoffload_pb2_grpc.SessionStatisticsTableStub(channel)
         print("\n\n-------------- Watch the Sessions --------------")
         while True:
           session_getAllSessions(statsStub)
