@@ -57,8 +57,8 @@ def session_addSession(stub):
     global sessionTable
 
     session=openoffload_pb2.sessionRequest()
-    session.inLif="ge0/0/1"
-    session.outLif="ge0/0/2"
+    session.inLif= 1
+    session.outLif= 2
     session.ipVersion=openoffload_pb2._IPV4
     session.sourceIp=socket.inet_pton(socket.AF_INET, randomIp())
     session.sourcePort=int(random.randint(8192,65535))
@@ -116,8 +116,8 @@ def session_addSessionIpv6(stub):
     global sessionTable
 
     session=openoffload_pb2.sessionRequest()
-    session.inLif="ge0/0/1"
-    session.outLif="ge0/0/2"
+    session.inLif= 1
+    session.outLif= 2
     session.ipVersion=openoffload_pb2._IPV6
     session.sourceIp=socket.inet_pton(socket.AF_INET6, randomIpv6())
     session.sourcePort=int(random.randint(8192,65535))
@@ -212,8 +212,8 @@ def session_deleteSession(stub, sessionId):
 def session_addMirrorSession(stub):
     # not yet implemented within the local session table
     session=openoffload_pb2.sessionRequest()
-    session.inLif="ge0/1/1"
-    session.outLif="ge0/1/2"
+    session.inLif= 1
+    session.outLif= 2
     session.sourceIp="10.0.1.1"
     session.sourcePort=str(int.random(8096,65355))
     session.destinationIp="10.1.1.1"
@@ -306,11 +306,6 @@ def run():
           newSessionId=session_addSessionIpv6(stub)
 
         while True:
-
-          #print("\n\n-------------- Get All the Sessions --------------")
-          #session_getAllSessions(statsStub)
-
-
           print("\n-------------- Get All the Closed Sessions and update our session table  --------------")
           sessionClosedSessions(statsStub)
 

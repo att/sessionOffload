@@ -29,8 +29,8 @@ import openoffload_pb2_grpc
 
 def session_addSession(stub):
     session=openoffload_pb2.sessionRequest()
-    session.inLif="ge0/0/1"
-    session.outLif="ge0/0/2"
+    session.inLif= 1
+    session.outLif= 2
     session.sourceIp=socket.inet_pton(socket.AF_INET, "10.0.0.1")
     session.sourcePort=12345
     session.destinationIp=socket.inet_pton(socket.AF_INET, "10.1.0.3")
@@ -46,8 +46,8 @@ def session_addSession(stub):
 
 def session_addSession_ipv6(stub):
     session=openoffload_pb2.sessionRequest()
-    session.inLif="ge0/0/1"
-    session.outLif="ge0/0/2"
+    session.inLif= 1
+    session.outLif= 2
     session.sourceIp=socket.inet_pton(socket.AF_INET6, "2001:0db8:85a3:0000:0000:8a2e:0370:7332")
     session.sourcePort=4430
     session.destinationIp=socket.inet_pton(socket.AF_INET6, "2001:0db8:85a3:0000:0000:8a03:0370:234F")
@@ -88,8 +88,8 @@ def session_deleteSession(stub):
 
 def session_addMirrorSession(stub):
     session=openoffload_pb2.sessionRequest()
-    session.inLif="ge0/1/1"
-    session.outLif="ge0/1/2"
+    session.inLif= 1
+    session.outLif= 2
     session.sourceIp=socket.inet_pton(socket.AF_INET, "10.0.0.1")
     session.sourcePort=12345
     session.destinationIp=socket.inet_pton(socket.AF_INET, "10.1.0.3")
@@ -132,7 +132,7 @@ def session_getAllSessions(stub):
 
 def activation_registerDevice(stub):
     register = openoffload_pb2.DeviceDescription()
-    register.name="Bluefield-1"
+    register.name="Acme-1"
     register.description = "Acme SmartNIC"
     register.type= openoffload_pb2._SMARTNIC
     register.sessionCapacity = 2000000
@@ -164,7 +164,7 @@ def activation_getAllDevices(stub):
 def activation_activateDevice(stub):
     register = openoffload_pb2.DeviceDescription()
     print("### Activating Device ####")
-    register.name="Bluefield-1"
+    register.name="Acme-1"
     register.description = "Acme SmartNIC"
     register.type= openoffload_pb2._SMARTNIC
     register.sessionCapacity = 2000000

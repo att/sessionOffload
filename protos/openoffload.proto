@@ -108,8 +108,8 @@ message actionType{
 // sessionId is returned by server side upon successful addSession
 // TODO versions of api's 
 message sessionRequest{
-  string inLif = 1;
-  string outLif = 2;
+  uint32  inLif = 1;
+  uint32  outLif = 2;
   IP_VERSION ipVersion = 3;
   bytes sourceIp = 4;
   uint32 sourcePort = 5;
