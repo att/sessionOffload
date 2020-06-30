@@ -34,8 +34,8 @@ import openoffload_pb2_grpc
 
 def session_addSession(stub):
     session=openoffload_pb2.sessionRequest()
-    session.inLif="ge0/0/1"
-    session.outLif="ge0/0/2"
+    session.inLif= 1
+    session.outLif= 2
     session.ipVersion=openoffload_pb2._IPV4
     session.sourceIp=socket.inet_pton(socket.AF_INET, '10.2.2.4')
     session.sourcePort=12345
