@@ -23,6 +23,9 @@ jobs:
     - uses: actions/checkout@v2
 
     # Runs a single command using the runners shell
-    - name: Run basic robot tests
-      run: mvn clean install
-      working-directory: tests/robot
+    - name: Robot Framework
+      uses: joonvena/robotframework-docker-action@v0.1
+      env:
+        BROWSER: chrome
+        ROBOT_TESTS_DIR: ${{ github.workspace }}/tests/robot
+        ROBOT_REPORTS_DIR: ${{ github.workspace }}/tests/reports
