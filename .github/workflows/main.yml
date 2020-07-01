@@ -21,11 +21,17 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
+    
+    # Runs a single command using the runners shell
+    - name: Run basic robot tests
+      run: mvn clean install
+      working-directory: tests/robot
+      
 
     # Runs a single command using the runners shell
-    - name: Robot Framework
-      uses: joonvena/robotframework-docker-action@v0.1
-      env:
-        BROWSER: chrome
-        ROBOT_TESTS_DIR: ${{ github.workspace }}/tests/robot
-        ROBOT_REPORTS_DIR: ${{ github.workspace }}/tests/robot/target/robotframework-reports
+    #- name: Robot Framework
+    #  uses: joonvena/robotframework-docker-action@v0.1
+    #  env:
+    #    BROWSER: chrome
+    #    ROBOT_TESTS_DIR: ${{ github.workspace }}/tests/robot
+    #    ROBOT_REPORTS_DIR: ${{ github.workspace }}/tests/robot/target/robotframework-reports
