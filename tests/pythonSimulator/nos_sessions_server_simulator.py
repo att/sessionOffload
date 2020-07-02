@@ -35,7 +35,7 @@ offloadSessionTable = {}
 
 class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
     """Provides methods that implement functionality of session table server."""
-    """ rpc addSession(sessionRequest) returns (sessionResponse) {} """
+    """ rpc addSession(sessionRequest) returns (addSessionResponse) {} """
     """ rpc getSession(sessionId) returns (sessionResponse) {}      """
     """ rpc deleteSession(sessionId) returns (sessionResponse) {}   """
     global offloadSessionTable
@@ -91,7 +91,7 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
                 # Raise Exception on GRPC client
                 context.set_details(msg)
                 context.set_code(grpc.StatusCode.UNKNOWN)
-                return openoffload_pb2.sessionResponse(requestStatus=openoffload_pb2._REJECTED)
+                return openoffload_pb2.addSessionResponse(requestStatus=openoffload_pb2._REJECTED)
 
 
             # check that the same 7 tuple doesn't already exist
@@ -103,14 +103,14 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
                 # Raise Exception on GRPC client
                 #context.set_details(msg)
                 #context.set_code(grpc.StatusCode.UNKNOWN)
-                return openoffload_pb2.sessionResponse(requestStatus=openoffload_pb2._REJECTED_SESSION_ALREADY_EXISTS)
+                return openoffload_pb2.addSessionResponse(requestStatus=openoffload_pb2._REJECTED_SESSION_ALREADY_EXISTS)
 
             newSessionId = self.nextSessionId()
             # check if offloadSessionTable is already full
             if newSessionId < 0:
                 msg = (f"INFO: The session table is full and cannot support any new offload sessions at this time.")
                 print(msg)
-                return openoffload_pb2.sessionResponse(requestStatus=openoffload_pb2._REJECTED_SESSION_TABLE_FULL)
+                return openoffload_pb2.addSessionResponse(requestStatus=openoffload_pb2._REJECTED_SESSION_TABLE_FULL)
 
 
 
@@ -137,7 +137,7 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
                                                 "timeOut": 3600,
                                                 "sessionCloseCode": openoffload_pb2._NOT_CLOSED
                                               }
-            return openoffload_pb2.sessionResponse(sessionId=newSessionId, requestStatus=openoffload_pb2._ACCEPTED);
+            return openoffload_pb2.addSessionResponse(sessionId=newSessionId, requestStatus=openoffload_pb2._ACCEPTED);
 
     def findSessionByTuple(self, inLif, outLif, sourceIp, sourcePort, destinationIp, destinationPort, protocolId):
             for sessionId, session in offloadSessionTable.items():

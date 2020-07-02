@@ -14,7 +14,7 @@
 # limitations under the License.
 #============LICENSE_END===============================================================================================================
 targetdir=buildBasic
-if [ ! -d "$targetdir" ]; then
+if [ ! -d "$targetdir/ssl" ]; then
     mkdir -p $targetdir/ssl
 fi
 cd $targetdir

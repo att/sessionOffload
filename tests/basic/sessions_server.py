@@ -31,7 +31,7 @@ import openoffload_pb2_grpc
 
 class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
     """Provides methods that implement functionality of session table server."""
-    """ rpc addSession(sessionRequest) returns (sessionResponse) {} """
+    """ rpc addSession(sessionRequest) returns (addSessionResponse) {} """
     """ rpc getSession(sessionId) returns (sessionResponse) {}      """
     """ rpc deleteSession(sessionId) returns (sessionResponse) {}   """
 
@@ -56,7 +56,7 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
             print("destinationPort:", int(request.destinationPort));
             print("ActionType 0=DROP,1=FORWARD,2=MIRROR,3=SNOOP:" , request.action.actionType)
             print("ActionNextHop:" , request.action.actionNextHop)
-            return openoffload_pb2.sessionResponse(sessionId=1001, requestStatus=openoffload_pb2._ACCEPTED);
+            return openoffload_pb2.addSessionResponse(sessionId=1001, requestStatus=openoffload_pb2._ACCEPTED);
 
     def getSession(self, request, context):
             print("############ GET SESSION ##################");
