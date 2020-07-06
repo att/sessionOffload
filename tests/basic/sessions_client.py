@@ -39,10 +39,10 @@ def session_addSession(stub):
     session.ipVersion=openoffload_pb2._IPV4
     session.action.actionType=openoffload_pb2._FORWARD
     session.action.actionNextHop = "12.2.3.4"
-    sessionResponse =  stub.addSession( session)
+    addSessionResponse =  stub.addSession( session)
     print("Adding Session")
-    print(sessionResponse.sessionId)
-    return sessionResponse.sessionId
+    print(addSessionResponse.sessionId)
+    return addSessionResponse.sessionId
 
 def session_addSession_ipv6(stub):
     session=openoffload_pb2.sessionRequest()
@@ -56,10 +56,10 @@ def session_addSession_ipv6(stub):
     session.ipVersion=openoffload_pb2._IPV6
     session.action.actionType=openoffload_pb2._FORWARD
     session.action.actionNextHop = "12.2.3.4"
-    sessionResponse =  stub.addSession( session)
+    addSessionResponse =  stub.addSession( session)
     print("Adding Session")
-    print(sessionResponse.sessionId)
-    return sessionResponse.sessionId
+    print(addSessionResponse.sessionId)
+    return addSessionResponse.sessionId
 
 def session_getSession(stub):
     sessionResponse =  stub.getSession( openoffload_pb2.sessionId(sessionId=1001))

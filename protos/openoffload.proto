@@ -17,7 +17,12 @@
 
 syntax = "proto3";
 
-package openoffload;
+// will move to v1 at release 
+// increment beta1 to beta2 , etc for changes during development
+
+package openoffload.v1beta1;
+
+
 
 option go_package = "openoffload";
 
@@ -69,7 +74,7 @@ service SessionTable {
 
 
 // Adds a session
-rpc addSession(sessionRequest) returns (sessionResponse) {}
+rpc addSession(sessionRequest) returns (addSessionResponse) {}
 
 // Obtains the session 
 rpc getSession(sessionId) returns (sessionResponse) {}
@@ -106,7 +111,6 @@ message actionType{
 }
 
 // sessionId is returned by server side upon successful addSession
-// TODO versions of api's 
 message sessionRequest{
   uint32  inLif = 1;
   uint32  outLif = 2;
@@ -119,7 +123,14 @@ message sessionRequest{
   actionType action = 9;
 }
 
-// TODO versions of api's 
+
+
+message addSessionResponse{
+  int64  sessionId = 1 ;
+  REQUEST_STATUS requestStatus = 2;
+  google.protobuf.Timestamp startTime = 3;
+}
+
 message sessionResponse{
   int64  sessionId = 1 ;
   int64  inPackets = 2 ;
