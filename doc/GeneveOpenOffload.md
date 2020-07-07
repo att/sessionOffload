@@ -20,10 +20,10 @@ Three possibilities for the encapsulation format were considered.
 ### VXLAN 
 VXLAN while a popular standard does not have any extension mechanisms, VXLAN-GPE is designed to enable other embedded protocols, the only one currently defined is VXLAN-GPE with NSH. NSH is designed for service chaining and as such is fairly complex.
 
-###Geneve 
+### Geneve 
 Geneve is  another option, it is designed to be a flexible protocol with the ability to register a fixed format with ICAN. Its extensibility allows the definition of a new protocol while using a standard header and well known port. The extensions can be registered with ICAN to identify a specific set of extensions.
 
-###Custom Protocol
+### Custom Protocol
 A custom protocol was considered and evaluated but after developing it, there were not a lot of differences between the custom protocol and the Geneve extensions. The custom protocol could have used fewer bits, but the required information required was the same.
 
 ## Comparisons
