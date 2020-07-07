@@ -47,11 +47,16 @@ The fields are as follows:
 For this Geneve extension there will be a new Option Class requested. The current Option Classes are listed in Reference 2 and the form to request a new Option Class is in Reference 3. 
 
 ## Optimizations
-Both GPE and Geneve have the option of encapsulating the original packet to either include the Ethernet header or exclude it and encapsulate the original packet starting at the IP header. Just encapsulating the packet at the IP header will save 14 bytes, however the choice of implementation is left to the hardware as the cost and complexity of the encapsulation is most likely the highest impact, rather than the bandwidth.
+ Geneve has the option of encapsulating the original packet to either include the Ethernet header or exclude it and encapsulate the original packet starting at the IP header. The ability to determine whether the ethernet header is included or not in the inner packet is set by the "Protocol Type" field in the Geneve header. The "Protocol Type" is defined as the by IEEE-802 as documented in Reference 4.
+
+Just encapsulating the packet at the IP header will save 14 bytes, however the choice of implementation is left to the hardware as the cost and complexity of the encapsulation is most likely the highest impact, rather than the bandwidth.
+
+
 
 ## References
 1. Geneve: Generic Network Virtualization Encapsulation
 2. IANA Network Virtualization Overlay (NVO3) Assignments
 3. Form to Request an Assignment from IANA for NVO3
+4. [IEEE-802 Numbers](https://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml)
 
 

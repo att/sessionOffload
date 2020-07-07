@@ -1,7 +1,7 @@
 # OpenOffload API Versioning
 
 ## Introduction
-OpenOffload follows a similar versioning model for its gRPC API as Kubernetes, see Reference 1. The intent is to enable teh evolution of the OpenOffload API while enabling developers of OpenOffload devices to have a stable APi to develop and deliver against.
+OpenOffload follows a similar versioning model for its gRPC API as Kubernetes, see Reference 1. The intent is to enable the evolution of the OpenOffload API while enabling developers of OpenOffload devices to have a stable APi to develop and deliver against.
 
 The naming convention will be as follows:
 
