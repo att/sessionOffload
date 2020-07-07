@@ -28,7 +28,9 @@ Beta verions have been tested and the API/features reviewed.
 ### Release Version
 Released versions will be supported for a specific period or time (or number of release versions).
 - Released versions will never change the interface, bugs will be fixed and the versions will be incremented.
-- Release versions will always be backwards compatible. 
+- Release versions will always be backwards compatible.
+- No Methods will be removed.
+- No fields will be removed only added.
 
 ## References
 
