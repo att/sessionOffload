@@ -6,7 +6,9 @@ OpenOffload follows a similar versioning model for its gRPC API as Kubernetes, s
 The naming convention will be as follows:
 
 **Alpha** /openoffload/v1/alpha1, this would be the first alpha of API version 1.
+
 **Beta** /openoffload/v1/beta1, this would be the first beta of API version 1
+
 **Release** /openoffload/v1, this would be the released and supported of API version 1
 
 ## Mapping to Product Release Versions
