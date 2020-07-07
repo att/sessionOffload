@@ -225,6 +225,20 @@ def run_get_all_sessions():
         statsStub = openoffload_pb2_grpc.SessionStatisticsTableStub(statsChannel)
         print("-------------- Get All Sessions --------------")
         session_getAllSessions(statsStub)
+
+def run_activation_sequence():
+    with open('ssl/server.crt', 'rb') as f:
+        creds = grpc.ssl_channel_credentials(f.read())
+        activationChannel =  grpc.secure_channel('localhost:3445',creds)
+        activationStub = openoffload_pb2_grpc.ActivationStub(activationChannel)
+        print("\n\n------------Creating new devices---------------------\n")
+        activation_registerDevice(activationStub)
+        print("\n------------- Listing available Devices --------------------\n")
+        activation_getAllDevices(activationStub)
+        print("\n------------- Activating Device --------------------\n")
+        activation_activateDevice(activationStub)
+        print("\n------------- Activation Tests Complete --------------------\n")
+
 def run():
     # NOTE(gRPC Python Team): openoffload_pb2.close() is possible on a channel and should be
     # used in circumstances in which the with statement does not fit the needs

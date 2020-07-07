@@ -98,6 +98,16 @@ Run Get All Sessions
      Should Contain   ${result.stdout}     SessionId: 1002    
      Should Contain   ${result.stdout}     CLOSED 
 
+Run Activation Sequence
+    [Documentation]   Run Activation Sequence
+    Run Process        python    -c  import sessions_client; sessions_client.run_activation_sequence();     cwd=${projectRoot}/../buildBasic   alias=client  
+     ${result} =	Get Process Result	client
+     Log       ${result.stderr}	
+     Log       ${result.stdout}	
+     Should Contain   ${result.stdout}     Status:  _DEVICE_REGISTERED
+     Should Contain   ${result.stdout}     Description:  Acme SmartNIC
+     Should Contain   ${result.stdout}     Status:  _DEVICE_ACTIVATED
+
 Stop Offload Server
    [Documentation]  Stop Offload Server
    Terminate Process   offload 
