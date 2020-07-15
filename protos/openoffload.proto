@@ -192,7 +192,7 @@ service Activation {
   //
   rpc registerOffloadDevice(deviceDescription) returns (registrationStatus){}
   rpc deregisterOffloadDevice(deviceDescription) returns (registrationStatus){}
-  rpc getRegistered(Empty) returns (deviceList) {}
+  rpc getRegisteredOffloadDevices(Empty) returns (deviceList) {}
   //
   // Device activation
   //
@@ -202,7 +202,7 @@ service Activation {
   //
   rpc activateOffload(deviceDescription) returns (activationStatus) {}
   rpc deactivateOffload(deviceDescription) returns (activationStatus) {}
-  rpc getActivated(Empty) returns (deviceDescription) {}
+  rpc getActivatedOffload(Empty) returns (deviceDescription) {}
 }
 //
 //

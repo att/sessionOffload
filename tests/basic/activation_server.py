@@ -35,9 +35,9 @@ class ActivationServicer(openoffload_pb2_grpc.ActivationServicer):
 	def __init__(self):
 		self.allDevices={}
 
-	def GetAllImplementations(self, request, context):
+	def getRegisteredOffloadDevices(self, request, context):
 		print("############ GetAllImplementations ##################")
-		listofdevice = openoffload_pb2.ListOfDevices()
+		listofdevice = openoffload_pb2.deviceList()
 		print('Devices: ', str(self.allDevices))
 		for value in self.allDevices.values():
 			listofdevice.devices.append(value)
@@ -46,21 +46,21 @@ class ActivationServicer(openoffload_pb2_grpc.ActivationServicer):
 	def activateOffload(self,request, context):
 		print("############ activateOffload ##################")
 		self.allDevices[request.name] = request
-		return openoffload_pb2.ActivationStatus(status=openoffload_pb2._DEVICE_ACTIVATED, device=request)
+		return openoffload_pb2.activationStatus(status=openoffload_pb2._DEVICE_ACTIVATED, device=request)
 
 	def deactivateOffload(self,request, context):
 		print("############ deactivateOffload ##################")
-		return openoffload_pb2.ActivationStatus(status=openoffload_pb2._DEVICE_DEACTIVATED, device=request)
+		return openoffload_pb2.activationStatus(status=openoffload_pb2._DEVICE_DEACTIVATED, device=request)
 
 	def registerOffloadDevice(self,request, context):
 		print("############ registerOffloadDevice ##################")
 		self.allDevices[request.name] = request
-		return openoffload_pb2.RegistrationStatus(status=openoffload_pb2._DEVICE_REGISTERED)
+		return openoffload_pb2.registrationStatus(status=openoffload_pb2._DEVICE_REGISTERED)
 
 	def deregisterOffloadDevice(self,request, context):
 		print("############ deregisterOffloadDevice ##################")
 		del self.allDevices[request.name]
-		return openoffload_pb2.RegistrationStatus(status=openoffload_pb2._DEVICE_DEREGISTERED)
+		return openoffload_pb2.registrationStatus(status=openoffload_pb2._DEVICE_DEREGISTERED)
 
 def activationService():
 	server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
