@@ -1,14 +1,50 @@
 
-# sessionOffload
+# OpenOffload
 
 gRPC API to offload TCP and UDP packet processing from an application to a hardware switch
 
-# Requisites
+# Creating Language Bindings
+
+There are three language bindings implemented in the language Makefile.
+
+- Python
+- Golang
+- C++
+
+To generate the language bindings for a specific language the appropriate language and related gRPC tools need to be installed. It is the responsibility of individual implementer to create there client and server code. 
+
+## Generating code
+
+### Python
+
+```bash
+$ cd openoffload
+$ make all-py
+```
+
+### Golang
+
+```bash
+$ cd openoffload
+$ make all-go
+```
+### C++
+
+```bash
+$ cd openoffload
+$ make all-cpp
+```
+
+# Installation and build for tests
+
+Depending on which language binding used different development tools need to be installed. To just run the tests only Python is required.
+
+## Requisites
 
 * Install Python
 * Install gRPC for Python (see References)
 
-# Build
+## Build
 
 The following command builds the Basic Python code
 Note: The PythonSimulator has more functional testing of error conditions and follows a similar build/test pattern.
@@ -17,11 +53,11 @@ Note: The PythonSimulator has more functional testing of error conditions and fo
 $ ./builditBasic.sh
 ```
 
-# Testing the sample code
+## Testing the sample code
 
 Create four separate terminal windows a client and three server windows
 
-## Server 1  Window (Offload sessions)
+### Server 1  Window (Offload sessions)
 
 Start the offload server in one window by going to the build directory and running the script below.
 
@@ -29,7 +65,7 @@ Start the offload server in one window by going to the build directory and runni
 $ cd buildBasic
 $ ./runOffloadServer.sh
 ```
-## Server 2 Window (statistics)
+### Server 2 Window (statistics)
 
 Start the statistics server in another window by going to the build directory and running the script below.
 
@@ -38,7 +74,7 @@ $ cd buildBasic
 $ ./runStatsServer.sh
 ```
 
-## Server 3 Window (activation)
+### Server 3 Window (activation)
 
 Start the activation server in another window by going to the build directory and running the script below.
 
@@ -47,7 +83,7 @@ $ cd buildBasic
 $ ./runActivationServer.sh
 ```
 
-## Client window
+### Client window
 
 Start the client in the fourth window by going to the build directory and running the script below.
 

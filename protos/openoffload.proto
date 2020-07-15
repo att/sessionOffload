@@ -20,11 +20,9 @@ syntax = "proto3";
 // will move to v1 at release 
 // increment beta1 to beta2 , etc for changes during development
 
-package openoffload.v1alpha1;
+package openoffload.v1alpha2;
 
-
-
-option go_package = "openoffload";
+option go_package = ".;openoffload_v1alpha2";
 
 import "google/protobuf/timestamp.proto";
 
@@ -151,25 +149,26 @@ message statisticsRequestArgs{
   int32  pageSize=1;
   //  what other arguments make sense for retrieving or filtering streams 
 }
-enum InterfaceType{
-	_NONE = 0;
-	_SOFTWARE = 1;
-	_SMARTNIC = 2;
-	_NOS	  = 3; 
+//////////////////////////////////////////////////////////////////////////////////
+//
+// Activation Service
+//
+enum INTERFACE_TYPE{
+  _NONE = 0;
+  _SOFTWARE = 1;
+  _SMARTNIC = 2;
+  _NOS    = 3; 
 }
 
-//enum RequiredCapabilities {
-//	_CAPABILITY1 = 0;
-//}
 
-enum ActivationStatusType {
-	_DEVICE_ACTIVATED = 0;
-	_DEVICE_DEACTIVATED = 1;
+enum ACTIVATION_STATUS_TYPE {
+  _DEVICE_ACTIVATED = 0;
+  _DEVICE_DEACTIVATED = 1;
 }
 
-enum RegistrationStatusType {
-	_DEVICE_REGISTERED = 0;
-	_DEVICE_DEREGISTERED = 1;
+enum REGISTRATION_STATUS_TYPE {
+  _DEVICE_REGISTERED = 0;
+  _DEVICE_DEREGISTERED = 1;
 }
 //
 // Empty message simulating void
@@ -177,64 +176,61 @@ message Empty {
 
 }
 service Activation {
-	//
-	// Discover implementations of OpenOffload
-	//
-	rpc GetAllImplementations(Empty) returns (ListOfDevices) {}
-	//
-	// Get the capabilities of an offload implementation
-	//
-	//rpc getCapabilities(ImplementationItem) returns (listOfCapabilities) {}
-	//
-	// Register and deregister the offload device
-	//
-	rpc activateOffload(DeviceDescription) returns (ActivationStatus) {}
-	rpc deactivateOffload(DeviceDescription) returns (ActivationStatus) {}
-	rpc registerOffloadDevice(DeviceDescription) returns (RegistrationStatus){}
-	rpc deregisterOffloadDevice(DeviceDescription) returns (RegistrationStatus){}
+  //
+  // Register OpenOffload devices with a network function. Currently multiple
+  // devices could be registered. For instance a SmartNIC device and a Software
+  // device could be registered and the operator could decide to activate one or
+  // the other
+  //
+
+  // 
+  // Device registeration
+  //
+  // Registration is the process of telling the network function that a offload device
+  // is available for use and some metadata about the device. The metadata is there only
+  // for the operator to make a decision on which device to activate.
+  //
+  rpc registerOffloadDevice(deviceDescription) returns (registrationStatus){}
+  rpc deregisterOffloadDevice(deviceDescription) returns (registrationStatus){}
+  rpc getRegistered(Empty) returns (deviceList) {}
+  //
+  // Device activation
+  //
+  // Activation is the process of selecting a registered device and activating it on 
+  // the netwwork function. Currently only one network device is supported per network
+  // element.
+  //
+  rpc activateOffload(deviceDescription) returns (activationStatus) {}
+  rpc deactivateOffload(deviceDescription) returns (activationStatus) {}
+  rpc getActivated(Empty) returns (deviceDescription) {}
 }
 //
 //
-message DeviceDescription {
-	string name = 1;
-	InterfaceType type = 2;
-	string description = 3;
-	int32  sessionCapacity = 4;
-	int32  sessionRate = 5;
+message deviceDescription {
+  string name = 1;
+  INTERFACE_TYPE type = 2;
+  string description = 3;
+  int32  sessionCapacity = 4;
+  int32  sessionRate = 5;
 }
 
 //
-// List of Implementations available
+// List of Offload devices available to be activated
 //
-message ListOfDevices {
-	repeated DeviceDescription devices = 1;
+message deviceList {
+  repeated deviceDescription devices = 1;
 }
 //
+// Status of a registration request
 //
-message RegistrationStatus {
-	RegistrationStatusType status = 1;
+message registrationStatus {
+  REGISTRATION_STATUS_TYPE status = 1;
 }
 //
 // Status of registration de-registration
 // may want to expand to include reason for failures
 //
-message ActivationStatus {
-	ActivationStatusType status = 1;
-	DeviceDescription device = 2;
-}
-//
-// NGFW can ask for a specific set of capabilities
-//
-message RequiredCapabilities {
-	int32 memoryAvailable = 1;
-	int32 sessionCapacity = 2;
-	int32 sessionRate = 3;
-}
-//
-// Offload implementation must return list of capabilities
-//
-message listOfCapabilities {
-	int32 memoryAvailable = 1;
-	int32 sessionCapacity = 2;
-	int32 sessionRate = 3;
+message activationStatus {
+  ACTIVATION_STATUS_TYPE status = 1;
+  deviceDescription device = 2;
 }
