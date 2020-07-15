@@ -418,23 +418,24 @@ const char descriptor_table_protodef_openoffload_2eproto[] PROTOBUF_SECTION_VARI
   "alpha2.sessionResponse\"\0000\001\022k\n\021getClosedS"
   "essions\022+.openoffload.v1alpha2.statistic"
   "sRequestArgs\032%.openoffload.v1alpha2.sess"
-  "ionResponse\"\0000\0012\342\004\n\nActivation\022l\n\025regist"
+  "ionResponse\"\0000\0012\367\004\n\nActivation\022l\n\025regist"
   "erOffloadDevice\022\'.openoffload.v1alpha2.d"
   "eviceDescription\032(.openoffload.v1alpha2."
   "registrationStatus\"\000\022n\n\027deregisterOffloa"
   "dDevice\022\'.openoffload.v1alpha2.deviceDes"
   "cription\032(.openoffload.v1alpha2.registra"
-  "tionStatus\"\000\022P\n\rgetRegistered\022\033.openoffl"
-  "oad.v1alpha2.Empty\032 .openoffload.v1alpha"
-  "2.deviceList\"\000\022d\n\017activateOffload\022\'.open"
-  "offload.v1alpha2.deviceDescription\032&.ope"
-  "noffload.v1alpha2.activationStatus\"\000\022f\n\021"
-  "deactivateOffload\022\'.openoffload.v1alpha2"
-  ".deviceDescription\032&.openoffload.v1alpha"
-  "2.activationStatus\"\000\022V\n\014getActivated\022\033.o"
-  "penoffload.v1alpha2.Empty\032\'.openoffload."
-  "v1alpha2.deviceDescription\"\000B\030Z\026.;openof"
-  "fload_v1alpha2b\006proto3"
+  "tionStatus\"\000\022^\n\033getRegisteredOffloadDevi"
+  "ces\022\033.openoffload.v1alpha2.Empty\032 .openo"
+  "ffload.v1alpha2.deviceList\"\000\022d\n\017activate"
+  "Offload\022\'.openoffload.v1alpha2.deviceDes"
+  "cription\032&.openoffload.v1alpha2.activati"
+  "onStatus\"\000\022f\n\021deactivateOffload\022\'.openof"
+  "fload.v1alpha2.deviceDescription\032&.openo"
+  "ffload.v1alpha2.activationStatus\"\000\022]\n\023ge"
+  "tActivatedOffload\022\033.openoffload.v1alpha2"
+  ".Empty\032\'.openoffload.v1alpha2.deviceDesc"
+  "ription\"\000B\030Z\026.;openoffload_v1alpha2b\006pro"
+  "to3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_openoffload_2eproto_deps[1] = {
   &::descriptor_table_google_2fprotobuf_2ftimestamp_2eproto,
@@ -454,7 +455,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_ope
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_openoffload_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_openoffload_2eproto = {
-  false, false, descriptor_table_protodef_openoffload_2eproto, "openoffload.proto", 3422,
+  false, false, descriptor_table_protodef_openoffload_2eproto, "openoffload.proto", 3443,
   &descriptor_table_openoffload_2eproto_once, descriptor_table_openoffload_2eproto_sccs, descriptor_table_openoffload_2eproto_deps, 11, 1,
   schemas, file_default_instances, TableStruct_openoffload_2eproto::offsets,
   file_level_metadata_openoffload_2eproto, 11, file_level_enum_descriptors_openoffload_2eproto, file_level_service_descriptors_openoffload_2eproto,

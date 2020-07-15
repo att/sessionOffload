@@ -165,8 +165,8 @@ class ActivationStub(object):
         request_serializer=openoffload__pb2.deviceDescription.SerializeToString,
         response_deserializer=openoffload__pb2.registrationStatus.FromString,
         )
-    self.getRegistered = channel.unary_unary(
-        '/openoffload.v1alpha2.Activation/getRegistered',
+    self.getRegisteredOffloadDevices = channel.unary_unary(
+        '/openoffload.v1alpha2.Activation/getRegisteredOffloadDevices',
         request_serializer=openoffload__pb2.Empty.SerializeToString,
         response_deserializer=openoffload__pb2.deviceList.FromString,
         )
@@ -180,8 +180,8 @@ class ActivationStub(object):
         request_serializer=openoffload__pb2.deviceDescription.SerializeToString,
         response_deserializer=openoffload__pb2.activationStatus.FromString,
         )
-    self.getActivated = channel.unary_unary(
-        '/openoffload.v1alpha2.Activation/getActivated',
+    self.getActivatedOffload = channel.unary_unary(
+        '/openoffload.v1alpha2.Activation/getActivatedOffload',
         request_serializer=openoffload__pb2.Empty.SerializeToString,
         response_deserializer=openoffload__pb2.deviceDescription.FromString,
         )
@@ -216,7 +216,7 @@ class ActivationServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def getRegistered(self, request, context):
+  def getRegisteredOffloadDevices(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -243,7 +243,7 @@ class ActivationServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def getActivated(self, request, context):
+  def getActivatedOffload(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -263,8 +263,8 @@ def add_ActivationServicer_to_server(servicer, server):
           request_deserializer=openoffload__pb2.deviceDescription.FromString,
           response_serializer=openoffload__pb2.registrationStatus.SerializeToString,
       ),
-      'getRegistered': grpc.unary_unary_rpc_method_handler(
-          servicer.getRegistered,
+      'getRegisteredOffloadDevices': grpc.unary_unary_rpc_method_handler(
+          servicer.getRegisteredOffloadDevices,
           request_deserializer=openoffload__pb2.Empty.FromString,
           response_serializer=openoffload__pb2.deviceList.SerializeToString,
       ),
@@ -278,8 +278,8 @@ def add_ActivationServicer_to_server(servicer, server):
           request_deserializer=openoffload__pb2.deviceDescription.FromString,
           response_serializer=openoffload__pb2.activationStatus.SerializeToString,
       ),
-      'getActivated': grpc.unary_unary_rpc_method_handler(
-          servicer.getActivated,
+      'getActivatedOffload': grpc.unary_unary_rpc_method_handler(
+          servicer.getActivatedOffload,
           request_deserializer=openoffload__pb2.Empty.FromString,
           response_serializer=openoffload__pb2.deviceDescription.SerializeToString,
       ),

@@ -353,7 +353,7 @@ type ActivationClient interface {
 	//
 	RegisterOffloadDevice(ctx context.Context, in *DeviceDescription, opts ...grpc.CallOption) (*RegistrationStatus, error)
 	DeregisterOffloadDevice(ctx context.Context, in *DeviceDescription, opts ...grpc.CallOption) (*RegistrationStatus, error)
-	GetRegistered(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*DeviceList, error)
+	GetRegisteredOffloadDevices(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*DeviceList, error)
 	//
 	// Device activation
 	//
@@ -363,7 +363,7 @@ type ActivationClient interface {
 	//
 	ActivateOffload(ctx context.Context, in *DeviceDescription, opts ...grpc.CallOption) (*ActivationStatus, error)
 	DeactivateOffload(ctx context.Context, in *DeviceDescription, opts ...grpc.CallOption) (*ActivationStatus, error)
-	GetActivated(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*DeviceDescription, error)
+	GetActivatedOffload(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*DeviceDescription, error)
 }
 
 type activationClient struct {
@@ -392,9 +392,9 @@ func (c *activationClient) DeregisterOffloadDevice(ctx context.Context, in *Devi
 	return out, nil
 }
 
-func (c *activationClient) GetRegistered(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*DeviceList, error) {
+func (c *activationClient) GetRegisteredOffloadDevices(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*DeviceList, error) {
 	out := new(DeviceList)
-	err := c.cc.Invoke(ctx, "/openoffload.v1alpha2.Activation/getRegistered", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/openoffload.v1alpha2.Activation/getRegisteredOffloadDevices", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -419,9 +419,9 @@ func (c *activationClient) DeactivateOffload(ctx context.Context, in *DeviceDesc
 	return out, nil
 }
 
-func (c *activationClient) GetActivated(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*DeviceDescription, error) {
+func (c *activationClient) GetActivatedOffload(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*DeviceDescription, error) {
 	out := new(DeviceDescription)
-	err := c.cc.Invoke(ctx, "/openoffload.v1alpha2.Activation/getActivated", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/openoffload.v1alpha2.Activation/getActivatedOffload", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -441,7 +441,7 @@ type ActivationServer interface {
 	//
 	RegisterOffloadDevice(context.Context, *DeviceDescription) (*RegistrationStatus, error)
 	DeregisterOffloadDevice(context.Context, *DeviceDescription) (*RegistrationStatus, error)
-	GetRegistered(context.Context, *Empty) (*DeviceList, error)
+	GetRegisteredOffloadDevices(context.Context, *Empty) (*DeviceList, error)
 	//
 	// Device activation
 	//
@@ -451,7 +451,7 @@ type ActivationServer interface {
 	//
 	ActivateOffload(context.Context, *DeviceDescription) (*ActivationStatus, error)
 	DeactivateOffload(context.Context, *DeviceDescription) (*ActivationStatus, error)
-	GetActivated(context.Context, *Empty) (*DeviceDescription, error)
+	GetActivatedOffload(context.Context, *Empty) (*DeviceDescription, error)
 	mustEmbedUnimplementedActivationServer()
 }
 
@@ -465,8 +465,8 @@ func (*UnimplementedActivationServer) RegisterOffloadDevice(context.Context, *De
 func (*UnimplementedActivationServer) DeregisterOffloadDevice(context.Context, *DeviceDescription) (*RegistrationStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeregisterOffloadDevice not implemented")
 }
-func (*UnimplementedActivationServer) GetRegistered(context.Context, *Empty) (*DeviceList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetRegistered not implemented")
+func (*UnimplementedActivationServer) GetRegisteredOffloadDevices(context.Context, *Empty) (*DeviceList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRegisteredOffloadDevices not implemented")
 }
 func (*UnimplementedActivationServer) ActivateOffload(context.Context, *DeviceDescription) (*ActivationStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ActivateOffload not implemented")
@@ -474,8 +474,8 @@ func (*UnimplementedActivationServer) ActivateOffload(context.Context, *DeviceDe
 func (*UnimplementedActivationServer) DeactivateOffload(context.Context, *DeviceDescription) (*ActivationStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeactivateOffload not implemented")
 }
-func (*UnimplementedActivationServer) GetActivated(context.Context, *Empty) (*DeviceDescription, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetActivated not implemented")
+func (*UnimplementedActivationServer) GetActivatedOffload(context.Context, *Empty) (*DeviceDescription, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetActivatedOffload not implemented")
 }
 func (*UnimplementedActivationServer) mustEmbedUnimplementedActivationServer() {}
 
@@ -519,20 +519,20 @@ func _Activation_DeregisterOffloadDevice_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Activation_GetRegistered_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Activation_GetRegisteredOffloadDevices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ActivationServer).GetRegistered(ctx, in)
+		return srv.(ActivationServer).GetRegisteredOffloadDevices(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/openoffload.v1alpha2.Activation/GetRegistered",
+		FullMethod: "/openoffload.v1alpha2.Activation/GetRegisteredOffloadDevices",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ActivationServer).GetRegistered(ctx, req.(*Empty))
+		return srv.(ActivationServer).GetRegisteredOffloadDevices(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -573,20 +573,20 @@ func _Activation_DeactivateOffload_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Activation_GetActivated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Activation_GetActivatedOffload_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ActivationServer).GetActivated(ctx, in)
+		return srv.(ActivationServer).GetActivatedOffload(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/openoffload.v1alpha2.Activation/GetActivated",
+		FullMethod: "/openoffload.v1alpha2.Activation/GetActivatedOffload",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ActivationServer).GetActivated(ctx, req.(*Empty))
+		return srv.(ActivationServer).GetActivatedOffload(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -604,8 +604,8 @@ var _Activation_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Activation_DeregisterOffloadDevice_Handler,
 		},
 		{
-			MethodName: "getRegistered",
-			Handler:    _Activation_GetRegistered_Handler,
+			MethodName: "getRegisteredOffloadDevices",
+			Handler:    _Activation_GetRegisteredOffloadDevices_Handler,
 		},
 		{
 			MethodName: "activateOffload",
@@ -616,8 +616,8 @@ var _Activation_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Activation_DeactivateOffload_Handler,
 		},
 		{
-			MethodName: "getActivated",
-			Handler:    _Activation_GetActivated_Handler,
+			MethodName: "getActivatedOffload",
+			Handler:    _Activation_GetActivatedOffload_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
