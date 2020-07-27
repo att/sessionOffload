@@ -26,7 +26,7 @@ From the available OpenOffload devices registered the VNF administrator can sele
 Once the device has been activated it uses the information supplied in the registration process to securely connect to the OpenOffload device.
 
 ### Add Session
-Once the device is activated the VNF can decide to offload flows to the OpenOffload device. To do this the VNF sends an addSession message to the activsated OpenOffload device. At this point the VNF should not see any payload packets from the OpenOffload device, all packets for the session should be handled by the offload device.
+Once the device is activated the VNF can decide to offload flows to the OpenOffload device. To do this the VNF sends an addSession message to the activated OpenOffload device. At this point the VNF will continue to see packets "in-flight" from the network until the OpenOffload device starts processign the flow. Then the VNF should not see any payload packets from the OpenOffload device, all packets for the session should be handled by the offload device.
 
 This message is delivered as a RPC so the VNF will get a synchronous response with a status code.
 
