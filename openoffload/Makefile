@@ -23,12 +23,15 @@ vpath %.proto $(PROTOS_PATH)
 GOOUT := golang
 
 $(PROTO_NAME).pb.go: $(PROTO_NAME).proto
+	mkdir -p golang
 	protoc -I $(PROTOS_PATH)/ $(PROTO_NAME).proto  --go-grpc_out=$(GOOUT) --go_out=$(GOOUT)  $(PROTO_NAME).proto
 
 $(PROTO_NAME).pb.py: $(PROTO_NAME).proto
+	mkdir -p python
 	$(PYTHONCMD) -m grpc_tools.protoc -I $(PROTOS_PATH) --python_out=$(PYTHONOUT) --grpc_python_out=$(PYTHONOUT) $(PROTO_NAME).proto
 
 $(PROTO_NAME).pb.cc: $(PROTO_NAME).proto
+	mkdir -p cpp
 	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=cpp $(PROTO_NAME).proto
 
 
