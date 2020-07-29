@@ -2,5 +2,5 @@ tests/buildBasic/
 tests/buildPythonSimulator/
 openoffload/cpp/**
 openoffload/golang/**
-openoffload/pyhton/**
+openoffload/python/**
 
