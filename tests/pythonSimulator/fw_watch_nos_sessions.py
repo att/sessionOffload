@@ -31,9 +31,9 @@ import openoffload_pb2
 import openoffload_pb2_grpc
 
 
-def session_getAllSessions(stub):
+def session_getOffloadedSessions(stub, paramPageSize, paramPage):
     sessionCnt=0
-    for sessionResponse in stub.getAllSessions(openoffload_pb2.sessionId(sessionId=0)):
+    for sessionResponse in stub.getAllSessions(openoffload_pb2.statisticsRequestArgs(pageSize=paramPageSize, page=paramPage)):
       sessionCnt=sessionCnt+1
       print(f"SessionId: {sessionResponse.sessionId}")
       print(f"\tSession State: {openoffload_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name}")
@@ -53,8 +53,14 @@ def run():
         statsStub = openoffload_pb2_grpc.SessionStatisticsTableStub(channel)
         print("\n\n-------------- Watch the Sessions --------------")
         while True:
-          session_getAllSessions(statsStub)
+          print("\n\n-------------- Get All the Sessions --------------")
+          session_getOffloadedSessions(statsStub, 0, 0)
+
+          # lets try out Paging
+          print("\n\n-------------- Get the second five Sessions --------------")
+          session_getOffloadedSessions(statsStub, 5, 2)
           time.sleep(3)
+
           print("\n")
 
 if __name__ == '__main__':

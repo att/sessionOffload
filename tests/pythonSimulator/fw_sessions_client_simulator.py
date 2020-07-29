@@ -16,7 +16,10 @@
 # limitations under the License.
 #============LICENSE_END===============================================================================================================
 # Rich Bowman rb0161@att.com
-
+#
+# fw_sessions_client_simulator.py - This script simulates a FW that would receive the first packets of a
+# new session and then decide to offload by calling GRPC services on the nos_sessions_server_simulator.py
+#
 
 from __future__ import print_function
 
@@ -190,12 +193,6 @@ def session_getSession(stub, sessionId):
     print("Session startTime",sessionResponse.startTime)
     print("Session endTime",sessionResponse.endTime)
 
-def session_getAllSessions(stub):
-    for sessionResponse in stub.getAllSessions(openoffload_pb2.sessionId(sessionId=0)):
-      print(f"SessionId: {sessionResponse.sessionId}")
-      print(f"\tSession State: {openoffload_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name}")
-      print(f"\tSession InPackets: {sessionResponse.inPackets} InBytes: {sessionResponse.inBytes} OutPackets: {sessionResponse.outPackets} OutBytes: {sessionResponse.outBytes}")
-      print(f"\tSession End Reason: {openoffload_pb2._SESSION_CLOSE_CODE.values_by_number[sessionResponse.sessionCloseCode].name}")
 
 def session_deleteSession(stub, sessionId):
     sessionResponse =  stub.deleteSession( openoffload_pb2.sessionId(sessionId=sessionId))
@@ -290,6 +287,16 @@ def randomIpv6():
     return addr_str
 
 
+def session_getOffloadedSessions(stub, paramPageSize, paramPage):
+    sessionCnt=0
+    for sessionResponse in stub.getAllSessions(openoffload_pb2.statisticsRequestArgs(pageSize=paramPageSize, page=paramPage)):
+      sessionCnt=sessionCnt+1
+      print(f"SessionId: {sessionResponse.sessionId}")
+      print(f"\tSession State: {openoffload_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name}")
+      print(f"\tSession InPackets: {sessionResponse.inPackets} InBytes: {sessionResponse.inBytes} OutPackets: {sessionResponse.outPackets} OutBytes: {sessionResponse.outBytes}")
+      print(f"\tSession End Reason: {openoffload_pb2._SESSION_CLOSE_CODE.values_by_number[sessionResponse.sessionCloseCode].name}")
+    print(f"\n\tFound {sessionCnt} offloaded sessions")
+
 def run():
     # NOTE(gRPC Python Team): openoffload_pb2.close() is possible on a channel and should be
     # used in circumstances in which the with statement does not fit the needs
@@ -299,12 +306,24 @@ def run():
         channel = grpc.secure_channel('localhost:3443', creds)
         stub = openoffload_pb2_grpc.SessionTableStub(channel)
         statsStub = openoffload_pb2_grpc.SessionStatisticsTableStub(channel)
-        print("-------------- Adding 4 IPv4 & IPv6 Sessions --------------")
-        for x in range(2):
+        print("-------------- Initialize the FW session table ---------------")
+        print(" Some firewalls may want to get all the current offloaded sessions")
+        print(" and load them into its current session table.  An example could ")
+        print(" be if a firewall has offload sessions and crashes/reboots.\n\n") 
+        session_getOffloadedSessions(statsStub, 0, 0)
+        # we currently just print these on the screen, but an actual production 
+        # implementation would want to consider loading them into the firwall's 
+        # session table.
+
+
+        print("-------------- Adding 10 IPv4 & 10 IPv6 Sessions --------------")
+        for x in range(10):
           newSessionId=session_addSession(stub)
-        for x in range(2):
+        for x in range(10):
           newSessionId=session_addSessionIpv6(stub)
 
+        # We did not thread this code, but would expect parrallism be used to add new offload
+        # sessions and to receive the offloaded sessions that have closed.
         while True:
           print("\n-------------- Get All the Closed Sessions and update our session table  --------------")
           sessionClosedSessions(statsStub)
