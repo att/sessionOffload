@@ -131,7 +131,7 @@ def session_getAllSessions(stub):
         print("##########################")
 
 def activation_registerDevice(stub):
-    register = openoffload_pb2.DeviceDescription()
+    register = openoffload_pb2.deviceDescription()
     register.name="Acme-1"
     register.description = "Acme SmartNIC"
     register.type= openoffload_pb2._SMARTNIC
@@ -139,8 +139,8 @@ def activation_registerDevice(stub):
     register.sessionRate = 100000
     registerResponse =  stub.registerOffloadDevice(register)
     print("Adding Device Description: ", register.name)
-    print("Status: ", openoffload_pb2._REGISTRATIONSTATUSTYPE.values_by_number[registerResponse.status].name)
-    register = openoffload_pb2.DeviceDescription()
+    print("Status: ", openoffload_pb2._REGISTRATION_STATUS_TYPE.values_by_number[registerResponse.status].name)
+    register = openoffload_pb2.deviceDescription()
     register.name="XDP"
     register.description = "Software Implementation"
     register.type= openoffload_pb2._SOFTWARE
@@ -148,21 +148,21 @@ def activation_registerDevice(stub):
     register.sessionRate = 10000
     registerResponse =  stub.registerOffloadDevice(register)
     print("Adding Device Description: ", register.name)
-    print("Status: ", openoffload_pb2._REGISTRATIONSTATUSTYPE.values_by_number[registerResponse.status].name)
+    print("Status: ", openoffload_pb2._REGISTRATION_STATUS_TYPE.values_by_number[registerResponse.status].name)
 
 def activation_getAllDevices(stub):
-    Devices = stub.GetAllImplementations(openoffload_pb2.Empty())
+    Devices = stub.getRegisteredOffloadDevices(openoffload_pb2.Empty())
     listDevices = Devices.devices
     for device in listDevices:
         print("### Registered Device ####")
         print("Name: ", device.name)
         print("Description: ", device.description)
-        print("Type: ", openoffload_pb2._INTERFACETYPE.values_by_number[device.type].name)
+        print("Type: ", openoffload_pb2._INTERFACE_TYPE.values_by_number[device.type].name)
         print("Session Capacity: ", device.sessionCapacity)
         print("Session Rate: ",device.sessionRate)
 
 def activation_activateDevice(stub):
-    register = openoffload_pb2.DeviceDescription()
+    register = openoffload_pb2.deviceDescription()
     print("### Activating Device ####")
     register.name="Acme-1"
     register.description = "Acme SmartNIC"
@@ -171,7 +171,7 @@ def activation_activateDevice(stub):
     register.sessionRate = 100000
     activateStatus = stub.activateOffload(register)
     print("Activated Device: ", register.name)
-    print("Status: ", openoffload_pb2._ACTIVATIONSTATUSTYPE.values_by_number[activateStatus.status].name)
+    print("Status: ", openoffload_pb2._ACTIVATION_STATUS_TYPE.values_by_number[activateStatus.status].name)
 
 def run_add_session_ipv4():
     with open('ssl/server.crt', 'rb') as f:
