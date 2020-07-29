@@ -285,12 +285,12 @@ class SessionStatisticsTableServicer(openoffload_pb2_grpc.SessionStatisticsTable
 
     def getAllSessions(self, request, context):
             print("############ GET ALL SESSIONS ##################");
-            print("pageSize:",request.pageSize);
-            print("page:",request.page);
+            #print("pageSize:",request.pageSize);
+            #print("page:",request.page);
     
             sessionCount = len(offloadSessionTable)
 
-            print(f"Session table has {sessionCount} entries.")
+            print(f"Offload Session Table has {sessionCount} entries.")
             if request.pageSize and request.page:
               if request.page == 1:
                 startIndex = 0
@@ -305,11 +305,11 @@ class SessionStatisticsTableServicer(openoffload_pb2_grpc.SessionStatisticsTable
               startIndex = 0
               endIndex = sessionCount - 1
 
-            print(f"start index = {startIndex} end index = {endIndex}")
+            #print(f"start index = {startIndex} end index = {endIndex}")
             for x in range(startIndex, endIndex + 1):
               sessionId = list(offloadSessionTable)[x]
               session = offloadSessionTable[sessionId]
-              print(f"index = {x} returning session {sessionId}")
+              #print(f"index = {x} returning session {sessionId}")
               yield openoffload_pb2.sessionResponse(sessionId=sessionId, sessionState=session["state"], requestStatus=openoffload_pb2._ACCEPTED, inPackets=session["inPackets"], inBytes=session["inBytes"], outPackets=session["outPackets"], outBytes=session["outBytes"], startTime=session["startTime"], endTime=session["endTime"], sessionCloseCode=session["sessionCloseCode"]);
                 
 
