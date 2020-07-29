@@ -146,7 +146,8 @@ message statisticsRequestArgs{
   //  pageSize = 0 will turn off paging
   //  does paging make sense for a stream ?
   //  the client should read/process each event on the stream anyway.
-  int32  pageSize=1;
+  uint32  pageSize=100;
+  uint32  page=1;
   //  what other arguments make sense for retrieving or filtering streams 
 }
 //////////////////////////////////////////////////////////////////////////////////

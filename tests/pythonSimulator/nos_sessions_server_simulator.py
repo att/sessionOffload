@@ -15,6 +15,11 @@
 # limitations under the License.
 #============LICENSE_END===============================================================================================================
 # Rich Bowman rb0161@att.com
+#
+# nos_sessions_server_simulator.py - this script was written to simulate the offload device that 
+# implements the GRPC service and L4 Statefull Offload.
+#
+# We keep a session table in a Python dictionary named offloadSessionTable.
 
 """The Python implementation of the WB Application Offload session table server with a simulation of the NOS."""
 
@@ -31,6 +36,7 @@ import google.protobuf.timestamp_pb2
 import openoffload_pb2
 import openoffload_pb2_grpc
 
+# the L4 sessions that have been offloaded
 offloadSessionTable = {}
 
 class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
@@ -40,6 +46,7 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
     """ rpc deleteSession(sessionId) returns (sessionResponse) {}   """
     global offloadSessionTable
     lastSessionId = 1
+
     #maxSessionId = 500
     # set it low and watch session Ids roll over and get reused
     # set it low to see how a FW client handles receiving failures adding new sessions since the table is full
@@ -152,7 +159,7 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
 
             return None
 
-
+    # find and return a single session by the passed in sessionId
     def getSession(self, request, context):
             print("############ GET SESSION ##################");
             print("sessionId:",request.sessionId);
@@ -199,7 +206,9 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
 
 
 
-
+    # This method would not exist in a production environment.  Its purpose is to simulate
+    # traffic flowing through the offloaded sesstions, client RST, client FIN, server RST, server FIN,
+    # and session timeouts.  This runs in its own thread.
     def simulateSessionsTraffic(self):
 
         while(True):
@@ -276,10 +285,33 @@ class SessionStatisticsTableServicer(openoffload_pb2_grpc.SessionStatisticsTable
 
     def getAllSessions(self, request, context):
             print("############ GET ALL SESSIONS ##################");
+            print("pageSize:",request.pageSize);
+            print("page:",request.page);
+    
+            sessionCount = len(offloadSessionTable)
 
-            for sessionId, session in offloadSessionTable.items():
-              print(f" returning session {sessionId}")
+            print(f"Session table has {sessionCount} entries.")
+            if request.pageSize and request.page:
+              if request.page == 1:
+                startIndex = 0
+              else:
+                startIndex = request.pageSize * (request.page - 1)
+
+              endIndex = request.pageSize * request.page - 1
+              if endIndex > sessionCount - 1:
+                endIndex = sessionCount - 1
+
+            else:
+              startIndex = 0
+              endIndex = sessionCount - 1
+
+            print(f"start index = {startIndex} end index = {endIndex}")
+            for x in range(startIndex, endIndex + 1):
+              sessionId = list(offloadSessionTable)[x]
+              session = offloadSessionTable[sessionId]
+              print(f"index = {x} returning session {sessionId}")
               yield openoffload_pb2.sessionResponse(sessionId=sessionId, sessionState=session["state"], requestStatus=openoffload_pb2._ACCEPTED, inPackets=session["inPackets"], inBytes=session["inBytes"], outPackets=session["outPackets"], outBytes=session["outBytes"], startTime=session["startTime"], endTime=session["endTime"], sessionCloseCode=session["sessionCloseCode"]);
+                
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
