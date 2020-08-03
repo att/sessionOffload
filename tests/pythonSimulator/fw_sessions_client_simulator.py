@@ -297,13 +297,28 @@ def session_getOffloadedSessions(stub, paramPageSize, paramPage):
       print(f"\tSession End Reason: {openoffload_pb2._SESSION_CLOSE_CODE.values_by_number[sessionResponse.sessionCloseCode].name}")
     print(f"\n\tFound {sessionCnt} offloaded sessions")
 
-def run():
+
+def run_addSession():
     # NOTE(gRPC Python Team): openoffload_pb2.close() is possible on a channel and should be
     # used in circumstances in which the with statement does not fit the needs
     # of the code.
     with open('ssl/server.crt', 'rb') as f:
         creds = grpc.ssl_channel_credentials(f.read())
         channel = grpc.secure_channel('localhost:3443', creds)
+        stub = openoffload_pb2_grpc.SessionTableStub(channel)
+        statsStub = openoffload_pb2_grpc.SessionStatisticsTableStub(channel)
+        session_getOffloadedSessions(statsStub, 0, 0)
+        print("-------------- Adding IPv4 --------------")
+        newSessionId=session_addSession(stub)
+        print("SESSIONID=", newSessionId)
+
+def run():
+    # NOTE(gRPC Python Team): openoffload_pb2.close() is possible on a channel and should be
+    # used in circumstances in which the with statement does not fit the needs
+    # of the code.
+    with open('ssl/server.crt', 'rb') as f:
+        creds = grpc.ssl_channel_credentials(f.read())
+        channel = grpc.secure_channel('localhost:5443', creds)
         stub = openoffload_pb2_grpc.SessionTableStub(channel)
         statsStub = openoffload_pb2_grpc.SessionStatisticsTableStub(channel)
         print("-------------- Initialize the FW session table ---------------")
