@@ -20,9 +20,9 @@ syntax = "proto3";
 // will move to v1 at release 
 // increment beta1 to beta2 , etc for changes during development
 
-package openoffload.v1alpha2;
+package openoffload.v1alpha3;
 
-option go_package = ".;openoffload_v1alpha2";
+option go_package = ".;openoffload_v1alpha3";
 
 import "google/protobuf/timestamp.proto";
 
@@ -110,23 +110,23 @@ message actionType{
 
 // sessionId is returned by server side upon successful addSession
 message sessionRequest{
-  uint32  inLif = 1;
-  uint32  outLif = 2;
-  IP_VERSION ipVersion = 3;
-  bytes sourceIp = 4;
-  uint32 sourcePort = 5;
-  bytes destinationIp = 6;
-  uint32 destinationPort = 7;
-  PROTOCOL_ID protocolId = 8;
-  actionType action = 9;
+  int64  sessionId = 1 ;
+  uint32  inLif = 2;
+  uint32  outLif = 3;
+  IP_VERSION ipVersion = 4;
+  bytes sourceIp = 5;
+  uint32 sourcePort = 6;
+  bytes destinationIp = 7;
+  uint32 destinationPort = 8;
+  PROTOCOL_ID protocolId = 9;
+  actionType action = 10;
 }
 
 
 
 message addSessionResponse{
-  int64  sessionId = 1 ;
-  REQUEST_STATUS requestStatus = 2;
-  google.protobuf.Timestamp startTime = 3;
+  REQUEST_STATUS requestStatus = 1;
+  google.protobuf.Timestamp startTime = 2;
 }
 
 message sessionResponse{

@@ -41,7 +41,7 @@ Run Add Session Ipv4
      ${result} =	Get Process Result	client
      Log       ${result.stderr}	
      Log       ${result.stdout}	
-     Should Contain   ${result.stdout}     SESSIONID= 1001    
+     Should Contain   ${result.stdout}    Request Status:  _ACCEPTED
 
 
 Run Add Session Ipv6
@@ -50,7 +50,7 @@ Run Add Session Ipv6
      ${result} =	Get Process Result	client
      Log       ${result.stderr}	
      Log       ${result.stdout}	
-     Should Contain   ${result.stdout}     SESSIONID= 1001    
+     Should Contain   ${result.stdout}      Request Status:  _ACCEPTED
 
 Run Get Session 
      [Documentation]    Get Session
@@ -75,7 +75,7 @@ Run Add Mirror Session
      ${result} =	Get Process Result	client
      Log       ${result.stderr}	
      Log       ${result.stdout}	
-     Should Contain   ${result.stdout}     SESSIONID= 1001    
+     Should Contain   ${result.stdout}     Request Status:  _ACCEPTED  
 
 Run Get Closed Sessions
      [Documentation]    Get Closed Sessions
