@@ -143,6 +143,8 @@ def activation_registerDevice(stub):
     register.type= openoffload_pb2._SMARTNIC
     register.sessionCapacity = 2000000
     register.sessionRate = 100000
+    register.tcpSessionTimeout = 15
+    register.udpSessionTimeout = 30
     registerResponse =  stub.registerOffloadDevice(register)
     print("Adding Device Description: ", register.name)
     print("Status: ", openoffload_pb2._REGISTRATION_STATUS_TYPE.values_by_number[registerResponse.status].name)
@@ -152,6 +154,8 @@ def activation_registerDevice(stub):
     register.type= openoffload_pb2._SOFTWARE
     register.sessionCapacity = 200000
     register.sessionRate = 10000
+    register.tcpSessionTimeout = 15
+    register.udpSessionTimeout = 30
     registerResponse =  stub.registerOffloadDevice(register)
     print("Adding Device Description: ", register.name)
     print("Status: ", openoffload_pb2._REGISTRATION_STATUS_TYPE.values_by_number[registerResponse.status].name)
@@ -166,6 +170,8 @@ def activation_getAllDevices(stub):
         print("Type: ", openoffload_pb2._INTERFACE_TYPE.values_by_number[device.type].name)
         print("Session Capacity: ", device.sessionCapacity)
         print("Session Rate: ",device.sessionRate)
+        print("TCP Session Timeout: ", device.tcpSessionTimeout)
+        print("UDP Session Timeout: ",device.udpSessionTimeout)
 
 def activation_activateDevice(stub):
     register = openoffload_pb2.deviceDescription()
@@ -175,6 +181,8 @@ def activation_activateDevice(stub):
     register.type= openoffload_pb2._SMARTNIC
     register.sessionCapacity = 2000000
     register.sessionRate = 100000
+    register.tcpSessionTimeout = 15
+    register.udpSessionTimeout = 30
     activateStatus = stub.activateOffload(register)
     print("Activated Device: ", register.name)
     print("Status: ", openoffload_pb2._ACTIVATION_STATUS_TYPE.values_by_number[activateStatus.status].name)

@@ -213,6 +213,8 @@ message deviceDescription {
   string description = 3;
   int32  sessionCapacity = 4;
   int32  sessionRate = 5;
+  uint32 tcpSessionTimeout =  6;
+  uint32 udpSessionTimeout = 7;
 }
 
 //
