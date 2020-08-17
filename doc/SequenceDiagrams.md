@@ -1,11 +1,11 @@
 # Sequence Diagrams 
 
 ## Introduction
-The Open Offload API can be used for session offload in a Disagregated Scaleable Firewall (DSFW) Application.
+The Open Offload API can be used for session offload in a Disaggregated Scaleable Firewall (DSFW) Application.
 This page will show the use of the API in the context of the DSFW to help explain its constiuent parts.
 
 
-## High Level Archiecture
+## High Level Architecture
 ![](images/dsfw_arch.png)
 
 
@@ -13,7 +13,7 @@ This page will show the use of the API in the context of the DSFW to help explai
 ![](images/nos_settings.png)
 
 
-## Inspecting Session Offloag
+## Inspecting Session Offload
 ![](images/inspect_offload.png)
 
 
