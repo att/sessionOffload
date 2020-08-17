@@ -1,7 +1,7 @@
 # Sequence Diagrams 
 
 ## Introduction
-The Open Offload API can be used for session offload in a Disagregated Stateful Firewall (DSFW) Application(DSFW) Draft Open Offload Geneve Format
+The Open Offload API can be used for session offload in a Disagregated Scaleable Firewall (DSFW) Application.
 This page will show the use of the API in the context of the DSFW to help explain its constiuent parts.
 
 
