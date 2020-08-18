@@ -103,23 +103,23 @@ message sessionId{
 
 // MIRROR and SNOOP require an actionNextHop
 // DROP and FORWARD do not have an actionNextHop
-message actionType{
+message actionParameters{
      ACTION_TYPE  actionType = 1;
      string actionNextHop = 2;
 }
 
 // sessionId is returned by server side upon successful addSession
 message sessionRequest{
-  int64  sessionId = 1 ;
-  uint32  inLif = 2;
-  uint32  outLif = 3;
+  uint64  sessionId = 1 ;
+  int32  inLif = 2;
+  int32  outLif = 3;
   IP_VERSION ipVersion = 4;
   bytes sourceIp = 5;
   uint32 sourcePort = 6;
   bytes destinationIp = 7;
   uint32 destinationPort = 8;
   PROTOCOL_ID protocolId = 9;
-  actionType action = 10;
+  actionParameters action = 10;
 }
 
 
@@ -130,11 +130,11 @@ message addSessionResponse{
 }
 
 message sessionResponse{
-  int64  sessionId = 1 ;
-  int64  inPackets = 2 ;
-  int64  outPackets = 3 ;
-  int64  inBytes  = 4 ;
-  int64  outBytes = 5;
+  uint64  sessionId = 1 ;
+  uint64  inPackets = 2 ;
+  uint64  outPackets = 3 ;
+  uint64  inBytes  = 4 ;
+  uint64  outBytes = 5;
   SESSION_STATE sessionState = 6 ;
   SESSION_CLOSE_CODE sessionCloseCode = 7 ;
   REQUEST_STATUS requestStatus = 8;
@@ -213,8 +213,8 @@ message deviceDescription {
   string description = 3;
   int32  sessionCapacity = 4;
   int32  sessionRate = 5;
-  uint32 tcpSessionTimeout =  6;
-  uint32 udpSessionTimeout = 7;
+  int32 tcpSessionTimeout =  6;
+  int32 udpSessionTimeout = 7;
 }
 
 //
