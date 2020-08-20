@@ -98,7 +98,7 @@ rpc getClosedSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
 // or have the applications have a mechanism to avoid duplicate sessionIDs across 
 // applications since there will be many applications instances to 1 switch
 message sessionId{
-  int64 sessionId = 1;
+  uint64 sessionId = 1;
 }
 
 // MIRROR and SNOOP require an actionNextHop
