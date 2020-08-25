@@ -169,10 +169,8 @@ def session_addSessionIpv6(stub):
       return False
     else:
       if sessionResponse.requestStatus == openoffload_pb2._ACCEPTED:
-        #print(f"new session added Offload SessionId: {sessionResponse.sessionId}")
         print(f"new session added Offload device")
         sessionTable[sessionId]["offloaded"] = True
-        #sessionTable[sessionId]["offloadSessionId"] = sessionResponse.sessionId
       elif sessionResponse.requestStatus == openoffload_pb2._REJECTED_SESSION_TABLE_FULL:
         print(f"Offload Engine has no room for this session, Offload failed since offload session table is full")
       else:
@@ -317,14 +315,14 @@ def run():
 
         print("-------------- Adding 10 IPv4 & 10 IPv6 Sessions --------------")
         newSessionId=None
-        for x in range(2):
+        for x in range(10):
           newSessionId=session_addSession(stub)
           print(f"Added new session id: {newSessionId}")
 
         print("Fetch the session from Offload device for testing purposes.")
         session_getSession(stub, newSessionId)
 
-        for x in range(2):
+        for x in range(10):
           newSessionId=session_addSessionIpv6(stub)
 
         # We did not thread this code, but would expect parrallism be used to add new offload
