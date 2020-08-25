@@ -299,7 +299,6 @@ class SessionStatisticsTableServicer(openoffload_pb2_grpc.SessionStatisticsTable
             print("############ GET CLOSED SESSIONS ##################");
 
             for sessionId in list(offloadSessionTable):
-              #print(f"session {sessionId}")
               session = offloadSessionTable[sessionId]
               if session["state"] == openoffload_pb2._CLOSED:
                 del offloadSessionTable[sessionId]
