@@ -59,7 +59,10 @@ def nextSessionId():
 def session_addSession(stub):
     global sessionTable
 
+    sessionId = nextSessionId()
+
     session=openoffload_pb2.sessionRequest()
+    session.sessionId = sessionId
     session.inLif= 1
     session.outLif= 2
     session.ipVersion=openoffload_pb2._IPV4
@@ -71,7 +74,6 @@ def session_addSession(stub):
     session.action.actionType=openoffload_pb2._FORWARD
     session.action.actionNextHop = "12.2.3.4"
 
-    sessionId = nextSessionId()
     print(f"\nAdding Session to local table new id {sessionId}")
     sessionTable[sessionId] = {
                                 "inLif": session.inLif,
@@ -104,9 +106,10 @@ def session_addSession(stub):
       return False
     else:
       if sessionResponse.requestStatus == openoffload_pb2._ACCEPTED:
-        print(f"new session added Offload SessionId: {sessionResponse.sessionId}")
+        #:print(f"new session added Offload SessionId: {sessionResponse.sessionId}")
+        print(f"new session added to Offload device")
         sessionTable[sessionId]["offloaded"] = True
-        sessionTable[sessionId]["offloadSessionId"] = sessionResponse.sessionId
+        #sessionTable[sessionId]["offloadSessionId"] = sessionResponse.sessionId
       elif sessionResponse.requestStatus == openoffload_pb2._REJECTED_SESSION_TABLE_FULL:
         print(f"Offload Engine has no room for this session, Offload failed since offload session table is full")
       else:
@@ -118,7 +121,9 @@ def session_addSession(stub):
 def session_addSessionIpv6(stub):
     global sessionTable
 
+    sessionId = nextSessionId()
     session=openoffload_pb2.sessionRequest()
+    session.sessionId = sessionId
     session.inLif= 1
     session.outLif= 2
     session.ipVersion=openoffload_pb2._IPV6
@@ -130,7 +135,6 @@ def session_addSessionIpv6(stub):
     session.action.actionType=openoffload_pb2._FORWARD
     session.action.actionNextHop = "12.2.3.4"
 
-    sessionId = nextSessionId()
     print(f"\nAdding Session to local table new id {sessionId}")
     timestamp = Timestamp()
     sessionTable[sessionId] = {
@@ -165,9 +169,8 @@ def session_addSessionIpv6(stub):
       return False
     else:
       if sessionResponse.requestStatus == openoffload_pb2._ACCEPTED:
-        print(f"new session added Offload SessionId: {sessionResponse.sessionId}")
+        print(f"new session added Offload device")
         sessionTable[sessionId]["offloaded"] = True
-        sessionTable[sessionId]["offloadSessionId"] = sessionResponse.sessionId
       elif sessionResponse.requestStatus == openoffload_pb2._REJECTED_SESSION_TABLE_FULL:
         print(f"Offload Engine has no room for this session, Offload failed since offload session table is full")
       else:
@@ -180,8 +183,8 @@ def session_addSessionIpv6(stub):
 
 
 def session_getSession(stub, sessionId):
+    print(f"Getting Session id: {sessionId}")
     sessionResponse =  stub.getSession( openoffload_pb2.sessionId(sessionId=sessionId))
-    print(f"Getting Session {sessionId}")
     print("SessionId:", sessionResponse.sessionId)
     print("Session State 0=ESTABLISHED :",sessionResponse.sessionState)
     print("Session RequestStatus:",sessionResponse.requestStatus)
@@ -231,29 +234,23 @@ def sessionClosedSessions(stub):
     for sessionResponse in stub.getClosedSessions(openoffload_pb2.sessionId(sessionId=0)):
       print(f"\n\nOFFLOAD SESSION END - Closed Session Offload SessionId: {sessionResponse.sessionId}")
       print(f"current sessionTable size: {len(sessionTable)}")
-      foundSession=False
-      # now find this offload session id in our local Session Tablea
-      for sessionId, session in sessionTable.items():
-        print(f"checking session id:{sessionId} offload id:", session["offloadSessionId"])
-        #print("dump session: ", session)
-        if session["offloadSessionId"] == sessionResponse.sessionId:
-          foundSession=True
-          print(f"\tFW sessionID: {sessionId} Offload sessionId: {sessionResponse.sessionId} Session State: {openoffload_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name}")
-          print(f"\tSession Start Time our table:",datetime.datetime.fromtimestamp(session["startTime"]), "Start Time Offload table:", sessionResponse.startTime.seconds, "End Time Offfload table:", sessionResponse.endTime.seconds)
-          if session["ipVersion"] == openoffload_pb2._IPV4:
-            print("\tsrcIP: %s srcPort: %d destIP: %s destPort: %d" % (socket.inet_ntop(socket.AF_INET, session["sourceIp"]), session["sourcePort"], socket.inet_ntop(socket.AF_INET, session["destinationIp"]), session["destinationPort"]));
-          else:
-            print("\tsrcIP: %s srcPort: %d destIP: %s destPort: %d" % (socket.inet_ntop(socket.AF_INET6, session["sourceIp"]), session["sourcePort"], socket.inet_ntop(socket.AF_INET6, session["destinationIp"]), session["destinationPort"]));
-          print("\tSession InPackets: %d InBytes: %d OutPackets: %d OutBytes: %d" % (sessionResponse.inPackets + session["inPackets"], sessionResponse.inBytes + session["inBytes"], sessionResponse.outPackets + session["outPackets"], sessionResponse.outBytes + session["outBytes"]))
-          print(f"\tSession End Reason: {openoffload_pb2._SESSION_CLOSE_CODE.values_by_number[sessionResponse.sessionCloseCode].name}")
-          print(f"\tUPDATING FW Session Table to reflect how it closed and its counters.\n\tFW LOG would be created at session close.")
 
-          # delete from local Session Table
-          del sessionTable[sessionId]
-          break
+      if not sessionResponse.sessionId in sessionTable.keys():
+        print(f"\tERROR session id: {sessionResponse.sessionId} not found in local session table")
+      else: 
+        session = sessionTable[sessionResponse.sessionId]
+        print(f"\tFW sessionID: {sessionResponse.sessionId}  Session State: {openoffload_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name}")
+        print(f"\tSession Start Time our table:",datetime.datetime.fromtimestamp(session["startTime"]), "Start Time Offload table:", sessionResponse.startTime.seconds, "End Time Offfload table:", sessionResponse.endTime.seconds)
+        if session["ipVersion"] == openoffload_pb2._IPV4:
+          print("\tsrcIP: %s srcPort: %d destIP: %s destPort: %d" % (socket.inet_ntop(socket.AF_INET, session["sourceIp"]), session["sourcePort"], socket.inet_ntop(socket.AF_INET, session["destinationIp"]), session["destinationPort"]));
+        else:
+          print("\tsrcIP: %s srcPort: %d destIP: %s destPort: %d" % (socket.inet_ntop(socket.AF_INET6, session["sourceIp"]), session["sourcePort"], socket.inet_ntop(socket.AF_INET6, session["destinationIp"]), session["destinationPort"]));
+        print("\tSession InPackets: %d InBytes: %d OutPackets: %d OutBytes: %d" % (sessionResponse.inPackets + session["inPackets"], sessionResponse.inBytes + session["inBytes"], sessionResponse.outPackets + session["outPackets"], sessionResponse.outBytes + session["outBytes"]))
+        print(f"\tSession End Reason: {openoffload_pb2._SESSION_CLOSE_CODE.values_by_number[sessionResponse.sessionCloseCode].name}")
+        print(f"\tUPDATING FW Session Table to reflect how it closed and its counters.\n\tFW LOG would be created at session close.")
 
-      if not foundSession:
-        print(f"\tERROR Offload session id: {sessionResponse.sessionId} not found in local session table")
+        # delete from local Session Table
+        del sessionTable[sessionResponse.sessionId]
 
 
 
@@ -317,8 +314,14 @@ def run():
 
 
         print("-------------- Adding 10 IPv4 & 10 IPv6 Sessions --------------")
+        newSessionId=None
         for x in range(10):
           newSessionId=session_addSession(stub)
+          print(f"Added new session id: {newSessionId}")
+
+        print("Fetch the session from Offload device for testing purposes.")
+        session_getSession(stub, newSessionId)
+
         for x in range(10):
           newSessionId=session_addSessionIpv6(stub)
 

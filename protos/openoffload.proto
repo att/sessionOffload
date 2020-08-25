@@ -20,9 +20,9 @@ syntax = "proto3";
 // will move to v1 at release 
 // increment beta1 to beta2 , etc for changes during development
 
-package openoffload.v1alpha2;
+package openoffload.v1alpha3;
 
-option go_package = ".;openoffload_v1alpha2";
+option go_package = ".;openoffload_v1alpha3";
 
 import "google/protobuf/timestamp.proto";
 
@@ -98,43 +98,43 @@ rpc getClosedSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
 // or have the applications have a mechanism to avoid duplicate sessionIDs across 
 // applications since there will be many applications instances to 1 switch
 message sessionId{
-  int64 sessionId = 1;
+  uint64 sessionId = 1;
 }
 
 // MIRROR and SNOOP require an actionNextHop
 // DROP and FORWARD do not have an actionNextHop
-message actionType{
+message actionParameters{
      ACTION_TYPE  actionType = 1;
      string actionNextHop = 2;
 }
 
 // sessionId is returned by server side upon successful addSession
 message sessionRequest{
-  uint32  inLif = 1;
-  uint32  outLif = 2;
-  IP_VERSION ipVersion = 3;
-  bytes sourceIp = 4;
-  uint32 sourcePort = 5;
-  bytes destinationIp = 6;
-  uint32 destinationPort = 7;
-  PROTOCOL_ID protocolId = 8;
-  actionType action = 9;
+  uint64  sessionId = 1 ;
+  int32  inLif = 2;
+  int32  outLif = 3;
+  IP_VERSION ipVersion = 4;
+  bytes sourceIp = 5;
+  uint32 sourcePort = 6;
+  bytes destinationIp = 7;
+  uint32 destinationPort = 8;
+  PROTOCOL_ID protocolId = 9;
+  actionParameters action = 10;
 }
 
 
 
 message addSessionResponse{
-  int64  sessionId = 1 ;
-  REQUEST_STATUS requestStatus = 2;
-  google.protobuf.Timestamp startTime = 3;
+  REQUEST_STATUS requestStatus = 1;
+  google.protobuf.Timestamp startTime = 2;
 }
 
 message sessionResponse{
-  int64  sessionId = 1 ;
-  int64  inPackets = 2 ;
-  int64  outPackets = 3 ;
-  int64  inBytes  = 4 ;
-  int64  outBytes = 5;
+  uint64  sessionId = 1 ;
+  uint64  inPackets = 2 ;
+  uint64  outPackets = 3 ;
+  uint64  inBytes  = 4 ;
+  uint64  outBytes = 5;
   SESSION_STATE sessionState = 6 ;
   SESSION_CLOSE_CODE sessionCloseCode = 7 ;
   REQUEST_STATUS requestStatus = 8;
@@ -213,6 +213,8 @@ message deviceDescription {
   string description = 3;
   int32  sessionCapacity = 4;
   int32  sessionRate = 5;
+  int32 tcpSessionTimeout =  6;
+  int32 udpSessionTimeout = 7;
 }
 
 //

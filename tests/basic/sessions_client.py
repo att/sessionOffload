@@ -29,6 +29,7 @@ import openoffload_pb2_grpc
 
 def session_addSession(stub):
     session=openoffload_pb2.sessionRequest()
+    session.sessionId= 12345678910
     session.inLif= 1
     session.outLif= 2
     session.sourceIp=socket.inet_pton(socket.AF_INET, "10.0.0.1")
@@ -41,11 +42,13 @@ def session_addSession(stub):
     session.action.actionNextHop = "12.2.3.4"
     addSessionResponse =  stub.addSession( session)
     print("Adding Session")
-    print(addSessionResponse.sessionId)
-    return addSessionResponse.sessionId
+    print(addSessionResponse.requestStatus)
+    print("Request Status: ",openoffload_pb2._REQUEST_STATUS.values_by_number[addSessionResponse.requestStatus].name)
+    return addSessionResponse.requestStatus
 
 def session_addSession_ipv6(stub):
     session=openoffload_pb2.sessionRequest()
+    session.sessionId= 12345678910
     session.inLif= 1
     session.outLif= 2
     session.sourceIp=socket.inet_pton(socket.AF_INET6, "2001:0db8:85a3:0000:0000:8a2e:0370:7332")
@@ -58,8 +61,9 @@ def session_addSession_ipv6(stub):
     session.action.actionNextHop = "12.2.3.4"
     addSessionResponse =  stub.addSession( session)
     print("Adding Session")
-    print(addSessionResponse.sessionId)
-    return addSessionResponse.sessionId
+    print(addSessionResponse.requestStatus)
+    print("Request Status: ",openoffload_pb2._REQUEST_STATUS.values_by_number[addSessionResponse.requestStatus].name)
+    return addSessionResponse.requestStatus
 
 def session_getSession(stub):
     sessionResponse =  stub.getSession( openoffload_pb2.sessionId(sessionId=1001))
@@ -88,6 +92,7 @@ def session_deleteSession(stub):
 
 def session_addMirrorSession(stub):
     session=openoffload_pb2.sessionRequest()
+    session.sessionId= 12345678910
     session.inLif= 1
     session.outLif= 2
     session.sourceIp=socket.inet_pton(socket.AF_INET, "10.0.0.1")
@@ -99,8 +104,9 @@ def session_addMirrorSession(stub):
     session.action.actionNextHop = "12.2.3.4"
     sessionResponse =  stub.addSession( session)
     print("Adding Session")
-    print(sessionResponse.sessionId)
-    return sessionResponse.sessionId
+    print(sessionResponse.requestStatus)
+    print("Request Status: ",openoffload_pb2._REQUEST_STATUS.values_by_number[sessionResponse.requestStatus].name)  
+    return sessionResponse.requestStatus
 
 
 def session_getClosedSessions(stub):
@@ -137,6 +143,8 @@ def activation_registerDevice(stub):
     register.type= openoffload_pb2._SMARTNIC
     register.sessionCapacity = 2000000
     register.sessionRate = 100000
+    register.tcpSessionTimeout = 15
+    register.udpSessionTimeout = 30
     registerResponse =  stub.registerOffloadDevice(register)
     print("Adding Device Description: ", register.name)
     print("Status: ", openoffload_pb2._REGISTRATION_STATUS_TYPE.values_by_number[registerResponse.status].name)
@@ -146,6 +154,8 @@ def activation_registerDevice(stub):
     register.type= openoffload_pb2._SOFTWARE
     register.sessionCapacity = 200000
     register.sessionRate = 10000
+    register.tcpSessionTimeout = 15
+    register.udpSessionTimeout = 30
     registerResponse =  stub.registerOffloadDevice(register)
     print("Adding Device Description: ", register.name)
     print("Status: ", openoffload_pb2._REGISTRATION_STATUS_TYPE.values_by_number[registerResponse.status].name)
@@ -160,6 +170,8 @@ def activation_getAllDevices(stub):
         print("Type: ", openoffload_pb2._INTERFACE_TYPE.values_by_number[device.type].name)
         print("Session Capacity: ", device.sessionCapacity)
         print("Session Rate: ",device.sessionRate)
+        print("TCP Session Timeout: ", device.tcpSessionTimeout)
+        print("UDP Session Timeout: ",device.udpSessionTimeout)
 
 def activation_activateDevice(stub):
     register = openoffload_pb2.deviceDescription()
@@ -169,6 +181,8 @@ def activation_activateDevice(stub):
     register.type= openoffload_pb2._SMARTNIC
     register.sessionCapacity = 2000000
     register.sessionRate = 100000
+    register.tcpSessionTimeout = 15
+    register.udpSessionTimeout = 30
     activateStatus = stub.activateOffload(register)
     print("Activated Device: ", register.name)
     print("Status: ", openoffload_pb2._ACTIVATION_STATUS_TYPE.values_by_number[activateStatus.status].name)
@@ -180,7 +194,7 @@ def run_add_session_ipv4():
         stub = openoffload_pb2_grpc.SessionTableStub(channel)
         print("-------------- Add IPv4 Session --------------")
         result = session_addSession(stub)
-        print("SESSIONID=",result)
+        print("Request Status=",result)
 def run_add_session_ipv6():
     with open('ssl/server.crt', 'rb') as f:
         creds = grpc.ssl_channel_credentials(f.read())
@@ -188,7 +202,7 @@ def run_add_session_ipv6():
         stub = openoffload_pb2_grpc.SessionTableStub(channel)
         print("-------------- Add IPv6 Session --------------")
         result = session_addSession_ipv6(stub)
-        print("SESSIONID=",result)
+        print("RequestStatus=",result)
 def run_get_session():
     with open('ssl/server.crt', 'rb') as f:
         creds = grpc.ssl_channel_credentials(f.read())
