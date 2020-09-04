@@ -1,0 +1,66 @@
+/*
+ *  Copyright (C) 2020 Palo Alto Networks Intellectual Property. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at:
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+extern "C" {
+#include "opof.h"
+#include "opof_util.h"
+}
+#include "opof_grpc.h"
+#include "opof_session_server.h"
+
+
+extern "C" void opof_server(const char *address, unsigned short port, const char* cert, const char* key);
+
+void opof_server(const char* address, unsigned short port, const char* cert, const char* key){
+
+  SessionTableImpl service;
+  
+  grpc::SslCredentialsOptions sslOpts;
+  std::string cppkey(key);
+  std::string cppcert(cert);
+  std::string cppaddress(address);
+  
+  grpc::SslServerCredentialsOptions::PemKeyCertPair pkcp;
+  pkcp.private_key = cppkey;
+  pkcp.cert_chain = cppcert;
+
+  grpc::SslServerCredentialsOptions ssl_opts;
+  ssl_opts.pem_root_certs="";
+  ssl_opts.pem_key_cert_pairs.push_back(pkcp);
+
+  std::shared_ptr<grpc::ServerCredentials> creds;
+  creds = grpc::SslServerCredentials(ssl_opts);
+  
+  cppaddress.append(":");
+  cppaddress.append(std::to_string(port));
+  //std::cout << "creating address from: " << "cppaddress: " << address << " Port: " << port << std::endl;
+  ServerBuilder builder;
+  builder.SetSyncServerOption(ServerBuilder::SyncServerOption::NUM_CQS, 10);
+  builder.SetSyncServerOption(ServerBuilder::SyncServerOption::MIN_POLLERS, 1);
+  builder.SetSyncServerOption(ServerBuilder::SyncServerOption::MAX_POLLERS, 20);
+
+  // Listen on the given address without any authentication mechanism.
+  builder.AddListeningPort(cppaddress, creds);
+  //std::unique_ptr<openoffload::v1alpha2::SessionTable::Stub> stub = openoffload::v1alpha2::SessionTable::NewStub(channel, stubOptions);
+  builder.RegisterService(&service);
+ 
+  std::unique_ptr<Server> server(builder.BuildAndStart());
+  std::cout << "Server listening on " << cppaddress << std::endl;
+
+  // Wait for the server to shutdown. Note that some other thread must be
+  // responsible for shutting down the server for this call to ever return.
+  server->Wait();
+  
+}

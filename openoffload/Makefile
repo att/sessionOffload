@@ -20,6 +20,8 @@ PROTOC:=protoc
 PYTHONOUT := python
 PROTOS_PATH = ../protos
 vpath %.proto $(PROTOS_PATH)
+GRPC_CPP_PLUGIN = grpc_cpp_plugin
+GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 GOOUT := golang
 
 $(PROTO_NAME).pb.go: $(PROTO_NAME).proto
@@ -34,14 +36,17 @@ $(PROTO_NAME).pb.cc: $(PROTO_NAME).proto
 	mkdir -p cpp
 	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=cpp $(PROTO_NAME).proto
 
+$(PROTO_NAME).grpc.pb.cc: $(PROTO_NAME).proto
+	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=cpp --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
 
 all-go:  $(PROTO_NAME).pb.go
 
 all-py:  $(PROTO_NAME).pb.py
 
-all-cpp: $(PROTO_NAME).pb.cc
+all-cpp:  $(PROTO_NAME).grpc.pb.cc $(PROTO_NAME).pb.cc
 
-all: $(PROTO_NAME).pb.go $(PROTO_NAME).pb.py $(PROTO_NAME).pb.cc
+all: $(PROTO_NAME).pb.go $(PROTO_NAME).pb.py $(PROTO_NAME).pb.cc $(PROTO_NAME).grpc.pb.cc
+
 
 .PHONY: clean
 #

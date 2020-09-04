@@ -20,9 +20,9 @@ syntax = "proto3";
 // will move to v1 at release 
 // increment beta1 to beta2 , etc for changes during development
 
-package openoffload.v1alpha3;
+package openoffload.v1alpha4;
 
-option go_package = ".;openoffload_v1alpha3";
+option go_package = ".;openoffload_v1alpha4";
 
 import "google/protobuf/timestamp.proto";
 
@@ -72,7 +72,7 @@ service SessionTable {
 
 
 // Adds a session
-rpc addSession(sessionRequest) returns (addSessionResponse) {}
+rpc addSession(stream sessionRequest) returns (addSessionResponse) {}
 
 // Obtains the session 
 rpc getSession(sessionId) returns (sessionResponse) {}
@@ -80,10 +80,6 @@ rpc getSession(sessionId) returns (sessionResponse) {}
 // Delete a session
 rpc deleteSession(sessionId) returns (sessionResponse) {}
 
-}
-
-
-service SessionStatisticsTable {
 // Stream back all current sessions
 rpc getAllSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
 
@@ -105,7 +101,7 @@ message sessionId{
 // DROP and FORWARD do not have an actionNextHop
 message actionParameters{
      ACTION_TYPE  actionType = 1;
-     string actionNextHop = 2;
+     uint32 actionNextHop = 2;
 }
 
 // sessionId is returned by server side upon successful addSession
@@ -114,15 +110,13 @@ message sessionRequest{
   int32  inLif = 2;
   int32  outLif = 3;
   IP_VERSION ipVersion = 4;
-  bytes sourceIp = 5;
+  uint32 sourceIp = 5;
   uint32 sourcePort = 6;
-  bytes destinationIp = 7;
+  uint32 destinationIp = 7;
   uint32 destinationPort = 8;
   PROTOCOL_ID protocolId = 9;
   actionParameters action = 10;
 }
-
-
 
 message addSessionResponse{
   REQUEST_STATUS requestStatus = 1;
@@ -146,8 +140,8 @@ message statisticsRequestArgs{
   //  pageSize = 0 will turn off paging
   //  does paging make sense for a stream ?
   //  the client should read/process each event on the stream anyway.
-  uint32  pageSize=100;
-  uint32  page=1;
+  uint32  pageSize=1;
+  uint32  page=2;
   //  what other arguments make sense for retrieving or filtering streams 
 }
 //////////////////////////////////////////////////////////////////////////////////
