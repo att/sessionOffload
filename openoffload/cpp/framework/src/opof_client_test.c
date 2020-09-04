@@ -104,9 +104,9 @@ void opof_client_test(const char *address, int max_sessions, unsigned int pageSi
     }
   }
 #endif
-  //pthread_create(&tid, NULL, opof_get_closed_sessions, &args);
- 
-  opof_get_closed_sessions(&args);
+  pthread_create(&tid, NULL, opof_get_closed_sessions, &args);
+  pthread_join(tid,NULL);
+  //opof_get_closed_sessions(&args);
   //opof_get_closed_sessions(handle,pageSize);
   //while(1);
   clock_t end = clock();

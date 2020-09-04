@@ -114,6 +114,8 @@ extern "C" {
       convertSessionRequest2c(request, &request_c);
       status = opof_add_session_server(&request_c, &addResponse_c);     
     }
+    REQUEST_STATUS reqStatus = REQUEST_STATUS::_REJECTED;
+    response->set_requeststatus(reqStatus);
     return Status::OK;
   }
 
@@ -163,8 +165,9 @@ Status SessionTableImpl::getClosedSessions(ServerContext* context, const statist
   sessionResponse_t **closedSessions= NULL;
   sessionResponse_t *closedResponse;
   int nresponses = request->pagesize();
-  closedSessions =createSessionResponse(nresponses);
+  closedSessions = createSessionResponse(nresponses);
   if (closedSessions == NULL){
+    response.set_requeststatus(REQUEST_STATUS::_NO_CLOSED_SESSIONS);
     return Status::OK;
   }
   for (int i=0; i < nresponses; i++){

@@ -141,7 +141,7 @@ openoffload.pb.o: openoffload.pb.cc openoffload.pb.h
 openoffload.grpc.pb.o: openoffload.grpc.pb.cc openoffload.grpc.pb.h
 	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
 
-opof_error.o: $(SRC_DIR)/opof_error.c opof_error.h
+opof_error.o: opof_error.c opof_error.h
 	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
 
 opof_main.o: opof_main.c opof.h opof_error.h

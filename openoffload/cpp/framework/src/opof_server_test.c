@@ -188,5 +188,8 @@ sessionResponse_t **createSessionResponse(int size){
         }
       }
    }
-  return responses;
+  if (i == 0) {
+    free(responses);
+  }
+  return NULL;
 }

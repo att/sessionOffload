@@ -101,11 +101,13 @@ for (int i=0; i< size; i++){
   writer->Write(request);
   free(request_c);
 }
+
 free(s);
 writer->WritesDone();
 Status status = writer->Finish();
 if (status.ok()) {
   //std::cout << "addSession Write successful of " << size  << " records" << std::endl;
+  //std::cout << "AddSession Response: " << response.requeststatus() << std::endl;
   return "Success";
 } else {
   std::cout << "addSession Write failed for " << size  << " records" << std::endl;
@@ -173,6 +175,9 @@ unsigned long SessionTableClient::getClosedSessions(statisticsRequestArgs_t *arg
   std::unique_ptr<ClientReader <sessionResponse> > reader(
         stub_->getClosedSessions(&context, request));
     while (reader->Read(&response)) {
+      if (response.requeststatus() == REQUEST_STATUS::_NO_CLOSED_SESSIONS){
+        return sessionCount;
+      }
       convertSessionResponse2c(&response, &responsec);
       //display_session_response(&responsec);
       sessionCount++;
