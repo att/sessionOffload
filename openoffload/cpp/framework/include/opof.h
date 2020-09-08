@@ -56,6 +56,7 @@ typedef enum {
    _REJECTED_SESSION_NONEXISTENT = 2,
    _REJECTED_SESSION_TABLE_FULL = 3,
    _REJECTED_SESSION_ALREADY_EXISTS = 4,
+   _NO_CLOSED_SESSIONS = 5,
 } REQUEST_STATUS_T;
 
 
@@ -69,8 +70,8 @@ typedef struct {
 //} sessionRequest_t;
 
 typedef struct addSessionResponseTuple {
-  unsigned long  sessionId;
   REQUEST_STATUS_T requestStatus;
+  unsigned long errorstatus;
   //google.protobuf.Timestamp startTime = 3;
 } addSessionResponse_t;
 

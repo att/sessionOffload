@@ -121,7 +121,8 @@ message sessionRequest{
 
 message addSessionResponse{
   REQUEST_STATUS requestStatus = 1;
-  google.protobuf.Timestamp startTime = 2;
+  uint64 errorstatus = 2;
+  google.protobuf.Timestamp startTime = 3;
 }
 
 message sessionResponse{

@@ -14,20 +14,31 @@
 #
 ##
 CLIENT_NAME :=opof_test
+PROTO_NAME := openoffload
+DIRECTORIES := directories
+PROTOS := protos
 VERSION=0.1
 LIBFILE := libopof.a
 #
 ROOT_DIR ?= $(HOME)
 #
+# CPP gRPC Definitions
+#
+PROTOC:=protoc
+GRPC_CPP_PLUGIN = grpc_cpp_plugin
+GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
+#
 # Source Directories
 #
-#
+PROTOS_PATH = ../../../protos
+vpath %.proto $(PROTOS_PATH)
 C_SRC_DIR := src
 vpath  %.c $(C_SRC_DIR)
 vpath  %.cc $(C_SRC_DIR)
 #
 H_SRC_DIR := include
 vpath  %.h $(H_SRC_DIR)
+vpath  %.h $(C_SRC_DIR)
 
 OBJ_SRC_DIR := obj
 vpath %.o $(OBJ_SRC_DIR)
@@ -56,9 +67,9 @@ CC := gcc -g
 CPP := g++ -g
 
 #CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DDEBUG -DVISIBLE
-CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall
+CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall 
 #CPPFLAGS := -c -O2 -std=c++11 -I ./ -I include  -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations  -DDEBUG -DVISIBLE
-CPPFLAGS := -c -O2 -std=c++11 -I ./ -I include  -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations
+CPPFLAGS := -c -O2 -std=c++11 -I ./ -I include  -I src -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations 
 #
 #
 # Link Flags
@@ -114,9 +125,26 @@ LIBS ?= \
   	$(ABSL_TIME_LIB) \
   	$(ABSL_TIME_ZONE_LIB)  
 #           
-all: $(OBJS)  $(CLIENT_NAME)
+all: $(DIRECTORIES) $(PROTOS) $(OBJS) $(CLIENT_NAME) $(LIBFILE) 
 #
-# Object files
+# Create directories
+#
+$(DIRECTORIES):
+	mkdir -p obj
+	mkdir -p lib
+	mkdir -p bin
+#
+# Generate gPRC files
+#
+$(PROTO_NAME).pb.cc: $(PROTO_NAME).proto
+	mkdir -p cpp
+	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=src $(PROTO_NAME).proto
+#
+$(PROTO_NAME).grpc.pb.cc: $(PROTO_NAME).proto
+	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=src --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
+#
+$(PROTOS):  $(PROTO_NAME).grpc.pb.cc $(PROTO_NAME).pb.cc
+
 #
 OBJS = \
 	$(OBJ_DIR)/openoffload.pb.o \

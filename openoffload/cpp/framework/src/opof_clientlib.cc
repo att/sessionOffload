@@ -35,18 +35,23 @@ sessionTable_t * opof_create_sessionTable(const char * host, unsigned int port, 
 	sessionTable_t *sessionHandle;
 	SessionTableClient *client;
 	std::string address(host);
-	//Channel channel;
+#ifdef SSL
 	grpc::SslCredentialsOptions sslOpts;
-  	sslOpts.pem_root_certs = public_key; 
+  	sslOpts.pem_root_certs = public_key;
+#endif
   	address.append(":");
   	address.append(std::to_string(port));
     //std::cout << "Public key: " << public_key << std::endl;
 
     sessionHandle  = (sessionTable_t *)malloc(sizeof(*sessionHandle));
-  
+ #ifdef SSL 
   	auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions(sslOpts));
   	//SessionTableClient client(grpc::CreateChannel("localhost:3443", channel_creds));
+
   	client = new SessionTableClient(grpc::CreateChannel(address, channel_creds));
+ #else
+  	client = new SessionTableClient(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
+ #endif
   	sessionHandle->obj = client;
   	std::cout << "Created SessionTableClient" << std::endl;
   	return sessionHandle;

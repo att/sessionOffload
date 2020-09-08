@@ -61,7 +61,7 @@ int main(int argc, char ** argv){
 #endif
 
     int c;
-    int status;
+    int status = SUCCESS;
     struct sigaction newSigAction;
     bool client_enable;
     bool server_enable;
@@ -221,7 +221,9 @@ int main(int argc, char ** argv){
     
 
     if (client_enable == true ) {
+#ifdef SSL
         status = get_key(CERT_FILE, cert);
+#endif
         if (status != FAILURE){
             opof_client_test(address, number, pageSize, port, cert);
         } else {
@@ -229,12 +231,18 @@ int main(int argc, char ** argv){
             exit (-1);
         }
     } else if (server_enable == true) {
+#ifdef SSL
         if ((get_key(CERT_FILE, cert) != FAILURE) && (get_key(KEY_FILE, key) != FAILURE)){
             opof_server(address, port, cert, key);
         } else {
             printf("Error: could not read server credentials\n");
             exit(-1);
         }
+#else
+        printf("Info: Creating Insecure Server\n");
+        opof_server(address, port, cert, key);
+
+#endif
     } 
 
     printf("Exiting normally\n");

@@ -26,11 +26,13 @@ extern "C" void opof_server(const char *address, unsigned short port, const char
 void opof_server(const char* address, unsigned short port, const char* cert, const char* key){
 
   SessionTableImpl service;
-  
+  std::string cppaddress(address);
+#ifdef SSL
   grpc::SslCredentialsOptions sslOpts;
   std::string cppkey(key);
   std::string cppcert(cert);
-  std::string cppaddress(address);
+
+  
   
   grpc::SslServerCredentialsOptions::PemKeyCertPair pkcp;
   pkcp.private_key = cppkey;
@@ -42,7 +44,7 @@ void opof_server(const char* address, unsigned short port, const char* cert, con
 
   std::shared_ptr<grpc::ServerCredentials> creds;
   creds = grpc::SslServerCredentials(ssl_opts);
-  
+#endif
   cppaddress.append(":");
   cppaddress.append(std::to_string(port));
   //std::cout << "creating address from: " << "cppaddress: " << address << " Port: " << port << std::endl;
@@ -52,7 +54,11 @@ void opof_server(const char* address, unsigned short port, const char* cert, con
   builder.SetSyncServerOption(ServerBuilder::SyncServerOption::MAX_POLLERS, 20);
 
   // Listen on the given address without any authentication mechanism.
+#ifdef SSL
   builder.AddListeningPort(cppaddress, creds);
+#else
+  builder.AddListeningPort(cppaddress, grpc::InsecureServerCredentials());
+#endif
   //std::unique_ptr<openoffload::v1alpha2::SessionTable::Stub> stub = openoffload::v1alpha2::SessionTable::NewStub(channel, stubOptions);
   builder.RegisterService(&service);
  

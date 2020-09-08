@@ -90,7 +90,7 @@ int opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *
     //
     //response->sessionId = parameters->sessId;
     response->requestStatus = _ACCEPTED;
-    fflush(stdout);
+    //fflush(stdout);
   return 0;
 }
 int opof_get_session_server(unsigned long sessionId, sessionResponse_t *response){
