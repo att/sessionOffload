@@ -67,9 +67,9 @@ CC := gcc -g
 CPP := g++ -g
 
 #CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DDEBUG -DVISIBLE
-CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall 
+CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DSSL
 #CPPFLAGS := -c -O2 -std=c++11 -I ./ -I include  -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations  -DDEBUG -DVISIBLE
-CPPFLAGS := -c -O2 -std=c++11 -I ./ -I include  -I src -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations 
+CPPFLAGS := -c -O2 -std=c++11 -I ./ -I include  -I src -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations -DSSL
 #
 #
 # Link Flags

@@ -107,7 +107,7 @@ writer->WritesDone();
 Status status = writer->Finish();
 if (status.ok()) {
   //std::cout << "addSession Write successful of " << size  << " records" << std::endl;
-  std::cout << "AddSession Response: " << response.requeststatus() << std::endl;
+  //std::cout << "AddSession Response: " << response.requeststatus() << std::endl;
   return "Success";
 } else {
   std::cout << "addSession Write failed for " << size  << " records" << std::endl;

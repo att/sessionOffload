@@ -164,13 +164,17 @@ Status SessionTableImpl::getClosedSessions(ServerContext* context, const statist
   sessionResponse response;
   sessionResponse_t **closedSessions= NULL;
   sessionResponse_t *closedResponse;
+  statisticsRequestArgs_t request_c;
+  int sessionCount;
   int nresponses = request->pagesize();
-  closedSessions = createSessionResponse(nresponses);
+  request_c.pageSize = nresponses;
+  closedSessions = opof_get_closed_sessions_server(&request_c, &sessionCount);
+  //closedSessions = createSessionResponse(nresponses, &sessionCount);
   if (closedSessions == NULL){
     response.set_requeststatus(REQUEST_STATUS::_NO_CLOSED_SESSIONS);
     return Status::OK;
   }
-  for (int i=0; i < nresponses; i++){
+  for (int i=0; i < sessionCount; i++){
     closedResponse = closedSessions[i];
     response.set_sessionid(closedResponse->sessionId);
     response.set_sessionstate((SESSION_STATE)closedResponse->sessionState);

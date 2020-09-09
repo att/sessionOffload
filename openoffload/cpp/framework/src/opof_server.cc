@@ -63,7 +63,7 @@ void opof_server(const char* address, unsigned short port, const char* cert, con
   builder.RegisterService(&service);
  
   std::unique_ptr<Server> server(builder.BuildAndStart());
-  std::cout << "Server listening on " << cppaddress << std::endl;
+  std::cout << "Server listening on: " << cppaddress << std::endl;
 
   // Wait for the server to shutdown. Note that some other thread must be
   // responsible for shutting down the server for this call to ever return.

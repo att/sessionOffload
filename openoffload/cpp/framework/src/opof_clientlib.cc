@@ -47,13 +47,14 @@ sessionTable_t * opof_create_sessionTable(const char * host, unsigned int port, 
  #ifdef SSL 
   	auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions(sslOpts));
   	//SessionTableClient client(grpc::CreateChannel("localhost:3443", channel_creds));
-
+  	std::cout << "INFO: Creating Secure Client Connection to: " << address << std::endl;
   	client = new SessionTableClient(grpc::CreateChannel(address, channel_creds));
  #else
+  	std::cout << "INFO: Creating Insecure Client Connection to: " << address << std::endl;
   	client = new SessionTableClient(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
  #endif
   	sessionHandle->obj = client;
-  	std::cout << "Created SessionTableClient" << std::endl;
+  	std::cout << "INFO: Created SessionTableClient" << std::endl;
   	return sessionHandle;
   	
 }

@@ -26,7 +26,7 @@ int get_key(const char *filename, char *key);
 //int create_address(char *address, unsigned short port);
 int range(int low, int high);
 void display_session_response(sessionResponse_t *response);
-sessionResponse_t **createSessionResponse(int size);
+sessionResponse_t **createSessionResponse(int size, int *sessionCount);
 //sessionRequest_t **createSessionRequest(int size);
 sessionRequest_t **createSessionRequest(int size, unsigned long start_sessionId);
 #endif
