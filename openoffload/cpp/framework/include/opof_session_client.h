@@ -27,7 +27,7 @@ class SessionTableClient {
 public: 
     SessionTableClient(std::shared_ptr<Channel> channel)
     : stub_(SessionTable::NewStub(channel)) {};
-    std::string addSessionClient(int size, sessionRequest_t **s, addSessionResponse_t *resp);
+    Status addSessionClient(int size, sessionRequest_t **s, addSessionResponse_t *resp);
     std::string getSessionClient(int session, sessionResponse_t *resp);
     std::string deleteSessionClient(int session, sessionResponse_t *resp);
     void getAllSessions();

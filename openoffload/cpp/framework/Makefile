@@ -157,12 +157,10 @@ OBJS = \
 	$(OBJ_DIR)/opof_server_test.o \
 	$(OBJ_DIR)/opof_clientlib.o \
 	$(OBJ_DIR)/opof_server.o \
-	$(OBJ_DIR)/opof_util.o
+	$(OBJ_DIR)/opof_util.o \
+	$(OBJ_DIR)/opof_test_util.o
 #
-$(LIBFILE): opof_clientlib.o opof_session_server.o opof_session_client.o opof_server.o
-	ar ru $(LIB_DIR)/$@ $^
-	ranlib $(LIB_DIR)/$@
-#
+
 openoffload.pb.o: openoffload.pb.cc openoffload.pb.h
 	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
 
@@ -193,19 +191,24 @@ opof_session_client.o: opof_session_client.cc opof.h opof_error.h opof_session_c
 opof_session_server.o: opof_session_server.cc opof.h opof_error.h opof_session_server.h  openoffload.grpc.pb.h openoffload.pb.h
 	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
 
-opof_util.o: opof_util.c opof.h opof_error.h opof_util.h
-	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
+opof_util.o: opof_util.cc opof.h opof_error.h opof_util.h
+	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
 
+opof_test_util.o: opof_test_util.cc opof.h opof_error.h opof_test_util.h
+	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
 
-$(CLIENT_NAME): openoffload.pb.o openoffload.grpc.pb.o opof_error.o opof_main.o opof_session_server.o opof_session_client.o opof_client_test.o opof_server_test.o opof_clientlib.o opof_server.o opof_util.o
+$(CLIENT_NAME): openoffload.pb.o openoffload.grpc.pb.o opof_error.o opof_main.o opof_session_server.o opof_session_client.o opof_client_test.o opof_server_test.o opof_clientlib.o opof_server.o opof_util.o opof_test_util.o
 	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $(BIN_DIR)/$@
-
+#
+#
+$(LIBFILE): opof_clientlib.o opof_session_server.o opof_session_client.o opof_server.o opof_util.o
+	ar ru $(LIB_DIR)/$@ $^
+	ranlib $(LIB_DIR)/$@
+#
+#
 .PHONY: clean
-
+#
 clean:
 	rm -f obj/*.o \
 	rm -f bin/* \
 	rm -f lib/*.a
-
-#depend: $(SRCS)#
-#	makedepend $(INCLUDES) $^

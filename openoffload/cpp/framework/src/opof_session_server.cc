@@ -18,9 +18,9 @@ extern "C" {
 #include "opof.h"
 #include "opof_error.h"
 #include "opof_serverlib.h"
-#include "opof_util.h"
 }
 
+#include "opof_util.h"
 #include "opof_grpc.h"
 #include "opof_session_server.h"
 
@@ -165,7 +165,7 @@ Status SessionTableImpl::getClosedSessions(ServerContext* context, const statist
   sessionResponse_t **closedSessions= NULL;
   sessionResponse_t *closedResponse;
   statisticsRequestArgs_t request_c;
-  int sessionCount;
+  int sessionCount = 0;
   int nresponses = request->pagesize();
   request_c.pageSize = nresponses;
   closedSessions = opof_get_closed_sessions_server(&request_c, &sessionCount);

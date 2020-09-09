@@ -14,7 +14,9 @@
 //
 #ifndef OPOF_UTIL_H
 #define OPOF_UTIL_H
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <arpa/inet.h>
 #include <sys/types.h>          
 #include <sys/socket.h>
@@ -22,11 +24,16 @@
 #include "opof.h"
 #include "opof_error.h"
 
+#ifdef __cplusplus
+}
+#endif
+#include "opof_grpc.h"
+
 int get_key(const char *filename, char *key);
 //int create_address(char *address, unsigned short port);
-int range(int low, int high);
+
 void display_session_response(sessionResponse_t *response);
-sessionResponse_t **createSessionResponse(int size, int *sessionCount);
-//sessionRequest_t **createSessionRequest(int size);
-sessionRequest_t **createSessionRequest(int size, unsigned long start_sessionId);
+void display_session_request(sessionRequest_t *request);
+void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *request);
+void convertSessionResponse2c(sessionResponse *responsecpp, sessionResponse_t *responsec);
 #endif

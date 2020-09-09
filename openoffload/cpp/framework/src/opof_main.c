@@ -28,7 +28,6 @@
 
 #include "opof.h"
 #include "opof_test.h"
-#include "opof_util.h"
 #include "opof_error.h"
 
 
@@ -45,6 +44,28 @@
 void signal_handler(int sig);
 void opof_client_test(const char *address, int number, unsigned int pageSize, unsigned short port, const char *cert);
 void opof_server(const char *address, unsigned short port, const char *cert, const char *key);
+//
+int get_key(const char *filename, char *key){
+    FILE *fp;
+    int status  = SUCCESS;
+  printf("Reading: %s\n", filename);
+    fp = fopen(filename, "r");
+    if(fp == NULL) {
+      perror("Error opening file ");
+      return(-1);
+    }
+    status = fread(key, sizeof(char), 2047,(FILE*)fp);
+    if (status == -1){
+        perror("Error reading file ");
+        return(-1);
+    } else {
+        printf("Read %d characters\n",status);
+        key[status++] = '\0'; /* Just to be safe. */
+    }
+   fclose(fp);
+   printf("Returning: %d from reading %s\n", status, filename);
+   return status;
+};
 /*
  * Main routine
  */

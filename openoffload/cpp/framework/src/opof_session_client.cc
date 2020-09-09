@@ -15,83 +15,20 @@
  */
 extern "C" {
 #include "opof.h"
-#include "opof_util.h"
 }
+#include "opof_util.h"
 #include "opof_grpc.h"
 #include "opof_session_client.h"
 
-void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *request){
-    actionParameters action;
 
-    request->set_sessionid(request_c->sessId);
-    request->set_inlif(request_c->inlif);
-    request->set_outlif(request_c->outlif);
-    request->set_ipversion((IP_VERSION)request_c->ipver);
-    request->set_sourceport(request_c->srcPort);
-    request->set_sourceip(request_c->srcIP);
-    request->set_destinationip(request_c->dstIP);
-    request->set_destinationport(request_c->dstPort);
-    request->set_protocolid((PROTOCOL_ID)request_c->proto);
-    action.set_actiontype((ACTION_TYPE)request_c->actType);
-    action.set_actionnexthop(request_c->nextHop);
-    request->mutable_action()->CopyFrom(action);
 
-}
-
-void convertSessionResponse2c(sessionResponse *responsecpp, sessionResponse_t *responsec){
-
-  responsec->sessionId = responsecpp->sessionid();
-  responsec->requestStatus = (REQUEST_STATUS_T)responsecpp->requeststatus();
-  responsec->sessionState = (SESSION_STATE_T)responsecpp->sessionstate();
-  responsec->sessionCloseCode = (SESSION_CLOSE_T)responsecpp->sessionclosecode();
-  responsec->inPackets = responsecpp->inpackets();
-  responsec->outPackets = responsecpp->outpackets();
-  responsec->inBytes = responsecpp->inbytes();
-  responsec->outBytes = responsecpp->outbytes();
-}
-
-/*
-std::string SessionTableClient::addSessionClient(sessionRequest_t **s, addSessionResponse_t *resp){
-
-Status status;
-ClientContext context;
-sessionRequest request;
-addSessionResponse response;
-actionParameters action;
-
-request.set_sessionid(s->sessId);
-request.set_inlif(s->inlif);
-request.set_outlif(s->outlif);
-request.set_sourceip(s->srcIP);
-request.set_destinationip(s->dstIP);
-request.set_ipversion((IP_VERSION)s->ipver);
-request.set_sourceport(s->srcPort);
-request.set_destinationport(s->dstPort);
-request.set_protocolid((PROTOCOL_ID)s->proto);
-action.set_actiontype((ACTION_TYPE)s->actType);
-action.set_actionnexthop(s->nextHop);
-request.mutable_action()->CopyFrom(action);
-
-status = stub_->addSession(&context, request, &response);
-if (status.ok()) {
-   // std::cout << "sessionID added is: " << response.sessionid() << std::endl;
-    //resp->sessionId = response.sessionid();
-    resp->requestStatus = (REQUEST_STATUS_T)response.requeststatus();
-    return "Success";
-  } else {
-    std::cout << "RPC addSession failed with error code: " << status.error_code() << ": " << status.error_message()
-              << std::endl;
-    return "RPC failed";
-  }
-  
-}
-*/
-std::string SessionTableClient::addSessionClient(int size, sessionRequest_t **s, addSessionResponse_t *resp){
+Status SessionTableClient::addSessionClient(int size, sessionRequest_t **s, addSessionResponse_t *resp){
 
 sessionRequest_t *request_c;
 sessionRequest request;
 addSessionResponse response;
 ClientContext context;
+Status status;
 std::unique_ptr<ClientWriter <sessionRequest> > writer(
         stub_->addSession(&context, &response));
 
@@ -104,15 +41,8 @@ for (int i=0; i< size; i++){
 
 free(s);
 writer->WritesDone();
-Status status = writer->Finish();
-if (status.ok()) {
-  //std::cout << "addSession Write successful of " << size  << " records" << std::endl;
-  //std::cout << "AddSession Response: " << response.requeststatus() << std::endl;
-  return "Success";
-} else {
-  std::cout << "addSession Write failed for " << size  << " records" << std::endl;
-  return "addSession RPC failed";
-}
+status = writer->Finish();
+return status;
 }
 // getSession
 std::string SessionTableClient::getSessionClient(int sessionid,sessionResponse_t *resp){

@@ -12,19 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#ifndef OPOF_SERVERLIB_H
-#define OPOF_SERVERLIB_H
+#ifndef OPOF_TEST_UTIL_H
+#define OPOF_TEST_UTIL_H
 
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include <stdlib.h>
 #include "opof.h"
 #include "opof_error.h"
+#include "opof_serverlib.h"
+#include "opof_hash.h"
 
-
-
-//sessionTable_t * opof_create_server(const char * host, unsigned int port, const char *public_key);
-//
- int opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *response);
- int opof_get_session_server(unsigned long sessionId, sessionResponse_t *response);
- int opof_del_session_server(unsigned long sessionId, sessionResponse_t *response);
- sessionResponse_t **opof_get_closed_sessions_server(statisticsRequestArgs_t *request, int *sessionCount);
-
+int range(int low, int high);
+sessionResponse_t **createSessionResponse(int size, int *sessionCount);
+sessionRequest_t **createSessionRequest(int size, unsigned long start_sessionId);
+sessionResponse_t *getClosedSessionsFromHash();
+#ifdef __cplusplus
+}
 #endif
+
+#endif //OPOF_TEST_UTIL_H

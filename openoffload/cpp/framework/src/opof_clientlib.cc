@@ -66,16 +66,18 @@ int opof_delete_client(sessionTable_t *session){
 }
 
 int opof_add_session(int size, sessionTable_t *sessionHandle,  sessionRequest_t **req, addSessionResponse_t *resp){
-	int status;
+	int addStatus = SUCCESS;
 	SessionTableClient *client;
-	std::string reply;
-	//sessionRequest_t *param;
-	//param = (sessionRequest_t *)parameters;
+	Status status;
 
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
-	reply = client->addSessionClient(size,req,resp);
- 	//std::cout << "Add Session received: " << reply << std::endl;
-	return status;
+	status = client->addSessionClient(size,req,resp);
+	if (status.ok() == true){
+		return addStatus;
+	} else {
+		std::cout << "ERROR addSessionClient: " << status.error_code() << status.error_message() << std::endl;
+		return FAILURE;
+	}
 }
 int opof_get_session(sessionTable_t *sessionHandle, unsigned long  session, sessionResponse_t *resp){
 	int status = SUCCESS;

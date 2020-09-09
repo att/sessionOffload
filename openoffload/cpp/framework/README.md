@@ -63,8 +63,10 @@ $ bin/opof_test -s
 
 Run the client
 
+'n' in the number of sessions and 'b' is the buffer size to stream
+
 ```bash
-$ bin/opof_test -c 
+$ bin/opof_test -c -n 128 - b 64
 ```
 
 # Programming the C Interface
@@ -217,6 +219,7 @@ To implement the interfaces to the server the following functions defined in "op
  int opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *response);
  int opof_get_session_server(unsigned long sessionId, sessionResponse_t *response);
  int opof_del_session_server(unsigned long sessionId, sessionResponse_t *response);
+ sessionResponse_t **opof_get_closed_sessions_server(statisticsRequestArgs_t *request, int *sessionCount);
 ```
 The file "opof_server_test.c" is a sample implementation of each of the functions. The sample implementaton implements a simple in memory hashtable to enable more complex test scenarios to be implemented.
 

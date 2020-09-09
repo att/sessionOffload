@@ -15,8 +15,8 @@
  */
 extern "C" {
 #include "opof.h"
-#include "opof_util.h"
 }
+#include "opof_util.h"
 #include "opof_grpc.h"
 #include "opof_session_server.h"
 
