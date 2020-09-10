@@ -208,7 +208,7 @@ opof_test_util.o: opof_test_util.cc opof.h opof_error.h opof_test_util.h
 $(CLIENT_NAME): openoffload.pb.o openoffload.grpc.pb.o opof_error.o opof_main.o opof_session_server.o opof_session_client.o opof_client_test.o opof_server_test.o opof_clientlib.o opof_server.o opof_util.o opof_test_util.o
 	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $(BIN_DIR)/$@
 #
-$(SERVER_NAME): opof_server_main.o 
+$(SERVER_NAME): opof_server_main.o opof_server_test.o opof_error.o opof_test_util.o
 	$(LD) $(LDFLAGS)  $(OBJ_DIR)/opof_server_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_server_test.o  $(OBJ_DIR)/opof_test_util.o $(SERVERFLAGS) $(LIBS)  -o $(BIN_DIR)/$@
 #
 $(LIBFILE): openoffload.pb.o openoffload.grpc.pb.o opof_session_server.o opof_server.o opof_util.o

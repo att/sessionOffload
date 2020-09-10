@@ -88,10 +88,6 @@ if (status.ok()) {
     return "RPC failed";
   }
 
-
-  //TODO: print timestamps
-  //std::cout << "session starttime is: " << response.starttime() << std::endl;
-  //std::cout << "session endtime is: " << response.endtime() << std::endl;
 }
 
 unsigned long SessionTableClient::getClosedSessions(statisticsRequestArgs_t *args){

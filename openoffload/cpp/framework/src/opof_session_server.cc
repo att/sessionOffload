@@ -24,12 +24,8 @@ extern "C" {
 #include "opof_grpc.h"
 #include "opof_session_server.h"
 
-//extern "C" int opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *response);
-//extern "C" int opof_get_session_server(unsigned long sessionId, sessionResponse_t *response);
-//extern "C" int opof_del_session_server(unsigned long sessionId, sessionResponse_t *response);
-//extern "C" sessionResponse_t **opof_get_closed_sessions_server(statisticsRequestArgs_t *request, int *sessionCount);
 
-  Status SessionTableImpl::addSession(ServerContext* context, ServerReader<sessionRequest>* reader, addSessionResponse* response) {
+Status SessionTableImpl::addSession(ServerContext* context, ServerReader<sessionRequest>* reader, addSessionResponse* response) {
     int status;
     addSessionResponse_t addResponse_c;
     sessionRequest_t request_c;
@@ -44,7 +40,7 @@ extern "C" {
   }
 
 
-  Status SessionTableImpl::getSession(ServerContext* context, const sessionId* sid,
+Status SessionTableImpl::getSession(ServerContext* context, const sessionId* sid,
                   sessionResponse* response) {
         sessionResponse_t response_c;
         int status;
@@ -56,7 +52,7 @@ extern "C" {
     return Status::OK;
   }
 
-  Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* sid,
+Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* sid,
                   sessionResponse* response) {
       int status;
       sessionResponse_t response_c;
