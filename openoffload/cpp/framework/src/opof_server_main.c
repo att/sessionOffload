@@ -29,7 +29,6 @@
 #include "opof.h"
 #include "opof_test.h"
 #include "opof_error.h"
-#include "opof_serverlib.h"
 
 
 #define OPOF_VERSION "0.1"
@@ -83,44 +82,25 @@ int main(int argc, char ** argv){
 #endif
 
     int c;
-    int status = SUCCESS;
     struct sigaction newSigAction;
-    bool client_enable;
-    bool server_enable;
     unsigned short port = 3443;
     char address[64];
-    int number = 1;
-    unsigned int pageSize = 1;
     char *str_part;
     char *default_address ="localhost";
     
     strncpy(address,default_address,strlen(default_address)+1);
-    client_enable = true;
-    server_enable = false;
     //
     static struct option longopts[] = {
-        {"client", required_argument,0,'c'},
-        {"server", required_argument,0,'s'},
         {"version", no_argument,0,'v'},
         {"address", no_argument, 0, 'a'},
         {"port", no_argument, 0 ,'p'},
-        {"number", no_argument,0,'n'},
-        {"buffersize", no_argument,0,'b'},
         {"help",no_argument,0,'h'},
     };
     /*
      * Loop over input
      */
-    while (( c = getopt_long(argc,argv, "a:p:n:b:csvh",longopts,NULL))!=    -1){
+    while (( c = getopt_long(argc,argv, "a:p:vh",longopts,NULL))!=    -1){
         switch(c) {
-            case 'c':
-                client_enable = true;
-                server_enable = false;
-                break;
-            case 's':
-                client_enable = false;
-                server_enable = true;
-                break;
             case 'v':
                 printf("\nVersion of OPOF Program: %s\n\n", OPOF_VERSION);
                 exit(0);
@@ -131,20 +111,10 @@ int main(int argc, char ** argv){
             case 'a':
                 strncpy(address, optarg,63);
                 break;
-            case 'n':
-                number = strtoul(optarg, &str_part,10);
-                break;
-             case 'b':
-                pageSize = (unsigned int)strtoul(optarg, &str_part,10);
-                break;
             case 'h':
-                printf("\nCommand line arguments for OpenOffload tests version: %s \n", OPOF_VERSION);
-                printf("\t-c, --client          Client Program \n");
-                printf("\t-s, --session         Server Program\n");
+                printf("\nCommand line arguments for OpenOffload server tests version: %s \n", OPOF_VERSION);
                 printf("\t-p, --port            gRPC Port \n");
                 printf("\t-a, --address         Address of gRPC Server\n");
-                printf("\t-n, --number          Number of sessions\n");
-                printf("\t-b, --buffersize      Streaming buffer size\n");
                 printf("\t-v, --version         Version of Open Offload Program\n");
                 printf("\t-h, --help:           Command line help \n\n");
                 exit(1);
@@ -242,17 +212,6 @@ int main(int argc, char ** argv){
 #endif
     
 
-    if (client_enable == true ) {
-#ifdef SSL
-        status = get_key(CERT_FILE, cert);
-#endif
-        if (status != FAILURE){
-            opof_client_test(address, number, pageSize, port, cert);
-        } else {
-            printf("Error: could not read client credentials\n");
-            exit (-1);
-        }
-    } else if (server_enable == true) {
 #ifdef SSL
         if ((get_key(CERT_FILE, cert) != FAILURE) && (get_key(KEY_FILE, key) != FAILURE)){
             opof_server(address, port, cert, key);
@@ -263,10 +222,7 @@ int main(int argc, char ** argv){
 #else
         printf("Info: Creating Insecure Server\n");
         opof_server(address, port, cert, key);
-
-#endif
-    } 
-
+#endif 
     printf("Exiting normally\n");
     return 1;
 }

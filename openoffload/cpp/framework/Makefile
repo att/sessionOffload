@@ -14,6 +14,7 @@
 #
 ##
 CLIENT_NAME :=opof_test
+SERVER_NAME :=opof_server_test
 PROTO_NAME := openoffload
 DIRECTORIES := directories
 PROTOS := protos
@@ -32,13 +33,14 @@ GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 #
 PROTOS_PATH = ../../../protos
 vpath %.proto $(PROTOS_PATH)
+
 C_SRC_DIR := src
 vpath  %.c $(C_SRC_DIR)
 vpath  %.cc $(C_SRC_DIR)
 #
 H_SRC_DIR := include
 vpath  %.h $(H_SRC_DIR)
-vpath  %.h $(C_SRC_DIR)
+#vpath  %.h $(C_SRC_DIR)
 
 OBJ_SRC_DIR := obj
 vpath %.o $(OBJ_SRC_DIR)
@@ -69,7 +71,7 @@ CPP := g++ -g
 #CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DDEBUG -DVISIBLE
 CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DSSL
 #CPPFLAGS := -c -O2 -std=c++11 -I ./ -I include  -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations  -DDEBUG -DVISIBLE
-CPPFLAGS := -c -O2 -std=c++11 -I ./ -I include  -I src -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations -DSSL
+CPPFLAGS := -c -O2 -std=c++11 -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations -DSSL
 #
 #
 # Link Flags
@@ -103,6 +105,7 @@ ABSL_TIME_ZONE_LIB := $(LIBDIR)/libabsl_time_zone.a
 LD = g++ -g
 #LDFLAGS = -lc  -lc++ -lgrpc++ -lprotobuf -L/usr/local/lib -L /opt/local/lib
 LDFLAGS = -lc  -lstdc++ -pthread
+SERVERFLAGS =  -L $(LIB_DIR) -lopof
 LIBS ?= \
 	$(PROTOBUF_LIB) \
   	$(GRPCPP_LIB) \
@@ -125,7 +128,7 @@ LIBS ?= \
   	$(ABSL_TIME_LIB) \
   	$(ABSL_TIME_ZONE_LIB)  
 #           
-all: $(DIRECTORIES) $(PROTOS) $(OBJS) $(CLIENT_NAME) $(LIBFILE) 
+all: $(DIRECTORIES) $(PROTOS) $(OBJS) $(LIBFILE) $(SERVER_NAME) $(CLIENT_NAME) 
 #
 # Create directories
 #
@@ -137,20 +140,21 @@ $(DIRECTORIES):
 # Generate gPRC files
 #
 $(PROTO_NAME).pb.cc: $(PROTO_NAME).proto
-	mkdir -p cpp
 	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=src $(PROTO_NAME).proto
+	mv src/$(PROTO_NAME).pb.h include/
 #
 $(PROTO_NAME).grpc.pb.cc: $(PROTO_NAME).proto
 	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=src --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
+	mv src/$(PROTO_NAME).grpc.pb.h include/
 #
 $(PROTOS):  $(PROTO_NAME).grpc.pb.cc $(PROTO_NAME).pb.cc
 
 #
 OBJS = \
+	$(OBJ_DIR)/opof_main.o \
 	$(OBJ_DIR)/openoffload.pb.o \
 	$(OBJ_DIR)/openoffload.grpc.pb.o \
 	$(OBJ_DIR)/opof_error.o \
-	$(OBJ_DIR)/opof_main.o \
 	$(OBJ_DIR)/opof_session_server.o \
 	$(OBJ_DIR)/opof_session_client.o \
 	$(OBJ_DIR)/opof_client_test.o \
@@ -159,6 +163,7 @@ OBJS = \
 	$(OBJ_DIR)/opof_server.o \
 	$(OBJ_DIR)/opof_util.o \
 	$(OBJ_DIR)/opof_test_util.o
+	
 #
 
 openoffload.pb.o: openoffload.pb.cc openoffload.pb.h
@@ -171,6 +176,9 @@ opof_error.o: opof_error.c opof_error.h
 	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
 
 opof_main.o: opof_main.c opof.h opof_error.h
+	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
+#
+opof_server_main.o: opof_server_main.c opof.h opof_error.h
 	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
 #
 opof_client_test.o: opof_client_test.c opof.h opof_error.h opof_clientlib.h
@@ -200,8 +208,10 @@ opof_test_util.o: opof_test_util.cc opof.h opof_error.h opof_test_util.h
 $(CLIENT_NAME): openoffload.pb.o openoffload.grpc.pb.o opof_error.o opof_main.o opof_session_server.o opof_session_client.o opof_client_test.o opof_server_test.o opof_clientlib.o opof_server.o opof_util.o opof_test_util.o
 	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $(BIN_DIR)/$@
 #
+$(SERVER_NAME): opof_server_main.o 
+	$(LD) $(LDFLAGS)  $(OBJ_DIR)/opof_server_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_server_test.o  $(OBJ_DIR)/opof_test_util.o $(SERVERFLAGS) $(LIBS)  -o $(BIN_DIR)/$@
 #
-$(LIBFILE): opof_clientlib.o opof_session_server.o opof_session_client.o opof_server.o opof_util.o
+$(LIBFILE): openoffload.pb.o openoffload.grpc.pb.o opof_session_server.o opof_server.o opof_util.o
 	ar ru $(LIB_DIR)/$@ $^
 	ranlib $(LIB_DIR)/$@
 #
@@ -211,4 +221,4 @@ $(LIBFILE): opof_clientlib.o opof_session_server.o opof_session_client.o opof_se
 clean:
 	rm -f obj/*.o \
 	rm -f bin/* \
-	rm -f lib/*.a
+	rm -f lib/*.als 

@@ -95,5 +95,31 @@ void convertSessionResponse2c(sessionResponse *responsecpp, sessionResponse_t *r
   responsec->outBytes = responsecpp->outbytes();
 }
 
+void convertSessionResponse2cpp(sessionResponse *responsecpp, sessionResponse_t *responsec){
+  responsecpp->set_sessionid(responsec->sessionId);
+  responsecpp->set_requeststatus((REQUEST_STATUS)responsec->requestStatus);
+  responsecpp->set_sessionstate((SESSION_STATE)responsec->sessionState);
+  responsecpp->set_sessionclosecode((SESSION_CLOSE_CODE)responsec->sessionCloseCode);
+  responsecpp->set_inpackets(responsec->inPackets);
+  responsecpp->set_outpackets(responsec->outPackets);
+  responsecpp->set_inbytes(responsec->inBytes);
+  responsecpp->set_outbytes(responsec->outBytes);
+}
+void convertSessionRequest2c(sessionRequest request, sessionRequest_t *request_c){
+    actionParameters action;
+
+    request_c->sessId = request.sessionid();
+    request_c->inlif = request.inlif();
+    request_c->outlif = request.outlif();
+    request_c->ipver = (IP_VERSION_T)request.ipversion();
+    request_c->srcPort = request.sourceport();
+    request_c->dstPort = request.destinationport();
+    request_c->proto = (PROTOCOL_ID_T)request.protocolid();
+    action = request.action();
+    request_c->actType= (ACTION_VALUE_T)action.actiontype();
+    request_c->nextHop= action.actionnexthop();
+
+ }
+
 
 

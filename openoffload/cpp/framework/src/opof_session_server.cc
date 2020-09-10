@@ -24,86 +24,10 @@ extern "C" {
 #include "opof_grpc.h"
 #include "opof_session_server.h"
 
- void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *request);
-
- void convertSessionResponse2cpp(sessionResponse *responsecpp, sessionResponse_t *responsec){
-  responsecpp->set_sessionid(responsec->sessionId);
-  responsecpp->set_requeststatus((REQUEST_STATUS)responsec->requestStatus);
-  responsecpp->set_sessionstate((SESSION_STATE)responsec->sessionState);
-  responsecpp->set_sessionclosecode((SESSION_CLOSE_CODE)responsec->sessionCloseCode);
-  responsecpp->set_inpackets(responsec->inPackets);
-  responsecpp->set_outpackets(responsec->outPackets);
-  responsecpp->set_inbytes(responsec->inBytes);
-  responsecpp->set_outbytes(responsec->outBytes);
-}
- void convertSessionRequest2c(sessionRequest request, sessionRequest_t *request_c){
-    actionParameters action;
-
-    request_c->sessId = request.sessionid();
-    request_c->inlif = request.inlif();
-    request_c->outlif = request.outlif();
-    request_c->ipver = (IP_VERSION_T)request.ipversion();
-    request_c->srcPort = request.sourceport();
-    request_c->dstPort = request.destinationport();
-    request_c->proto = (PROTOCOL_ID_T)request.protocolid();
-    action = request.action();
-    request_c->actType= (ACTION_VALUE_T)action.actiontype();
-    request_c->nextHop= action.actionnexthop();
-
- }
-
- 
-#ifdef RPC
-
-  Status SessionTableImpl::addSession(ServerContext* context, const sessionRequest* request,
-                  addSessionResponse* response){
-    addSessionResponse_t addResponse_c;
-    sessionRequest_t request_c;
-    int status;
-    actionParameters action;
-    int sessId = 1000;
-   
-    REQUEST_STATUS reqStatus = REQUEST_STATUS::_ACCEPTED;
-    request_c.sessId = request->sessionid();
-    request_c.inlif = request->inlif();
-    request_c.outlif = request->outlif();
-    request_c.ipver = (IP_VERSION_T)request->ipversion();
-    request_c.srcPort = request->sourceport();
-    request_c.dstPort = request->destinationport();
-    request_c.proto = (PROTOCOL_ID_T)request->protocolid();
-    action = request->action();
-    request_c.actType= (ACTION_VALUE_T)action.actiontype();
-    request_c.nextHop= action.actionnexthop();
-    request.mutable_action()->CopyFrom(action);
-#ifdef DEBUG
-    std::cout << "In add Session Server " << std::endl;
-    std::cout << "offload flow with: " << std::endl;
-    std::cout << "session id: " << request->sessionid() << std::endl;
-  	std::cout << "inlif: " << request->inlif() << std::endl;
-  	std::cout << "outlif: " << request->outlif() << std::endl;  
-  	std::cout << "source IP: " << request->sourceip() << std::endl;
-  	std::cout << "destination IP: " << request->destinationip() << std::endl;
-  	std::cout << "IP version: " << request->ipversion() << std::endl; 
-  	std::cout << "source port: " << request->sourceport() << std::endl;
-  	std::cout << "destination port: " << request->destinationport() << std::endl;    
-  	std::cout << "protocol id: " << request->protocolid() << std::endl;   
-  	std::cout << "nexthop is: " << action.actionnexthop() << std::endl;
-  	std::cout << "actionType: " << action.actiontype() << std::endl;
-#endif
-    /*
-    * Call C function (User defined)
-    */
-    status = opof_add_session_server(&request_c, &addResponse_c);
-    if (status != 0){
-      return grpc::Status(grpc::StatusCode::CANCELLED, "call to opof_add_session_server failed");
-    }
-    //response->set_sessionid(addResponse_c.sessionId);
-    response->set_requeststatus((REQUEST_STATUS)addResponse_c.requestStatus);
-  // Add an IPv4 session
-    return Status::OK;
-  }
-
-#endif
+//extern "C" int opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *response);
+//extern "C" int opof_get_session_server(unsigned long sessionId, sessionResponse_t *response);
+//extern "C" int opof_del_session_server(unsigned long sessionId, sessionResponse_t *response);
+//extern "C" sessionResponse_t **opof_get_closed_sessions_server(statisticsRequestArgs_t *request, int *sessionCount);
 
   Status SessionTableImpl::addSession(ServerContext* context, ServerReader<sessionRequest>* reader, addSessionResponse* response) {
     int status;
