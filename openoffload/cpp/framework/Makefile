@@ -221,4 +221,4 @@ $(LIBFILE): openoffload.pb.o openoffload.grpc.pb.o opof_session_server.o opof_se
 clean:
 	rm -f obj/*.o \
 	rm -f bin/* \
-	rm -f lib/*.als 
+	rm -f lib/*.a
