@@ -48,6 +48,7 @@ vpath %.o $(OBJ_SRC_DIR)
 # Output directories
 #
 ##
+INC_DIR := include
 SRC_DIR := src
 LIB_DIR := lib
 OBJ_DIR := obj
@@ -163,13 +164,20 @@ OBJS = \
 	$(OBJ_DIR)/opof_server.o \
 	$(OBJ_DIR)/opof_util.o \
 	$(OBJ_DIR)/opof_test_util.o
-	
+
+LIBOBJS = \
+	$(OBJ_DIR)/openoffload.pb.o \
+	$(OBJ_DIR)/openoffload.grpc.pb.o \
+	$(OBJ_DIR)/opof_session_server.o \
+	$(OBJ_DIR)/opof_server.o \
+	$(OBJ_DIR)/opof_util.o
+
 #
 
-openoffload.pb.o: openoffload.pb.cc openoffload.pb.h
+openoffload.pb.o: $(SRC_DIR)/openoffload.pb.cc $(INC_DIR)/openoffload.pb.h
 	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
 
-openoffload.grpc.pb.o: openoffload.grpc.pb.cc openoffload.grpc.pb.h
+openoffload.grpc.pb.o: $(SRC_DIR)/openoffload.grpc.pb.cc $(INC_DIR)/openoffload.grpc.pb.h
 	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
 
 opof_error.o: opof_error.c opof_error.h
@@ -212,7 +220,7 @@ $(SERVER_NAME): opof_server_main.o opof_server_test.o opof_error.o opof_test_uti
 	$(LD) $(LDFLAGS)  $(OBJ_DIR)/opof_server_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_server_test.o  $(OBJ_DIR)/opof_test_util.o $(SERVERFLAGS) $(LIBS)  -o $(BIN_DIR)/$@
 #
 $(LIBFILE): openoffload.pb.o openoffload.grpc.pb.o opof_session_server.o opof_server.o opof_util.o
-	ar ru $(LIB_DIR)/$@ $^
+	ar ruv $(LIB_DIR)/$@ $(LIBOBJS)
 	ranlib $(LIB_DIR)/$@
 #
 #
@@ -221,4 +229,8 @@ $(LIBFILE): openoffload.pb.o openoffload.grpc.pb.o opof_session_server.o opof_se
 clean:
 	rm -f obj/*.o \
 	rm -f bin/* \
-	rm -f lib/*.a
+	rm -f lib/*.a \
+	rm -f src/openoffload.grpc.pb.cc \
+	rm -f src/openoffload.pb.cc \
+	rm -f include/openoffload.grpc.pb.h \
+	rm -f include/openoffload.pb.h
