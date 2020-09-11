@@ -246,7 +246,9 @@ $ docker build -t opofbld:0.3 .
 Access the container to get the files
 
 ```bash
-$ docker run -it opofbld:0.3 /bin/bash
+$ mkdir dockerresults
+$ docker create -it --name results opofbld:0.3 /bin/bash
+$ docker cp results:/home/grpc/local/tests/bin/ results/
 ```
 
 # References
