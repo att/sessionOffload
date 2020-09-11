@@ -243,7 +243,11 @@ $ cp ../../../prots/openoffload.proto .
 $ cd ..
 $ docker build -t opofbld:0.3 .
 ```
+Access the container to get the files
 
+```bash
+$ docker run -it opofbld:0.3 /bin/bash
+```
 
 # References
 
