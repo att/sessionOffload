@@ -237,10 +237,10 @@ Create the build container from the base image
 There is a little hack necessary to get the proto file in the right place for docker
 
 ```bash
-$ cp ../../../prots/openoffload.proto .
+$ cd ..
+$ cp ../../../protos/openoffload.proto .
 ```
 ```bash
-$ cd ..
 $ docker build -t opofbld:0.3 .
 ```
 Access the container to get the files
