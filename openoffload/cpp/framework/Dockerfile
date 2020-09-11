@@ -1,40 +1,22 @@
-FROM centos:7.6.1810
-USER root
-RUN mkdir -p /home/grpc/local
-WORKDIR /home/grpc/local
-ENV GRPC_INSTALL /home/grpc/local
-RUN echo $GRPC_INSTALL
-RUN yum -y install wget
-RUN yum -y group install "Development Tools"
-RUN wget --no-check-certificate -q -O cmake-linux.sh https://github.com/Kitware/CMake/releases/download/v3.17.0/cmake-3.17.0-Linux-x86_64.sh
-RUN ["sh", "cmake-linux.sh",  "--", "--skip-license", "--prefix=/home/grpc/local"]
-RUN rm cmake-linux.sh
-ENV PATH="$GRPC_INSTALL/bin:${PATH}"
-RUN echo $PATH
-RUN git config --global  http.sslVerify false
-RUN git clone --recurse-submodules -b v1.30.0 https://github.com/grpc/grpc
-RUN cd grpc
-RUN mkdir -p /home/grpc/local/grpc/cmake/build
-WORKDIR /home/grpc/local/grpc/cmake/build
-RUN echo $PATH
-#CMD ["sh", "-c", "tail -f /dev/null"]
-RUN pwd
-RUN cmake -DgRPC_INSTALL=ON -DgRPC_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/home/grpc/local ../..
-RUN make -j 4
-RUN make install
-RUN cd ../..
+FROM grpcbuild:0.3
 #
-RUN mkdir /home/grpc/local/tests
+USER root
+ENV PATH="/home/grpc/local/bin:${PATH}"
+RUN mkdir -p /home/grpc/local/tests
+RUN mkdir -p /home/grpc/local/tests/src/
+RUN mkdir -p /home/grpc/local/tests/include/
+RUN mkdir -p /home/grpc/local/tests/ssl/
 WORKDIR /home/grpc/local/tests
-COPY *.cc /home/grpc/local/tests/
-COPY *.h /home/grpc/local/tests/
-COPY tests/src/*.c /home/grpc/local/tests/src/
-COPY tests/src/*.cc /home/grpc/local/tests/src/
-COPY tests/include/*.h /home/grpc/local/tests/include/
-COPY tests/ssl/* /home/grpc/local/tests/ssl/
-COPY tests/Makefile_Centos /home/grpc/local/tests/Makefile
-RUN mkdir obj
-RUN mkdir bin
-RUN mkdir log
-RUN make
+COPY src/*.c /home/grpc/local/tests/src/
+COPY src/*.cc /home/grpc/local/tests/src/
+COPY include/*.h /home/grpc/local/tests/include/
+COPY ssl/* /home/grpc/local/tests/ssl/
+COPY Makefile /home/grpc/local/tests/Makefile
+RUN mkdir -p /home/protos
+COPY openoffload.proto /home/protos/
+RUN ls ../../../protos
+RUN mkdir -p bin
+RUN mkdir -p obj
+RUN mkdir -p log
+RUN make HOME=/home/grpc all
 CMD ["sh", "-c", "tail -f /dev/null"]
