@@ -79,6 +79,7 @@ CPPFLAGS := -c -O2 -std=c++11 -I include -I $(ROOT_DIR)/local/include -Wno-depre
 #
 LIBDIR := $(ROOT_DIR)/local/lib
 LIB64DIR := $(ROOT_DIR)/local/lib64
+#
 GPR_LIB := $(LIBDIR)/libgpr.a
 CHANNELZ_LIB := $(LIBDIR)/libgrpcpp_channelz.a
 GRPCPP_LIB := $(LIBDIR)/libgrpc++.a
@@ -129,7 +130,7 @@ LIBS ?= \
   	$(ABSL_TIME_LIB) \
   	$(ABSL_TIME_ZONE_LIB)  
 #           
-all: $(DIRECTORIES) $(PROTOS) $(OBJS) $(LIBFILE) $(SERVER_NAME) $(CLIENT_NAME) 
+all: $(DIRECTORIES) $(PROTOS) $(LIBFILE) $(SERVER_NAME) $(CLIENT_NAME) 
 #
 # Create directories
 #
@@ -177,7 +178,7 @@ LIBOBJS = \
 openoffload.pb.o: $(SRC_DIR)/openoffload.pb.cc $(INC_DIR)/openoffload.pb.h
 	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
 
-openoffload.grpc.pb.o: $(SRC_DIR)/openoffload.grpc.pb.cc $(INC_DIR)/openoffload.grpc.pb.h
+openoffload.grpc.pb.o: $(SRC_DIR)/openoffload.grpc.pb.cc $(INC_DIR)/openoffload.grpc.pb.h $(INC_DIR)/openoffload.pb.h 
 	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
 
 opof_error.o: opof_error.c opof_error.h
