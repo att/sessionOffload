@@ -223,6 +223,28 @@ To implement the interfaces to the server the following functions defined in "op
 ```
 The file "opof_server_test.c" is a sample implementation of each of the functions. The sample implementaton implements a simple in memory hashtable to enable more complex test scenarios to be implemented.
 
+# Building from dockerfiles
+
+## Step 1 
+Create the basic build image with all the required libraries
+
+```bash
+$ cd openoffload/cpp/framework/build
+$ docker build -t grpcbuild:0.3 .
+```
+## Step 2
+Create the build container from the base image
+There is a little hack necessary to get the proto file in the right place for docker
+
+```bash
+$ cp ../../../prots/openoffload.proto .
+```
+```bash
+$ cd ..
+$ docker build -t opofbld:0.3 .
+```
+
+
 # References
 
 1. [gRPC Quick Start Install](https://grpc.io/docs/languages/cpp/quickstart/)
