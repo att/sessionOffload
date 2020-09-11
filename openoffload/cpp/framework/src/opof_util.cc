@@ -80,6 +80,17 @@ void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *requ
     action.set_actiontype((ACTION_TYPE)request_c->actType);
     action.set_actionnexthop(request_c->nextHop);
     request->mutable_action()->CopyFrom(action);
+#ifdef DEBUG
+    char address[INET_ADDRSTRLEN];
+    struct in_addr ip;
+    printf("DEBUG: Source IP as int: %d\n",request_c->srcIP);
+    ip.s_addr = request_c->srcIP;
+    printf("DEBUG: Source IP: %s\n", inet_ntop(AF_INET,(void *)&ip,address,INET_ADDRSTRLEN));
+    ip.s_addr = request_c->dstIP;
+    printf("DEBUG: Dest IP: %s\n", inet_ntop(AF_INET,(void *)&ip,address,INET_ADDRSTRLEN));
+    ip.s_addr = request_c->nextHop;
+    printf("DEBUG: NextHop IP: %s\n", inet_ntop(AF_INET,(void *)&ip,address,INET_ADDRSTRLEN));
+#endif
 
 }
 
@@ -112,12 +123,25 @@ void convertSessionRequest2c(sessionRequest request, sessionRequest_t *request_c
     request_c->inlif = request.inlif();
     request_c->outlif = request.outlif();
     request_c->ipver = (IP_VERSION_T)request.ipversion();
+    request_c->srcIP = request.sourceip();
+    request_c->dstIP = request.destinationip();
     request_c->srcPort = request.sourceport();
     request_c->dstPort = request.destinationport();
     request_c->proto = (PROTOCOL_ID_T)request.protocolid();
     action = request.action();
     request_c->actType= (ACTION_VALUE_T)action.actiontype();
     request_c->nextHop= action.actionnexthop();
+#ifdef DEBUG
+    char address[INET_ADDRSTRLEN];
+    struct in_addr ip;
+    printf("DEBUG: Source IP as int: %d\n",request_c->srcIP);
+    ip.s_addr = request_c->srcIP;
+    printf("DEBUG: Source IP: %s\n", inet_ntop(AF_INET,(void *)&ip,address,INET_ADDRSTRLEN));
+    ip.s_addr = request_c->dstIP;
+    printf("DEBUG: Dest IP: %s\n", inet_ntop(AF_INET,(void *)&ip,address,INET_ADDRSTRLEN));
+    ip.s_addr = request_c->nextHop;
+    printf("DEBUG: NextHop IP: %s\n", inet_ntop(AF_INET,(void *)&ip,address,INET_ADDRSTRLEN));
+#endif
 
  }
 

@@ -15,6 +15,8 @@
 #include <arpa/inet.h>
 #include <sys/types.h>          
 #include <sys/socket.h>
+#include <netinet/in.h>
+
 
 #include "opof_test_util.h"
 
@@ -72,17 +74,24 @@ sessionRequest_t **createSessionRequest(int size, unsigned long start_sessionId)
   proto = _TCP;
   ipver = _IPV4;
   action = _FORWARD;
-  unsigned int srcip;
-  unsigned int dstip;
-  unsigned int nexthopip;
+  struct in_addr srcip;
+  struct in_addr dstip;
+  struct in_addr nexthopip;
   const char *src_addr = "10.0.1.1";
   const char *dst_addr= "10.1.0.1";
   const char *nextHop = "192.168.0.1";
+  char address[INET_ADDRSTRLEN];
+  status = inet_pton(AF_INET,src_addr, &srcip); 
+  status = inet_pton(AF_INET,dst_addr, &dstip); 
+  status = inet_pton(AF_INET,nextHop, &nexthopip); 
+//#ifdef DEBUG
 
-  status = inet_pton(AF_INET, src_addr, &srcip); 
-  status = inet_pton(AF_INET, dst_addr, &dstip); 
-  status = inet_pton(AF_INET, nextHop, &nexthopip); 
-  
+printf("DEBUG: Source IP: %s\n", inet_ntop(AF_INET,(void *)&srcip,address,INET_ADDRSTRLEN));
+printf("DEBUG: Source IP as int: %d\n",srcip.s_addr);
+printf("DEBUG: Dest IP: %s\n", inet_ntop(AF_INET,(void *)&dstip,address,INET_ADDRSTRLEN));
+printf("DEBUG: NextHop IP: %s\n", inet_ntop(AF_INET,(void *)&nexthopip,address,INET_ADDRSTRLEN));
+
+//#endif
 
   requests = (sessionRequest_t **)malloc(size * (sizeof(requests)));
 
@@ -92,13 +101,13 @@ sessionRequest_t **createSessionRequest(int size, unsigned long start_sessionId)
     request->sessId = (i+start_sessionId);
     request->inlif = 1;
     request->outlif = 2;
-    request->srcIP = srcip;
-    request->dstIP = dstip;
+    request->srcIP = (unsigned int)srcip.s_addr;
+    request->dstIP = (unsigned int)dstip.s_addr;
     request->srcPort = 80;
     request->dstPort = 45678;
     request->proto = proto;
     request->ipver = ipver;
-    request->nextHop = nexthopip;
+    request->nextHop = (unsigned int)nexthopip.s_addr;
     request->actType = action;
     requests[i] = request;
   }
