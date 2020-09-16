@@ -81,7 +81,7 @@ int main(int argc, char ** argv){
 #ifdef FORK
     pid_t pid,sid;
 #endif
-
+    char test_config[FILENAME_MAX];
     int c;
     int status = SUCCESS;
     struct sigaction newSigAction;
@@ -97,6 +97,7 @@ int main(int argc, char ** argv){
     strncpy(address,default_address,strlen(default_address)+1);
     client_enable = true;
     server_enable = false;
+    test_config[0]="\0";
     //
     static struct option longopts[] = {
         {"client", required_argument,0,'c'},
@@ -106,12 +107,13 @@ int main(int argc, char ** argv){
         {"port", no_argument, 0 ,'p'},
         {"number", no_argument,0,'n'},
         {"buffersize", no_argument,0,'b'},
+        {"testcfg", no_argument,0,'t'},
         {"help",no_argument,0,'h'},
     };
     /*
      * Loop over input
      */
-    while (( c = getopt_long(argc,argv, "a:p:n:b:csvh",longopts,NULL))!=    -1){
+    while (( c = getopt_long(argc,argv, "a:p:n:b:t:csvh",longopts,NULL))!=    -1){
         switch(c) {
             case 'c':
                 client_enable = true;
@@ -137,6 +139,9 @@ int main(int argc, char ** argv){
              case 'b':
                 pageSize = (unsigned int)strtoul(optarg, &str_part,10);
                 break;
+            case 't':
+                strncpy(test_config, optarg, FILENAME_MAX);
+                break;
             case 'h':
                 printf("\nCommand line arguments for OpenOffload tests version: %s \n", OPOF_VERSION);
                 printf("\t-c, --client          Client Program \n");
@@ -146,6 +151,7 @@ int main(int argc, char ** argv){
                 printf("\t-n, --number          Number of sessions\n");
                 printf("\t-b, --buffersize      Streaming buffer size\n");
                 printf("\t-v, --version         Version of Open Offload Program\n");
+                printf("\t-t, --testcfg         Test configuration file\n");
                 printf("\t-h, --help:           Command line help \n\n");
                 exit(1);
             default:
@@ -247,7 +253,11 @@ int main(int argc, char ** argv){
         status = get_key(CERT_FILE, cert);
 #endif
         if (status != FAILURE){
-            opof_client_test(address, number, pageSize, port, cert);
+            if (test_config == NULL){
+                opof_client_test(address, number, pageSize, port, cert);
+            } else {
+                opof_run_tests(address, number, pageSize, port, cert,test_config);
+            }
         } else {
             printf("Error: could not read client credentials\n");
             exit (-1);

@@ -70,9 +70,9 @@ CC := gcc -g
 CPP := g++ -g
 
 #CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DDEBUG -DVISIBLE
-CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DSSL
+CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DSSL -DDEBUG
 #CPPFLAGS := -c -O2 -std=c++11 -I ./ -I include  -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations  -DDEBUG -DVISIBLE
-CPPFLAGS := -c -O2 -std=c++11 -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations -DSSL
+CPPFLAGS := -c -O2 -std=c++11 -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations -DSSL -DDEBUG
 #
 #
 # Link Flags
@@ -106,7 +106,8 @@ ABSL_TIME_ZONE_LIB := $(LIBDIR)/libabsl_time_zone.a
 
 LD = g++ -g
 #LDFLAGS = -lc  -lc++ -lgrpc++ -lprotobuf -L/usr/local/lib -L /opt/local/lib
-LDFLAGS = -lc  -lstdc++ -pthread
+LIBCONFIG = /usr/local/lib/libconfig.a
+LDFLAGS = -lc  -lstdc++ -pthread -lconfig
 SERVERFLAGS =  -L $(LIB_DIR) -lopof
 LIBS ?= \
 	$(PROTOBUF_LIB) \
@@ -160,11 +161,13 @@ OBJS = \
 	$(OBJ_DIR)/opof_session_server.o \
 	$(OBJ_DIR)/opof_session_client.o \
 	$(OBJ_DIR)/opof_client_test.o \
+	$(OBJ_DIR)/opof_run_tests.o \
 	$(OBJ_DIR)/opof_server_test.o \
 	$(OBJ_DIR)/opof_clientlib.o \
 	$(OBJ_DIR)/opof_server.o \
 	$(OBJ_DIR)/opof_util.o \
-	$(OBJ_DIR)/opof_test_util.o
+	$(OBJ_DIR)/opof_test_util.o \
+	$(OBJ_DIR)/opof_config.o
 
 LIBOBJS = \
 	$(OBJ_DIR)/openoffload.pb.o \
@@ -184,6 +187,9 @@ openoffload.grpc.pb.o: $(SRC_DIR)/openoffload.grpc.pb.cc $(INC_DIR)/openoffload.
 opof_error.o: opof_error.c opof_error.h
 	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
 
+opof_config.o: opof_config.c opof_error.h
+	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
+
 opof_main.o: opof_main.c opof.h opof_error.h
 	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
 #
@@ -191,6 +197,9 @@ opof_server_main.o: opof_server_main.c opof.h opof_error.h
 	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
 #
 opof_client_test.o: opof_client_test.c opof.h opof_error.h opof_clientlib.h
+	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
+
+opof_run_tests.o: opof_run_tests.c opof.h opof_error.h opof_clientlib.h
 	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
 
 opof_server_test.o: opof_server_test.c opof.h opof_error.h
@@ -214,8 +223,8 @@ opof_util.o: opof_util.cc opof.h opof_error.h opof_util.h
 opof_test_util.o: opof_test_util.cc opof.h opof_error.h opof_test_util.h
 	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
 
-$(CLIENT_NAME): openoffload.pb.o openoffload.grpc.pb.o opof_error.o opof_main.o opof_session_server.o opof_session_client.o opof_client_test.o opof_server_test.o opof_clientlib.o opof_server.o opof_util.o opof_test_util.o
-	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $(BIN_DIR)/$@
+$(CLIENT_NAME): openoffload.pb.o openoffload.grpc.pb.o opof_error.o opof_main.o opof_session_server.o opof_session_client.o opof_client_test.o opof_server_test.o opof_clientlib.o opof_server.o opof_util.o opof_test_util.o opof_run_tests.o opof_config.o
+	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) $(LIBCONFIG) -o $(BIN_DIR)/$@
 #
 $(SERVER_NAME): opof_server_main.o opof_server_test.o opof_error.o opof_test_util.o
 	$(LD) $(LDFLAGS)  $(OBJ_DIR)/opof_server_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_server_test.o  $(OBJ_DIR)/opof_test_util.o $(SERVERFLAGS) $(LIBS)  -o $(BIN_DIR)/$@

@@ -13,6 +13,18 @@ $ yum -y install wget
 $ yum -y group install "Development Tools"
 ```
 
+## Install [libconfig](http://hyperrealm.github.io/libconfig/)
+Libconfig is used to configure test files the the test client only.
+[libconfig install instructions](https://github.com/hyperrealm/libconfig/blob/master/INSTALL)
+
+```bash
+$ wget http://hyperrealm.github.io/libconfig/dist/libconfig-1.7.2.tar.gz
+$ tar xvzf libconfig-1.7.2
+$ cd libconfig-1.7.2
+$ ./configure
+$ make 
+$ make install
+```
 ## Install gRPC C++
 
 ```bash
@@ -67,6 +79,13 @@ Run the client
 
 ```bash
 $ bin/opof_test -c -n 128 - b 64
+```
+## Testing 
+
+To run specific tests users can create configuration files and run them as specific tests. The configuration files are in the "config" directory.
+
+```bash
+$ bin/opof_test -c -t config/test1.cfg
 ```
 
 # Programming the C Interface
@@ -207,7 +226,7 @@ The address is a string representing the address of the server and the port is a
 ```
 ### Extending the server
 
-The server s started by calling 
+The server is started by calling 
 
 ```C
 void opof_server(const char* address, unsigned short port, const char* cert, const char* key)
@@ -243,6 +262,7 @@ $ cp ../../../protos/openoffload.proto .
 ```bash
 $ docker build -t opofbld:0.3 .
 ```
+## Step 3
 Access the container to get the files
 
 ```bash

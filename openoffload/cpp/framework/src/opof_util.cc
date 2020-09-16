@@ -52,7 +52,7 @@ void display_session_response(sessionResponse_t *response){
 
 void display_session_request(sessionRequest_t *request){
 
-    printf("\n\nSession Response\n");
+    printf("\n\nSession Request\n");
     printf("Session ID: %ld\n",request->sessId);
     printf( "Inlif: %d\n",request->inlif);
     printf( "Outlif: %d\n",request->outlif);
