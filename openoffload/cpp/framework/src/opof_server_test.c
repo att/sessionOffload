@@ -23,7 +23,7 @@
 int opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *response ){
  
 #ifdef DEBUG
-  display_session_request(paramaters);
+  display_session_request(parameters);
 #endif
     record_t *r;
     //record_t *records = NULL;

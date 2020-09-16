@@ -81,9 +81,18 @@ sessionRequest_t **createSessionRequest(int size, unsigned long start_sessionId)
   const char *dst_addr= "10.1.0.1";
   const char *nextHop = "192.168.0.1";
   char address[INET_ADDRSTRLEN];
-  status = inet_pton(AF_INET,src_addr, &srcip); 
-  status = inet_pton(AF_INET,dst_addr, &dstip); 
-  status = inet_pton(AF_INET,nextHop, &nexthopip); 
+  status = inet_pton(AF_INET,src_addr, &srcip);
+  if (status != 1) {
+    fprintf(stderr,"ERROR: invalid address: %s %s\n",src_addr, strerror(errno));
+  }
+  status = inet_pton(AF_INET,dst_addr, &dstip);
+  if (status != 1){
+    fprintf(stderr,"ERROR: invalid address: %s %s\n",src_addr, strerror(errno));
+  }
+  status = inet_pton(AF_INET,nextHop, &nexthopip);
+  if (status != 1){
+    fprintf(stderr,"ERROR: invalid address: %s %s\n",src_addr, strerror(errno));
+  }
 //#ifdef DEBUG
 
 printf("DEBUG: Source IP: %s\n", inet_ntop(AF_INET,(void *)&srcip,address,INET_ADDRSTRLEN));
@@ -142,4 +151,32 @@ HASH_ITER(hh, sessions, r, tmp) {
 }
 return response;
 
+}
+
+void display_session_response(sessionResponse_t *response){
+
+    printf("\n\nSession Response\n");
+    printf("Session ID: %ld\n",response->sessionId);
+    printf("In Packets %ld\n",response->inPackets);
+    printf("Out Packets: %ld\n",response->outPackets);
+    printf("In Bytes: %ld\n",response->inBytes);
+    printf("Out Bytes: %ld\n",response->outBytes);
+    printf("Session State: %d\n",response->sessionState);
+    printf("Session Close Code; %d\n",response->sessionCloseCode);
+    printf("Request Status: %d\n",response->requestStatus);
+}
+
+void display_session_request(sessionRequest_t *request){
+
+    printf("\n\nSession Request\n");
+    printf("Session ID: %ld\n",request->sessId);
+    printf( "Inlif: %d\n",request->inlif);
+    printf( "Outlif: %d\n",request->outlif);
+    printf( "Source Port: %d\n",request->srcPort);
+    printf( "Source IP: %d\n", request->srcIP);
+    printf( "Destination IP: %d\n",request->dstIP);
+    printf( "Destination Port: %d\n",request->dstPort);
+    printf( "Protocol ID: %d\n",request->proto);
+    printf( "IP Version: %d\n",request->ipver);
+    printf( "Action Value: %d\n",request->actType);
 }

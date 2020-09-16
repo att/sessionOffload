@@ -29,7 +29,7 @@
 #include "opof.h"
 #include "opof_test.h"
 #include "opof_error.h"
-#include "opof_serverlib.h"
+
 
 
 #define OPOF_VERSION "0.1"
@@ -45,7 +45,7 @@
 void signal_handler(int sig);
 void opof_client_test(const char *address, int number, unsigned int pageSize, unsigned short port, const char *cert);
 void opof_run_tests(const char *address, int number, unsigned int pageSize, unsigned short port, const char *cert, char *filename);
-void opof_server(const char *address, unsigned short port, const char *cert, const char *key);
+
 //
 int get_key(const char *filename, char *key){
     FILE *fp;
@@ -76,7 +76,6 @@ int main(int argc, char ** argv){
      * Command Line Arguments
      */
     char cert[2048];
-    char key [2048];
   
     FILE *fp, *logfile;
 #ifdef FORK
@@ -86,8 +85,6 @@ int main(int argc, char ** argv){
     int c;
     int status = SUCCESS;
     struct sigaction newSigAction;
-    bool client_enable;
-    bool server_enable;
     unsigned short port = 3443;
     char address[64];
     int number = 1;
@@ -96,13 +93,10 @@ int main(int argc, char ** argv){
     char *default_address ="localhost";
     
     strncpy(address,default_address,strlen(default_address)+1);
-    client_enable = true;
-    server_enable = false;
+    
     test_config[0]='\0';
     //
     static struct option longopts[] = {
-        {"client", required_argument,0,'c'},
-        {"server", required_argument,0,'s'},
         {"version", no_argument,0,'v'},
         {"address", no_argument, 0, 'a'},
         {"port", no_argument, 0 ,'p'},
@@ -114,16 +108,8 @@ int main(int argc, char ** argv){
     /*
      * Loop over input
      */
-    while (( c = getopt_long(argc,argv, "a:p:n:b:t:csvh",longopts,NULL))!=    -1){
+    while (( c = getopt_long(argc,argv, "a:p:n:b:t:vh",longopts,NULL))!=    -1){
         switch(c) {
-            case 'c':
-                client_enable = true;
-                server_enable = false;
-                break;
-            case 's':
-                client_enable = false;
-                server_enable = true;
-                break;
             case 'v':
                 printf("\nVersion of OPOF Program: %s\n\n", OPOF_VERSION);
                 exit(0);
@@ -145,8 +131,6 @@ int main(int argc, char ** argv){
                 break;
             case 'h':
                 printf("\nCommand line arguments for OpenOffload tests version: %s \n", OPOF_VERSION);
-                printf("\t-c, --client          Client Program \n");
-                printf("\t-s, --session         Server Program\n");
                 printf("\t-p, --port            gRPC Port \n");
                 printf("\t-a, --address         Address of gRPC Server\n");
                 printf("\t-n, --number          Number of sessions\n");
@@ -249,7 +233,6 @@ int main(int argc, char ** argv){
 #endif
     
 
-    if (client_enable == true ) {
 #ifdef SSL
         status = get_key(CERT_FILE, cert);
 #endif
@@ -262,23 +245,8 @@ int main(int argc, char ** argv){
         } else {
             printf("Error: could not read client credentials\n");
             exit (-1);
-        }
-    } else if (server_enable == true) {
-#ifdef SSL
-        if ((get_key(CERT_FILE, cert) != FAILURE) && (get_key(KEY_FILE, key) != FAILURE)){
-            opof_server(address, port, cert, key);
-        } else {
-            printf("Error: could not read server credentials\n");
-            exit(-1);
-        }
-#else
-        printf("Info: Creating Insecure Server\n");
-        opof_server(address, port, cert, key);
-
-#endif
-    } 
-
-    printf("Exiting normally\n");
+        } 
+    printf("Exiting client test normally\n");
     return 1;
 }
 

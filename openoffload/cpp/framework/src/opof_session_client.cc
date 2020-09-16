@@ -132,7 +132,6 @@ void SessionTableClient::getAllSessions(){
       std::cout << "Found feature called "  << std::endl;
       std::cout << "Session ID: " << response.sessionid() << std::endl;
       convertSessionResponse2c(&response, &responsec);
-      display_session_response(&responsec);
                // << feature.name() << " at "
                // << feature.location().latitude()/kCoordFactor_ << ", "
                // << feature.location().longitude()/kCoordFactor_ << std::endl;

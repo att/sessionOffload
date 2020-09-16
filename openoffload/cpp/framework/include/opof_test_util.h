@@ -23,13 +23,14 @@ extern "C" {
 #include <stdlib.h>
 #include "opof.h"
 #include "opof_error.h"
-#include "opof_serverlib.h"
 #include "opof_hash.h"
 
 int range(int low, int high);
 sessionResponse_t **createSessionResponse(int size, int *sessionCount);
 sessionRequest_t **createSessionRequest(int size, unsigned long start_sessionId);
 sessionResponse_t *getClosedSessionsFromHash();
+void display_session_response(sessionResponse_t *response);
+void display_session_request(sessionRequest_t *request);
 #ifdef __cplusplus
 }
 #endif

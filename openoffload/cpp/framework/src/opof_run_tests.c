@@ -28,6 +28,7 @@
 
 
 //int get_key(char *location, char *public_key);
+sessionRequest_t **read_config(char *filename);
 
 void opof_run_tests(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, char *test_config){
 

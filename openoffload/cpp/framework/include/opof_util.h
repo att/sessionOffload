@@ -32,8 +32,6 @@ extern "C" {
 int get_key(const char *filename, char *key);
 //int create_address(char *address, unsigned short port);
 
-void display_session_response(sessionResponse_t *response);
-void display_session_request(sessionRequest_t *request);
 void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *request);
 void convertSessionResponse2c(sessionResponse *responsecpp, sessionResponse_t *responsec);
 void convertSessionResponse2cpp(sessionResponse *responsecpp, sessionResponse_t *responsec);

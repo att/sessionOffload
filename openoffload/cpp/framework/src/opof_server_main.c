@@ -42,7 +42,6 @@
  * Declare functions
  */
 void signal_handler(int sig);
-void opof_client_test(const char *address, int number, unsigned int pageSize, unsigned short port, const char *cert);
 void opof_server(const char *address, unsigned short port, const char *cert, const char *key);
 //
 int get_key(const char *filename, char *key){
