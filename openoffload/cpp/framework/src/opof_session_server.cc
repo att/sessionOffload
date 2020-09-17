@@ -27,15 +27,28 @@ extern "C" {
 
 Status SessionTableImpl::addSession(ServerContext* context, ServerReader<sessionRequest>* reader, addSessionResponse* response) {
     int status;
+    unsigned long errorCode;
+    unsigned long error = 1;
+    int index=0;
+    REQUEST_STATUS reqStatus;
     addSessionResponse_t addResponse_c;
     sessionRequest_t request_c;
     sessionRequest request;
     while(reader->Read(&request)){
       convertSessionRequest2c(request, &request_c);
-      status = opof_add_session_server(&request_c, &addResponse_c);     
+      status = opof_add_session_server(&request_c, &addResponse_c);
+      if (status == FAILURE){
+        errorCode = errorCode ^ (error << index);
+      }
+      index++;
     }
-    REQUEST_STATUS reqStatus = REQUEST_STATUS::_REJECTED;
+    if (errorCode > 0){
+      reqStatus = REQUEST_STATUS::_REJECTED;
+    }else {
+      reqStatus = REQUEST_STATUS::_ACCEPTED;
+    }
     response->set_requeststatus(reqStatus);
+    response->set_errorstatus(errorCode);
     return Status::OK;
   }
 

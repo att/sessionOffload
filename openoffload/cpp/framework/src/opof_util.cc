@@ -67,7 +67,11 @@ void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *requ
 #endif
 
 }
+void convertAddSessionResponse2c(addSessionResponse_t *response_c, addSessionResponse *response){
 
+  response_c->requestStatus = (REQUEST_STATUS_T)response->requeststatus();
+  response_c->errorStatus = response->errorstatus();
+}
 void convertSessionResponse2c(sessionResponse *responsecpp, sessionResponse_t *responsec){
 
   responsec->sessionId = responsecpp->sessionid();

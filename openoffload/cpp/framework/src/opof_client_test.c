@@ -34,7 +34,7 @@ void opof_client_test(const char *address, int max_sessions, unsigned int pageSi
   int status;
   streamArgs_t args;
   sessionTable_t *handle;
-
+  unsigned long error = 1;
   sessionRequest_t **request;
   addSessionResponse_t addResp;
 #ifdef FAST
@@ -55,6 +55,11 @@ void opof_client_test(const char *address, int max_sessions, unsigned int pageSi
     status = opof_add_session(pageSize,handle, request, &addResp);
     if (status == FAILURE){
       printf("ERROR: Adding sessions: \n");
+      for (i=0; i < pageSize; i++){
+        if ((addResp.errorStatus & (error << i)) > 0) {
+          printf("Session index: %d failed code: %lu", i, (addResp.errorStatus & (error << i)));
+        }
+      }
       exit(-1);
       //printf("Success on add session test\n");
     }

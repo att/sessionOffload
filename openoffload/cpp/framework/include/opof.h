@@ -71,7 +71,7 @@ typedef struct {
 
 typedef struct addSessionResponseTuple {
   REQUEST_STATUS_T requestStatus;
-  unsigned long errorstatus;
+  unsigned long errorStatus;
   //google.protobuf.Timestamp startTime = 3;
 } addSessionResponse_t;
 

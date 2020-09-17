@@ -42,6 +42,8 @@ for (int i=0; i< size; i++){
 free(s);
 writer->WritesDone();
 status = writer->Finish();
+convertAddSessionResponse2c(resp,&response);
+
 return status;
 }
 // getSession

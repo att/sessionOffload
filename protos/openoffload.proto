@@ -68,11 +68,16 @@ enum ACTION_TYPE{
    _SNOOP = 3;
 }
 
-
+//
+// The session table was combined with the statistices service
+// in v1alpha4 to simplfy the code.
+//
 service SessionTable {
 
 
 // Adds a session
+// This was changed in v1alpha4 to be a streaming API, for performance
+// reasons.
 rpc addSession(stream sessionRequest) returns (addSessionResponse) {}
 
 // Obtains the session 
@@ -118,10 +123,13 @@ message sessionRequest{
   PROTOCOL_ID protocolId = 9;
   actionParameters action = 10;
 }
-
+//
+// In v1apha4 the errorstatus was added to act as a bitmask
+// of errors for each of the sesssions sent in a stream (max 64).
+//
 message addSessionResponse{
   REQUEST_STATUS requestStatus = 1;
-  uint64 errorstatus = 2;
+  uint64 errorStatus = 2;
   google.protobuf.Timestamp startTime = 3;
 }
 
