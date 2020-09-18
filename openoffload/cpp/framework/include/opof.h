@@ -18,6 +18,9 @@
 #define FAILURE -1
 
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+
 typedef enum  { 
   _HOPOPT = 0,
   _TCP = 6,
@@ -101,8 +104,10 @@ typedef struct sessionRequestTuple {
     unsigned long sessId;
     unsigned int inlif;
     unsigned int outlif;
-    unsigned int srcIP;
-    unsigned int dstIP;
+    struct in_addr srcIP;
+    struct in6_addr srcIPV6;
+    struct in_addr dstIP;
+    struct in6_addr dstIPV6;
     unsigned int srcPort;
     unsigned int dstPort;
     PROTOCOL_ID_T proto;

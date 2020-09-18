@@ -18,8 +18,9 @@
 extern "C" {
 #endif
 #include <arpa/inet.h>
-#include <sys/types.h>          
-#include <sys/socket.h>
+//#include <sys/types.h>          
+//#include <sys/socket.h>
+#include <inttypes.h>
 
 #include "opof.h"
 #include "opof_error.h"

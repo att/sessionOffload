@@ -60,6 +60,7 @@ using openoffload::v1alpha4::IP_VERSION;
 using openoffload::v1alpha4::PROTOCOL_ID;
 using openoffload::v1alpha4::ACTION_TYPE;
 using openoffload::v1alpha4::REQUEST_STATUS;
+using openoffload::v1alpha4::ADD_SESSION_STATUS;
 using openoffload::v1alpha4::SESSION_STATE;
 using openoffload::v1alpha4::SESSION_CLOSE_CODE;
 using openoffload::v1alpha4::actionParameters;

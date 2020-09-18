@@ -51,7 +51,26 @@ enum SESSION_CLOSE_CODE {
   _RST        = 2;
   _TIMEOUT    = 3;
 }
-
+//
+// Errors for adding a session
+// If all sessions are successful inserted return _ACCEPTED
+//
+// If check of session capacity in offload device is insufficient to add all sessions 
+// do not insert any sessions and return  _REJECTED_SESSION_TABLE_FULL. It is the 
+// responsibility of the client to re-try
+//
+// If the server is unavailable for some other reason then return _REJECTED_SESSION_TABLE_UNAVAILABLE.
+// It is the  responsibility of the client to re-try
+//
+// All other errors will return _REJECTED with a buit mask of the failed sessions and it is the responsibility
+// of the client to address the issues
+//
+enum ADD_SESSION_STATUS{
+  _SESSION_ACCEPTED = 0;
+  _SESSION_REJECTED = 1;
+  _SESSION_TABLE_FULL = 2;
+  _SESSION_TABLE_UNAVAILABLE =3;
+}
 enum REQUEST_STATUS{
    _ACCEPTED = 0;
    _REJECTED = 1;
@@ -116,19 +135,21 @@ message sessionRequest{
   int32  inLif = 2;
   int32  outLif = 3;
   IP_VERSION ipVersion = 4;
-  uint32 sourceIp = 5;
-  uint32 sourcePort = 6;
-  uint32 destinationIp = 7;
-  uint32 destinationPort = 8;
-  PROTOCOL_ID protocolId = 9;
-  actionParameters action = 10;
+  uint64 sourceIp = 5;
+  bytes sourceIpV6 =6;
+  uint32 sourcePort = 7;
+  uint64 destinationIp = 8;
+  bytes destinationIpV6 =9;
+  uint32 destinationPort = 10;
+  PROTOCOL_ID protocolId = 11;
+  actionParameters action = 12;
 }
 //
 // In v1apha4 the errorstatus was added to act as a bitmask
 // of errors for each of the sesssions sent in a stream (max 64).
 //
 message addSessionResponse{
-  REQUEST_STATUS requestStatus = 1;
+  ADD_SESSION_STATUS requestStatus = 1;
   uint64 errorStatus = 2;
   google.protobuf.Timestamp startTime = 3;
 }

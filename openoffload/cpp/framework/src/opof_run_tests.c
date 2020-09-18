@@ -28,7 +28,7 @@
 
 
 //int get_key(char *location, char *public_key);
-sessionRequest_t **read_config(char *filename);
+sessionRequest_t **read_config(char *filename, int *nsessions);
 
 void opof_run_tests(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, char *test_config){
 
@@ -47,15 +47,20 @@ void opof_run_tests(const char *address, int max_sessions, unsigned int pageSize
   handle = opof_create_sessionTable(address, port, cert);
   args.handle = handle;
  
-  printf("\nNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
+  
   clock_t begin = clock();
   //
   
     
     
-    request = read_config(test_config);
-
-    status = opof_add_session(pageSize,handle, request, &addResp);
+    request = read_config(test_config, &max_sessions);
+    printf("\nNumber of Sessions: %d page size: %d\n",max_sessions, max_sessions);
+    //TODO handle more than 64 tests
+    if (max_sessions > 64){
+      fprintf(stderr,"ERROR: Truncated numberof session tests to 64, from %d\n", max_sessions);
+      max_sessions = 64;
+    }
+    status = opof_add_session(max_sessions,handle, request, &addResp);
     if (status == FAILURE){
       printf("ERROR: Adding sessions: \n");
       exit(-1);

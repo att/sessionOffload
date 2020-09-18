@@ -15,6 +15,9 @@
  */
 extern "C" {
 #include "opof.h"
+#ifdef DEBUG
+#include "opof_test_util.h"
+#endif
 }
 #include "opof_util.h"
 #include "opof_grpc.h"
@@ -34,6 +37,9 @@ std::unique_ptr<ClientWriter <sessionRequest> > writer(
 
 for (int i=0; i< size; i++){
   request_c = s[i];
+#ifdef DEBUG
+  display_session_request(request_c);
+#endif
   convertSessionRequest2cpp(request_c, &request);
   writer->Write(request);
   free(request_c);

@@ -41,30 +41,29 @@ int create_address(char *address, unsigned short port){
 
 void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *request){
     actionParameters action;
-
+    std::string s;
     request->set_sessionid(request_c->sessId);
     request->set_inlif(request_c->inlif);
     request->set_outlif(request_c->outlif);
     request->set_ipversion((IP_VERSION)request_c->ipver);
     request->set_sourceport(request_c->srcPort);
-    request->set_sourceip(request_c->srcIP);
-    request->set_destinationip(request_c->dstIP);
+    if (request_c->ipver == _IPV6){
+       s.assign(request_c->srcIPV6.s6_addr, request_c->srcIPV6.s6_addr+ 16);
+      request->set_sourceipv6(s);
+    } else {
+      request->set_sourceip(request_c->srcIP.s_addr);
+    } 
+    if (request_c->ipver == _IPV6){
+      s.assign(request_c->dstIPV6.s6_addr, request_c->dstIPV6.s6_addr+ 16);
+      request->set_destinationipv6(s);
+    } else {
+      request->set_destinationip(request_c->dstIP.s_addr);
+    } 
     request->set_destinationport(request_c->dstPort);
     request->set_protocolid((PROTOCOL_ID)request_c->proto);
     action.set_actiontype((ACTION_TYPE)request_c->actType);
     action.set_actionnexthop(request_c->nextHop);
     request->mutable_action()->CopyFrom(action);
-#ifdef DEBUG
-    char address[INET_ADDRSTRLEN];
-    struct in_addr ip;
-    printf("DEBUG: Source IP as int: %d\n",request_c->srcIP);
-    ip.s_addr = request_c->srcIP;
-    printf("DEBUG: Source IP: %s\n", inet_ntop(AF_INET,(void *)&ip,address,INET_ADDRSTRLEN));
-    ip.s_addr = request_c->dstIP;
-    printf("DEBUG: Dest IP: %s\n", inet_ntop(AF_INET,(void *)&ip,address,INET_ADDRSTRLEN));
-    ip.s_addr = request_c->nextHop;
-    printf("DEBUG: NextHop IP: %s\n", inet_ntop(AF_INET,(void *)&ip,address,INET_ADDRSTRLEN));
-#endif
 
 }
 void convertAddSessionResponse2c(addSessionResponse_t *response_c, addSessionResponse *response){
@@ -96,30 +95,30 @@ void convertSessionResponse2cpp(sessionResponse *responsecpp, sessionResponse_t 
 }
 void convertSessionRequest2c(sessionRequest request, sessionRequest_t *request_c){
     actionParameters action;
-
+    std::vector<uint8_t> char_array(16, 0);
     request_c->sessId = request.sessionid();
     request_c->inlif = request.inlif();
     request_c->outlif = request.outlif();
     request_c->ipver = (IP_VERSION_T)request.ipversion();
-    request_c->srcIP = request.sourceip();
-    request_c->dstIP = request.destinationip();
+    if (request_c->ipver == _IPV6){
+      char_array.assign(request.sourceipv6().begin(), request.sourceipv6().end());
+      memcpy(request_c->srcIPV6.s6_addr,&char_array[0],16);
+    } else {
+      request_c->srcIP.s_addr = request.sourceip();
+    }
+    if (request_c->ipver == _IPV6){
+      char_array.assign(request.destinationipv6().begin(), request.destinationipv6().end());
+       memcpy(request_c->dstIPV6.s6_addr,&char_array[0],16);
+    } else {
+      request_c->dstIP.s_addr = request.destinationip();
+    }
     request_c->srcPort = request.sourceport();
     request_c->dstPort = request.destinationport();
     request_c->proto = (PROTOCOL_ID_T)request.protocolid();
     action = request.action();
     request_c->actType= (ACTION_VALUE_T)action.actiontype();
     request_c->nextHop= action.actionnexthop();
-#ifdef DEBUG
-    char address[INET_ADDRSTRLEN];
-    struct in_addr ip;
-    printf("DEBUG: Source IP as int: %d\n",request_c->srcIP);
-    ip.s_addr = request_c->srcIP;
-    printf("DEBUG: Source IP: %s\n", inet_ntop(AF_INET,(void *)&ip,address,INET_ADDRSTRLEN));
-    ip.s_addr = request_c->dstIP;
-    printf("DEBUG: Dest IP: %s\n", inet_ntop(AF_INET,(void *)&ip,address,INET_ADDRSTRLEN));
-    ip.s_addr = request_c->nextHop;
-    printf("DEBUG: NextHop IP: %s\n", inet_ntop(AF_INET,(void *)&ip,address,INET_ADDRSTRLEN));
-#endif
+
 
  }
 

@@ -35,9 +35,9 @@ int opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *
     r->inLif = parameters->inlif;
     r->outLif = parameters->outlif;
     r->ipVersion  = parameters->ipver;
-    r->sourceIp = parameters->srcIP;
+    r->sourceIp = parameters->srcIP.s_addr;
     r->sourcePort = parameters->srcPort;
-    r->dstIp = parameters->dstIP;
+    r->dstIp = parameters->dstIP.s_addr;
     r->dstPort = parameters->dstPort;
     r->inPackets = range(100,1000);
     r->outPackets = range(110,1500);

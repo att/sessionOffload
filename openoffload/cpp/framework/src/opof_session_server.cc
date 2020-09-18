@@ -30,7 +30,7 @@ Status SessionTableImpl::addSession(ServerContext* context, ServerReader<session
     unsigned long errorCode;
     unsigned long error = 1;
     int index=0;
-    REQUEST_STATUS reqStatus;
+    ADD_SESSION_STATUS reqStatus;
     addSessionResponse_t addResponse_c;
     sessionRequest_t request_c;
     sessionRequest request;
@@ -43,9 +43,9 @@ Status SessionTableImpl::addSession(ServerContext* context, ServerReader<session
       index++;
     }
     if (errorCode > 0){
-      reqStatus = REQUEST_STATUS::_REJECTED;
+      reqStatus = ADD_SESSION_STATUS::_SESSION_REJECTED;
     }else {
-      reqStatus = REQUEST_STATUS::_ACCEPTED;
+      reqStatus = ADD_SESSION_STATUS::_SESSION_ACCEPTED;
     }
     response->set_requeststatus(reqStatus);
     response->set_errorstatus(errorCode);

@@ -14,11 +14,13 @@
 //
 //void display_session_request(sessionRequest_t *request);
 
-sessionRequest_t **read_config(char *filename){
+sessionRequest_t **read_config(char *filename,int *nsessions){
   	sessionRequest_t *request;
 	sessionRequest_t **sessionRequests = NULL;
 	config_t cfg;
   	config_setting_t *requests;
+  	struct in6_addr addr6;
+  	struct in_addr addr4;
   	const char *str;
 	int i;
 	int value;
@@ -44,13 +46,12 @@ sessionRequest_t **read_config(char *filename){
 	requests = config_lookup(&cfg, "testdata.requests");
 	if(requests != NULL){
 
-	    int count = config_setting_length(requests);
-	    sessionRequests = (sessionRequest_t **)malloc(count * (sizeof(requests)));
+	    *nsessions = config_setting_length(requests);
+	    sessionRequests = (sessionRequest_t **)malloc(*nsessions * (sizeof(request)));
 
-	 	for(i = 0; i < count; ++i){
-	 		request = (sessionRequest_t *)malloc(sizeof(*request));
+	 	for(i = 0; i < *nsessions; ++i){
+	 		request = (sessionRequest_t *)malloc(sizeof(sessionRequest_t));
 	      	config_setting_t *session = config_setting_get_elem(requests, i);
-	      	request = (sessionRequest_t *)malloc(sizeof(*request));
 	      	config_setting_lookup_int(session, "sessionid", &value);
 	      	request->sessId = value;
 	      	 config_setting_lookup_int(session, "actiontype",&value);
@@ -59,21 +60,33 @@ sessionRequest_t **read_config(char *filename){
 		    request->inlif = value;
 		    config_setting_lookup_int(session, "outlif",&value);
 		    request->outlif = value;
+		   	config_setting_lookup_int(session, "ipversion",&value);
+		    request->ipver = value;
+		    if (request->ipver == _IPV6){
+ 				config_setting_lookup_string(session, "sourceip",&srcaddr);
+		    	inet_pton(AF_INET6, srcaddr, &addr6);
+		    	request->srcIPV6 = addr6;
+		    } else {
+		    	 config_setting_lookup_string(session, "sourceip",&srcaddr);
+		    	inet_pton(AF_INET, srcaddr, &addr4);
+		    	request->srcIP = addr4;
+		    }
 		    config_setting_lookup_string(session, "nexthop",&nexthopaddr);
 		    inet_pton(AF_INET,nexthopaddr, &value);
 		    request->nextHop = value;
 		    config_setting_lookup_int(session, "protocolid",&value);
 		    request->proto = value;
-		    config_setting_lookup_int(session, "ipversion",&value);
-		    request->ipver = value;
-		    config_setting_lookup_string(session, "sourceip",&srcaddr);
-		    inet_pton(AF_INET, srcaddr, &value);
-		    request->srcIP = value;
 		    config_setting_lookup_int(session, "sourceport",&value);
 		    request->srcPort = value;
-		    config_setting_lookup_string(session, "destinationip",&dstaddr);
-		    inet_pton(AF_INET,dstaddr, &value);
-		    request->dstIP = value;
+		     if (request->ipver == _IPV6){
+ 				config_setting_lookup_string(session, "destinationip",&dstaddr);
+		    	inet_pton(AF_INET6, dstaddr, &addr6);
+		    	request->dstIPV6 = addr6;
+		    } else {
+		    	 config_setting_lookup_string(session, "destinationip",&srcaddr);
+		    	inet_pton(AF_INET, srcaddr, &addr4);
+		    	request->dstIP = addr4;
+		    }
  			config_setting_lookup_int(session, "destinationport",&value);
 		    request->dstPort = value;		   
 		    sessionRequests[i] = request;

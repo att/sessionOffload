@@ -110,8 +110,8 @@ printf("DEBUG: NextHop IP: %s\n", inet_ntop(AF_INET,(void *)&nexthopip,address,I
     request->sessId = (i+start_sessionId);
     request->inlif = 1;
     request->outlif = 2;
-    request->srcIP = (unsigned int)srcip.s_addr;
-    request->dstIP = (unsigned int)dstip.s_addr;
+    request->srcIP = srcip;
+    request->dstIP = dstip;
     request->srcPort = 80;
     request->dstPort = 45678;
     request->proto = proto;
@@ -154,7 +154,6 @@ return response;
 }
 
 void display_session_response(sessionResponse_t *response){
-
     printf("\n\nSession Response\n");
     printf("Session ID: %ld\n",response->sessionId);
     printf("In Packets %ld\n",response->inPackets);
@@ -167,14 +166,19 @@ void display_session_response(sessionResponse_t *response){
 }
 
 void display_session_request(sessionRequest_t *request){
-
+    char str[INET6_ADDRSTRLEN];
     printf("\n\nSession Request\n");
     printf("Session ID: %ld\n",request->sessId);
     printf( "Inlif: %d\n",request->inlif);
     printf( "Outlif: %d\n",request->outlif);
     printf( "Source Port: %d\n",request->srcPort);
-    printf( "Source IP: %d\n", request->srcIP);
-    printf( "Destination IP: %d\n",request->dstIP);
+    if ((request->ipver) == _IPV6){
+      printf( "Source IP: %s\n", inet_ntop(AF_INET6, &request->srcIPV6, str, INET6_ADDRSTRLEN));
+      printf( "Destination IP: %s\n",inet_ntop(AF_INET6, &request->dstIPV6, str, INET6_ADDRSTRLEN));
+    } else {
+      printf( "Source IP: %s\n", inet_ntop(AF_INET, &request->srcIP, str, INET6_ADDRSTRLEN));
+      printf( "Destination IP: %s\n",inet_ntop(AF_INET, &request->dstIP, str, INET6_ADDRSTRLEN));
+    }
     printf( "Destination Port: %d\n",request->dstPort);
     printf( "Protocol ID: %d\n",request->proto);
     printf( "IP Version: %d\n",request->ipver);
