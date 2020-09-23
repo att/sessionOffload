@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+/**
+* \ingroup testlibrary
+*
+* \brief gRPC Test Library for C/C++
+*
+*/
+
 #include <arpa/inet.h>
 #include <sys/types.h>          
 #include <sys/socket.h>

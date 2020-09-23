@@ -13,6 +13,13 @@
 // limitations under the License.
 //
 
+/**
+* \defgroup utilities
+*
+* \brief gRPC Utilities for C/C++ Library
+*
+*/
+
 extern "C" {
 #include <stdio.h>
 #include "opof.h"

@@ -11,6 +11,14 @@
 #include "opof.h"
 #include "opof_error.h"
 
+
+
+/**
+* \ingroup testlibrary
+*
+* \brief gRPC Test Library for C/C++
+*
+*/
 //
 //void display_session_request(sessionRequest_t *request);
 

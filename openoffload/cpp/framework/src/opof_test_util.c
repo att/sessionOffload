@@ -12,6 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
+/**
+* \ingroup testlibrary
+*
+* \brief gRPC Test Library for C/C++
+*
+*/
+
 #include <arpa/inet.h>
 #include <sys/types.h>          
 #include <sys/socket.h>
@@ -25,6 +33,43 @@ int range(int lower, int upper){
   return ((rand() %  (upper - lower + 1)) + lower); 
 }
 
+sessionResponse_t **getClosedSessions(int size, int *sessionCount){
+  record_t *r, *tmp;
+  int i=0;
+
+  int count = 0;
+  sessionResponse_t **responses = NULL;
+  sessionResponse_t *response;
+  responses = (sessionResponse_t **)malloc(size * (sizeof(sessionResponse_t *)));
+  *sessionCount = 0;
+
+  HASH_ITER(hh, sessions, r, tmp) {
+     if (r->sessionState == _CLOSED){
+        count++;
+        response = (sessionResponse_t *)malloc(sizeof(sessionResponse_t));
+        response->sessionId = r->key.sessionId;
+        response->inPackets = range(100,1000);
+        response->outPackets = range(110,1500);
+        response->inBytes = range(1000,5000);
+        response->outBytes = range(1000,5000);
+        response->sessionState = r->sessionState;
+        response->sessionCloseCode = _TIMEOUT;
+        response->requestStatus = _ACCEPTED;
+        HASH_DEL(sessions, r);  /* delete it (users advances to next) */
+        free(r);             /* free it */
+        responses[i] = response;
+        i++;
+        if (i == size){
+          *sessionCount = count;
+          return responses;
+        }
+      }
+   }
+  if (i == 0) {
+    return NULL;
+  }
+  return NULL;
+}
 sessionResponse_t **createSessionResponse(int size, int *sessionCount){
   record_t *r, *tmp;
   int i=0;
@@ -153,8 +198,8 @@ return response;
 
 }
 
-void display_session_response(sessionResponse_t *response){
-    printf("\n\nSession Response\n");
+void display_session_response(sessionResponse_t *response, const char *message){
+    printf("\n\nSession Response: %s\n",message);
     printf("Session ID: %ld\n",response->sessionId);
     printf("In Packets %ld\n",response->inPackets);
     printf("Out Packets: %ld\n",response->outPackets);
@@ -165,22 +210,39 @@ void display_session_response(sessionResponse_t *response){
     printf("Request Status: %d\n",response->requestStatus);
 }
 
-void display_session_request(sessionRequest_t *request){
+void display_session_request(sessionRequest_t *request, const char * message){
     char str[INET6_ADDRSTRLEN];
-    printf("\n\nSession Request\n");
+    printf("\n\nSession Request: %s\n",message);
     printf("Session ID: %ld\n",request->sessId);
     printf( "Inlif: %d\n",request->inlif);
     printf( "Outlif: %d\n",request->outlif);
-    printf( "Source Port: %d\n",request->srcPort);
     if ((request->ipver) == _IPV6){
+      printf( "IP Version: V6\n");
       printf( "Source IP: %s\n", inet_ntop(AF_INET6, &request->srcIPV6, str, INET6_ADDRSTRLEN));
       printf( "Destination IP: %s\n",inet_ntop(AF_INET6, &request->dstIPV6, str, INET6_ADDRSTRLEN));
     } else {
+      printf( "IP Version: V4\n");
       printf( "Source IP: %s\n", inet_ntop(AF_INET, &request->srcIP, str, INET6_ADDRSTRLEN));
       printf( "Destination IP: %s\n",inet_ntop(AF_INET, &request->dstIP, str, INET6_ADDRSTRLEN));
     }
+    printf( "Source Port: %d\n",request->srcPort);
     printf( "Destination Port: %d\n",request->dstPort);
-    printf( "Protocol ID: %d\n",request->proto);
-    printf( "IP Version: %d\n",request->ipver);
-    printf( "Action Value: %d\n",request->actType);
+    if (request->proto == 6){
+      printf( "Protocol Type (%d): TCP\n", request->proto);
+    } else if (request->proto ==17 ){
+      printf( "Protocol Type (%d): UDP\n",request->proto);
+    } else {
+      printf( "request->proto is: unknown\n");
+    }
+    if (request->actType == 0){
+      printf( "Action Value (%d): DROP\n",request->actType);
+    } else if (request->actType == 1) {
+    printf( "Action Value (%d):  FORWARD\n",request->actType);
+    } else if (request->actType == 2) {
+    printf( "Action Value (%d):  MIRROR\n",request->actType);
+    } else if (request->actType == 3) {
+    printf( "Action Value (%d):  SNOOP\n",request->actType);
+    } else {
+       printf( "Action Value (%d): UNKNOWN\n",request->actType);
+    }
 }

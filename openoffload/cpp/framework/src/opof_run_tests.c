@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+/**
+* \ingroup testlibrary
+*
+* \brief gRPC Test Library for C/C++
+*
+*/
+
 #include <arpa/inet.h>
 #include <sys/types.h>          
 #include <sys/socket.h>
@@ -36,12 +43,11 @@ void opof_run_tests(const char *address, int max_sessions, unsigned int pageSize
   streamArgs_t args;
   sessionTable_t *handle;
 
-  sessionRequest_t **request;
+  sessionRequest_t **request,*temp;
   addSessionResponse_t addResp;
-#ifdef FAST
   sessionResponse_t resp;
-#endif
   args.pageSize = pageSize;
+  int sessionId;
 
  
   handle = opof_create_sessionTable(address, port, cert);
@@ -66,22 +72,21 @@ void opof_run_tests(const char *address, int max_sessions, unsigned int pageSize
       exit(-1);
       //printf("Success on add session test\n");
   }
-#ifdef FAST
   for (int i=0; i < max_sessions; i++){
-    //printf("\n\nGetting session\n");
-    status = opof_get_session(handle, i, &resp);
+    temp = request[i];
+    sessionId = temp->sessId;
+    status = opof_get_session(handle, sessionId, &resp);
     if (status == FAILURE){
       printf("ERROR: getting sessions: %ld\n",i);
       exit(-1);
     }
 
-    status = opof_del_session(handle, i, &resp);
+    status = opof_del_session(handle, sessionId, &resp);
     if (status == FAILURE){
       printf("ERROR: deleting sessions: %ld\n",i);
       exit(-1);
     }
   }
-#endif
   
   opof_get_closed_sessions(&args);
  

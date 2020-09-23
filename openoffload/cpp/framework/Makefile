@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+WORKING_DIR ?= $(shell pwd)
+$(info Working directory is  $(WORKING_DIR))
 ##
+DOXYGEN := doxygen
 COMBINED_NAME := opof_test
 CLIENT_NAME :=opof_client_test
 SERVER_NAME :=opof_server_test
@@ -55,6 +58,7 @@ SRC_DIR := src
 LIB_DIR := lib
 OBJ_DIR := obj
 BIN_DIR := bin
+DOC_DIR := doc
 INCLUDES := -I ./include \
 	-I ./ -I /usr/include \
 	-I $(ROOT_DIR)/local/include \
@@ -72,9 +76,10 @@ CC := gcc -g
 CPP := g++ -g
 
 #CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DDEBUG -DVISIBLE
-CFLAGS := -c -O2 -I include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DSSL -DDEBUG
+CFLAGS := -c -O2 -I include -Wno-undef -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DDEBUG
 #CPPFLAGS := -c -O2 -std=c++11 -I ./ -I include  -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations  -DDEBUG -DVISIBLE
-CPPFLAGS := -c -O2 -std=c++11 -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations -DSSL -DDEBUG
+#CPPFLAGS := -c -O2 -std=c++11 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations -DSSL -DDEBUG
+CPPFLAGS := -c -O2 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-decl -DDEBUG
 #
 #
 # Link Flags
@@ -137,12 +142,18 @@ LIBS ?= \
 #           
 all: $(DIRECTORIES) $(PROTOS) $(SERVER_LIB) $(CLIENT_LIB) $(COMBINED_NAME) $(SERVER_NAME) $(CLIENT_NAME) 
 #
+# Create documentation
+#
+doc:
+	$(DOXYGEN) $(DOC_DIR)/Doxyfile
+#
 # Create directories
 #
 $(DIRECTORIES):
 	mkdir -p obj
 	mkdir -p lib
 	mkdir -p bin
+	mkdir -p doc
 #
 # Generate gPRC files
 #
@@ -241,7 +252,7 @@ $(COMBINED_NAME): openoffload.pb.o openoffload.grpc.pb.o opof_error.o opof_main.
 	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) $(LIBCONFIG) -o $(BIN_DIR)/$@
 #
 $(CLIENT_NAME): opof_client_main.o opof_client_test.o opof_config.o opof_error.o opof_test_util.o opof_run_tests.o
-	$(LD) $(LDFLAGS)  $(OBJ_DIR)/opof_client_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_client_test.o $(OBJ_DIR)/opof_run_tests.o $(OBJ_DIR)/opof_config.o  $(OBJ_DIR)/opof_test_util.o  $(CLIENTFLAGS) $(LIBS) -o $(BIN_DIR)/$@
+	$(LD) $(LDFLAGS)  $(OBJ_DIR)/opof_client_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_client_test.o $(OBJ_DIR)/opof_run_tests.o $(OBJ_DIR)/opof_config.o  $(OBJ_DIR)/opof_test_util.o  $(CLIENTFLAGS)  $(LIBS) -o $(BIN_DIR)/$@
 #
 $(SERVER_NAME): opof_server_main.o opof_server_test.o opof_error.o opof_test_util.o
 	$(LD) $(LDFLAGS)  $(OBJ_DIR)/opof_server_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_server_test.o  $(OBJ_DIR)/opof_test_util.o $(SERVERFLAGS) $(LIBS)  -o $(BIN_DIR)/$@
@@ -255,7 +266,7 @@ $(CLIENT_LIB): openoffload.pb.o openoffload.grpc.pb.o opof_session_client.o opof
 	ranlib $(LIB_DIR)/$@
 #
 #
-.PHONY: clean
+.PHONY: clean all doc
 #
 clean:
 	rm -f obj/*.o \

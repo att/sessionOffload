@@ -12,6 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
+
+/**
+* \ingroup testlibrary
+*
+* \brief gRPC Test Library for C/C++
+*
+*/
+
 #include <stdlib.h>
 
 #include "opof.h"
@@ -23,7 +32,7 @@
 int opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *response ){
  
 #ifdef DEBUG
-  display_session_request(parameters);
+  display_session_request(parameters, "Server addSession");
 #endif
     record_t *r;
     //record_t *records = NULL;

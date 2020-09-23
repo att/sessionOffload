@@ -13,6 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+* \ingroup testlibrary
+*
+* \brief gRPC Test Library for C/C++
+*
+*/
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -254,7 +262,7 @@ int main(int argc, char ** argv){
         status = get_key(CERT_FILE, cert);
 #endif
         if (status != FAILURE){
-            if (test_config == NULL){
+            if (test_config[0]=='\0'){
                 opof_client_test(address, number, pageSize, port, cert);
             } else {
                 opof_run_tests(address, number, pageSize, port, cert,test_config);

@@ -25,6 +25,32 @@ $ ./configure
 $ make 
 $ make install
 ```
+To configure you system to find the libconfig.so file
+```bash
+$ vi /etc/ld.so.conf
+```
+
+and add the path to your install directory of libconfig. The default is /usr/local/lib so
+the file would look like this:
+
+```bash
+include ld.so.conf.d/*.conf
+/usr/local/lib
+```
+
+Close the file and update the shared library config
+
+```bash
+$ ldconfig 
+```
+
+Check that the libconfig.so file is in config
+```bash
+sudo ldconfig -p | grep libconfig
+```
+
+This will print out links to libconfig.so
+
 ## Install gRPC C++
 
 ```bash

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 #ifndef OPOF_CLIENTLIB_H
 #define OPOF_CLIENTLIB_H
 #ifdef __cplusplus
@@ -20,7 +21,6 @@ extern "C" {
 
 //extern "C" {
 #include "opof.h"
-#include "opof_error.h"
 //
 //#include "opof_sessiontable.h"
 struct sessionTable;

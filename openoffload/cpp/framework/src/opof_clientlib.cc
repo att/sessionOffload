@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
+
+/**
+* \defgroup clientlibrary gRPC Client implementation
+*
+*/
 #include <stdlib.h>
 
 
 extern "C" {
 #include "opof.h"
-#include "opof_error.h"
 }
 
 #include "opof_grpc.h"
@@ -30,6 +35,18 @@ struct sessionTable{
 	void *obj;
 };
 
+/** \ingroup clientlibrary
+* \brief Entry point for C Inteface to C++ Class structure
+*
+* This method hides the C++ constructor and returns the C__ instance as a void pointer in the 
+* sessionTable_t typedef struct. All methods of the sessionTable client class are passed this handle.
+*
+* \param address The address the server is listening on either the IP address or "localhost"
+* \param port    The port the port the server is listening on
+* \param cert    The pulbic key fo the TLS connection
+* \return 	     sessionTable_t, returns a handle to the C++ instance as a void handle.
+*
+*/
 sessionTable_t * opof_create_sessionTable(const char * host, unsigned int port, const char *public_key){
 	
 	sessionTable_t *sessionHandle;
@@ -64,7 +81,21 @@ int opof_delete_client(sessionTable_t *session){
 
 	return status;
 }
-
+/**  \ingroup clientlibrary
+* \brief Add sessions to the offload device in batches of up to 64.
+*
+* THe opof_add_session interface is a C wrapper on the underlying gRPC C++ code. This function
+* streams up to 64 sessionRequest_t structs to the server. The server either returns success or failure.
+* On failure the server returns a bitmask in the addSessionResponse_t. Any sessions that failed are set to 1 
+* the bitmask.
+*
+* \param size 
+* \param sessionTable_t  
+* \param sessionRequest_t   T
+* \param addSessionResponse_t
+* \return 	     SUCCESS or FAILURE
+*
+*/
 int opof_add_session(int size, sessionTable_t *sessionHandle,  sessionRequest_t **req, addSessionResponse_t *resp){
 	int addStatus = SUCCESS;
 	SessionTableClient *client;

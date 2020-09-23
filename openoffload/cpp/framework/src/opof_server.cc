@@ -13,6 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+* \defgroup serverlibrary
+*
+* \brief gRPC Server implementation
+*
+*/
 extern "C" {
 #include "opof.h"
 }
@@ -23,6 +29,15 @@ extern "C" {
 
 extern "C" void opof_server(const char *address, unsigned short port, const char* cert, const char* key);
 
+/**
+* \brief  gRPC C++ Server Implementation
+*
+* \param address The address the server is listening on either the IP address or "localhost"
+* \param port    The port the port the server is listening on
+* \param cert    The pulbic key fo the TLS connection
+* \parman key    The privaste key of the TLS connection
+*
+*/
 void opof_server(const char* address, unsigned short port, const char* cert, const char* key){
 
   SessionTableImpl service;

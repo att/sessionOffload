@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
+
+
+/**
+* \ingroup serverlibrary
+*
+* \brief gRPC Server implementation
+*
+*/
+
 extern "C" {
 #include "opof.h"
 #include "opof_error.h"
@@ -24,7 +33,13 @@ extern "C" {
 #include "opof_grpc.h"
 #include "opof_session_server.h"
 
-
+/**
+* \brief addSession
+*
+* \param context
+* \param reader
+* \param response
+*/
 Status SessionTableImpl::addSession(ServerContext* context, ServerReader<sessionRequest>* reader, addSessionResponse* response) {
     int status;
     unsigned long errorCode;
@@ -102,7 +117,6 @@ Status SessionTableImpl::getClosedSessions(ServerContext* context, const statist
   int nresponses = request->pagesize();
   request_c.pageSize = nresponses;
   closedSessions = opof_get_closed_sessions_server(&request_c, &sessionCount);
-  //closedSessions = createSessionResponse(nresponses, &sessionCount);
   if (closedSessions == NULL){
     response.set_requeststatus(REQUEST_STATUS::_NO_CLOSED_SESSIONS);
     return Status::OK;

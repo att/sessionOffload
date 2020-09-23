@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+
 extern "C" {
 #include "opof.h"
 #ifdef DEBUG
@@ -24,7 +26,14 @@ extern "C" {
 #include "opof_session_client.h"
 
 
-
+/**  \ingroup clientlibrary
+* \brief
+*
+* \param size
+* \param sessionRequest_t
+* \param addSeesionResponse_t
+*
+*/
 Status SessionTableClient::addSessionClient(int size, sessionRequest_t **s, addSessionResponse_t *resp){
 
 sessionRequest_t *request_c;
@@ -38,14 +47,14 @@ std::unique_ptr<ClientWriter <sessionRequest> > writer(
 for (int i=0; i< size; i++){
   request_c = s[i];
 #ifdef DEBUG
-  display_session_request(request_c);
+  display_session_request(request_c, "addSessionClient");
 #endif
   convertSessionRequest2cpp(request_c, &request);
   writer->Write(request);
-  free(request_c);
+  //free(request_c);
 }
 
-free(s);
+//free(s);
 writer->WritesDone();
 status = writer->Finish();
 convertAddSessionResponse2c(resp,&response);
@@ -62,6 +71,9 @@ std::string SessionTableClient::getSessionClient(int sessionid,sessionResponse_t
 
   Status status = stub_->getSession(&context, sid, &response);
   convertSessionResponse2c(&response, resp);
+#ifdef DEBUG
+  display_session_response(resp, "getSessionClient");
+#endif
   if (status.ok()) {
     return "Success";
   } else {
@@ -82,6 +94,11 @@ sessionResponse response;
 sid.set_sessionid(sessionid);
 ClientContext context;
 Status status = stub_->deleteSession(&context, sid, &response);
+
+convertSessionResponse2c(&response, resp);
+#ifdef DEBUG
+  display_session_response(resp, "delSessionClient");
+#endif
 
 if (status.ok()) {
   resp->sessionId = response.sessionid();
