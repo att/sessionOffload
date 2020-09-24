@@ -96,7 +96,7 @@ $ bin/opof_test -h
 Run the server
 
 ```bash
-$ bin/opof_test -s
+$ bin/opof__server_test
 ```
 
 Run the client
@@ -104,14 +104,14 @@ Run the client
 'n' in the number of sessions and 'b' is the buffer size to stream
 
 ```bash
-$ bin/opof_test -c -n 128 - b 64
+$ bin/opof__client_test -n 128 - b 64
 ```
 ## Testing 
 
 To run specific tests users can create configuration files and run them as specific tests. The configuration files are in the "config" directory.
 
 ```bash
-$ bin/opof_test -c -t config/test1.cfg
+$ bin/opof_client_test -t config/test1.cfg
 ```
 
 # Programming the C Interface
