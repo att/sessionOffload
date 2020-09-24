@@ -115,15 +115,10 @@ int opof_get_session(sessionTable_t *sessionHandle, unsigned long  session, sess
 	int status = SUCCESS;
 	SessionTableClient *client;
 	std::string reply;
-	//sessionRequest_t *param;
-	//sessionId sid;
-    //sid.set_sessionid(sessionid);
-
-	//param = (sessionTuple_t *)parameters;
 
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
 	reply = client->getSessionClient(session, resp);
- 	//std::cout << "Get Session received: " << reply << std::endl;
+ 	std::cout << "Get Session received: " << reply << std::endl;
 	return status;
 }
 
@@ -134,14 +129,13 @@ int opof_del_session(sessionTable_t *sessionHandle,  unsigned long  sessionId, s
 
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
 	reply = client->deleteSessionClient(sessionId, resp);
-
+	std::cout << "Delete Session received: " << reply << std::endl;
 	return status;
 }
 
-void opof_get_closed_sessions(streamArgs_t *args){
+void opof_get_closed_sessions(sessionTable_t *sessionHandle,streamArgs_t *args){
 	//void opof_get_closed_sessions(sessionTable_t *sessionHandle, unsigned int size){
 	int status= SUCCESS;
-	sessionTable_t *sessionHandle;
 	SessionTableClient *client;
 	std::string reply;
 	unsigned long closed_sessions =1;

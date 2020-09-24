@@ -74,10 +74,12 @@ Status SessionTableImpl::getSession(ServerContext* context, const sessionId* sid
         int status;
 
         status = opof_get_session_server(sid->sessionid(), &response_c);
-        convertSessionResponse2cpp(response, &response_c);
-
-  // Add an IPv4 session
-    return Status::OK;
+        if (status == SUCCESS){
+          convertSessionResponse2cpp(response, &response_c);
+          return Status::OK;
+        } else {
+          return Status(grpc::StatusCode::NOT_FOUND, "Get Session Not Found");
+        }
   }
 
 Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* sid,
@@ -86,24 +88,43 @@ Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* 
       sessionResponse_t response_c;
         //std::cout << "sessionID to delete is: " << sid->sessionid() << std::endl;
         status = opof_del_session_server(sid->sessionid(), &response_c);
-        convertSessionResponse2cpp(response, &response_c);
-        
-
-  // Add an IPv4 session
-    return Status::OK;
+        if (status ==SUCCESS){
+          convertSessionResponse2cpp(response, &response_c);
+          return Status::OK;
+        } else {
+          return Status(grpc::StatusCode::NOT_FOUND, "Delete Session Not Found");
+        }
   }
 
   Status SessionTableImpl::getAllSessions(ServerContext* context, const statisticsRequestArgs* request, ServerWriter<sessionResponse>* writer) {
   
   sessionResponse response;
+  sessionResponse_t **closedSessions= NULL;
+  sessionResponse_t *closedResponse;
+  statisticsRequestArgs_t request_c;
+  int sessionCount = 0;
+  int nresponses = request->pagesize();
+  request_c.pageSize = nresponses;
+  closedSessions = opof_get_all_sessions_server(&request_c, &sessionCount);
+  if (closedSessions == NULL){
+    response.set_requeststatus(REQUEST_STATUS::_NO_CLOSED_SESSIONS);
+    return Status::OK;
+  }
+  for (int i=0; i < sessionCount; i++){
+    closedResponse = closedSessions[i];
+    response.set_sessionid(closedResponse->sessionId);
+    response.set_sessionstate((SESSION_STATE)closedResponse->sessionState);
+    response.set_inpackets(closedResponse->inPackets);
+    response.set_outpackets(closedResponse->outPackets);
+    response.set_inbytes(closedResponse->inBytes);
+    response.set_outbytes(closedResponse->outBytes);
+    response.set_sessionclosecode((SESSION_CLOSE_CODE)closedResponse->sessionCloseCode);
+    response.set_requeststatus(REQUEST_STATUS::_ACCEPTED);
+    writer->Write(response);
+    free(closedResponse);
+  }
+  free(closedSessions);
 
-  response.set_sessionid(1001);
-  response.set_sessionstate(SESSION_STATE::_CLOSED);
-  response.set_inpackets(2000);
-  response.set_outpackets(2200);
-  response.set_requeststatus(REQUEST_STATUS::_ACCEPTED);
-
-  writer->Write(response);
   return Status::OK;
  }
 

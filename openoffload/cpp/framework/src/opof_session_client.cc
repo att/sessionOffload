@@ -130,6 +130,10 @@ unsigned long SessionTableClient::getClosedSessions(statisticsRequestArgs_t *arg
         return sessionCount;
       }
       convertSessionResponse2c(&response, &responsec);
+#ifdef DEBUG
+      display_session_response(&responsec, "getClosedSessionClient");
+#endif
+
       //display_session_response(&responsec);
       sessionCount++;
     }
@@ -154,12 +158,10 @@ void SessionTableClient::getAllSessions(){
   std::unique_ptr<ClientReader <sessionResponse> > reader(
         stub_->getAllSessions(&context, request));
     while (reader->Read(&response)) {
-      std::cout << "Found feature called "  << std::endl;
-      std::cout << "Session ID: " << response.sessionid() << std::endl;
       convertSessionResponse2c(&response, &responsec);
-               // << feature.name() << " at "
-               // << feature.location().latitude()/kCoordFactor_ << ", "
-               // << feature.location().longitude()/kCoordFactor_ << std::endl;
+#ifdef DEBUG
+      display_session_response(&responsec, "getAllSessionClient");
+#endif
     }
 
   Status status = reader->Finish();

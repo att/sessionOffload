@@ -72,23 +72,26 @@ void opof_run_tests(const char *address, int max_sessions, unsigned int pageSize
       exit(-1);
       //printf("Success on add session test\n");
   }
+  opof_get_all_sessions(handle);
+  opof_get_closed_sessions(handle,&args);
+
   for (int i=0; i < max_sessions; i++){
     temp = request[i];
     sessionId = temp->sessId;
     status = opof_get_session(handle, sessionId, &resp);
     if (status == FAILURE){
-      printf("ERROR: getting sessions: %ld\n",i);
+      printf("ERROR: getting sessions: %d\n",i);
       exit(-1);
     }
 
     status = opof_del_session(handle, sessionId, &resp);
     if (status == FAILURE){
-      printf("ERROR: deleting sessions: %ld\n",i);
+      printf("ERROR: deleting sessions: %d\n",i);
       exit(-1);
     }
   }
   
-  opof_get_closed_sessions(&args);
+  
  
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;

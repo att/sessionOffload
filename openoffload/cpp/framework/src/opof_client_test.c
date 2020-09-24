@@ -88,7 +88,7 @@ void opof_client_test(const char *address, int max_sessions, unsigned int pageSi
   }
 #endif
   
-  opof_get_closed_sessions(&args);
+  opof_get_closed_sessions(handle,&args);
  
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;

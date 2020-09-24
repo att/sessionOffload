@@ -29,47 +29,11 @@
 #include "opof_test_util.h"
 
 
+
 int range(int lower, int upper){
   return ((rand() %  (upper - lower + 1)) + lower); 
 }
 
-sessionResponse_t **getClosedSessions(int size, int *sessionCount){
-  record_t *r, *tmp;
-  int i=0;
-
-  int count = 0;
-  sessionResponse_t **responses = NULL;
-  sessionResponse_t *response;
-  responses = (sessionResponse_t **)malloc(size * (sizeof(sessionResponse_t *)));
-  *sessionCount = 0;
-
-  HASH_ITER(hh, sessions, r, tmp) {
-     if (r->sessionState == _CLOSED){
-        count++;
-        response = (sessionResponse_t *)malloc(sizeof(sessionResponse_t));
-        response->sessionId = r->key.sessionId;
-        response->inPackets = range(100,1000);
-        response->outPackets = range(110,1500);
-        response->inBytes = range(1000,5000);
-        response->outBytes = range(1000,5000);
-        response->sessionState = r->sessionState;
-        response->sessionCloseCode = _TIMEOUT;
-        response->requestStatus = _ACCEPTED;
-        HASH_DEL(sessions, r);  /* delete it (users advances to next) */
-        free(r);             /* free it */
-        responses[i] = response;
-        i++;
-        if (i == size){
-          *sessionCount = count;
-          return responses;
-        }
-      }
-   }
-  if (i == 0) {
-    return NULL;
-  }
-  return NULL;
-}
 sessionResponse_t **createSessionResponse(int size, int *sessionCount){
   record_t *r, *tmp;
   int i=0;

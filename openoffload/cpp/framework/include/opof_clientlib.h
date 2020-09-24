@@ -32,7 +32,7 @@ int opof_add_session(int size, sessionTable_t *sessionHandle,  sessionRequest_t 
 int opof_del_session(sessionTable_t *sessionHandle,  unsigned long  sessionId, sessionResponse_t *resp);
 int opof_get_session(sessionTable_t *sessionHandle,  unsigned long  sessionId , sessionResponse_t *resp);
 void opof_get_all_sessions(sessionTable_t *sessionHandle);
-void opof_get_closed_sessions(streamArgs_t *args);
+void opof_get_closed_sessions(sessionTable_t *sessionHandle,streamArgs_t *args);
 //void opof_get_closed_sessions(sessionTable_t *sessionHandle, unsigned int size);
 #ifdef __cplusplus
 }
