@@ -79,7 +79,7 @@ CPP := g++ -g
 CFLAGS := -c -O2 -I include -Wno-undef -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DDEBUG
 #CPPFLAGS := -c -O2 -std=c++11 -I ./ -I include  -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations  -DDEBUG -DVISIBLE
 #CPPFLAGS := -c -O2 -std=c++11 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations -DSSL -DDEBUG
-CPPFLAGS := -c -O2 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-decl -DDEBUG
+CPPFLAGS := -c -O2 -std=c++11 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-decl -DDEBUG
 #
 #
 # Link Flags
