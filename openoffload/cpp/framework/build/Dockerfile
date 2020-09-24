@@ -26,4 +26,19 @@ RUN make -j 4
 RUN make install
 RUN cd ../..
 #
+# Install the libconfig library
+#
+RUN mkdir -p /home/grpc/tmp
+WORKDIR /home/grpc/tmp
+RUN wget http://hyperrealm.github.io/libconfig/dist/libconfig-1.7.2.tar.gz
+RUN tar xvzf libconfig-1.7.2.tar.gz
+WORKDIR /home/grpc/tmp/libconfig-1.7.2
+RUN ./configure
+RUN make
+#
+# Install in default location /usr/local
+#
+RUN make install
+WORKDIR /home/grpc/
+#
 CMD ["sh", "-c", "tail -f /dev/null"]

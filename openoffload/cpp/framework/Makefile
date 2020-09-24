@@ -113,8 +113,8 @@ ABSL_TIME_ZONE_LIB := $(LIBDIR)/libabsl_time_zone.a
 
 LD = g++ -g
 #LDFLAGS = -lc  -lc++ -lgrpc++ -lprotobuf -L/usr/local/lib -L /opt/local/lib
-LIBCONFIG = $(LIBDIR)/libconfig.a
-LDFLAGS = -lc  -lstdc++ -pthread -lconfig
+LIBCONFIG := /usr/local/lib/libconfig.a
+LDFLAGS = -lc  -lstdc++ -pthread  
 SERVERFLAGS =  -L $(LIB_DIR) -lopof_server
 CLIENTFLAGS =  -L $(LIB_DIR) -lopof_client
 
@@ -249,13 +249,13 @@ opof_test_util.o: opof_test_util.c opof.h opof_error.h opof_test_util.h
 	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
 
 $(COMBINED_NAME): openoffload.pb.o openoffload.grpc.pb.o opof_error.o opof_main.o opof_session_server.o opof_session_client.o opof_client_test.o opof_server_test.o opof_clientlib.o opof_server.o opof_util.o opof_test_util.o opof_run_tests.o opof_config.o
-	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) $(LIBCONFIG) -o $(BIN_DIR)/$@
+	$(LD) $(LDFLAGS) $(OBJS) $(LIBCONFIG) $(LIBS) -o $(BIN_DIR)/$@
 #
 $(CLIENT_NAME): opof_client_main.o opof_client_test.o opof_config.o opof_error.o opof_test_util.o opof_run_tests.o
-	$(LD) $(LDFLAGS)  $(OBJ_DIR)/opof_client_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_client_test.o $(OBJ_DIR)/opof_run_tests.o $(OBJ_DIR)/opof_config.o  $(OBJ_DIR)/opof_test_util.o  $(CLIENTFLAGS)  $(LIBS) -o $(BIN_DIR)/$@
+	$(LD) $(LDFLAGS)  $(OBJ_DIR)/opof_client_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_client_test.o $(OBJ_DIR)/opof_run_tests.o $(OBJ_DIR)/opof_config.o  $(OBJ_DIR)/opof_test_util.o  $(CLIENTFLAGS)  $(LIBCONFIG) $(LIBS) -o $(BIN_DIR)/$@
 #
 $(SERVER_NAME): opof_server_main.o opof_server_test.o opof_error.o opof_test_util.o
-	$(LD) $(LDFLAGS)  $(OBJ_DIR)/opof_server_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_server_test.o  $(OBJ_DIR)/opof_test_util.o $(SERVERFLAGS) $(LIBS)  -o $(BIN_DIR)/$@
+	$(LD) $(LDFLAGS)  $(OBJ_DIR)/opof_server_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_server_test.o  $(OBJ_DIR)/opof_test_util.o $(SERVERFLAGS) $(LIBCONFIG) $(LIBS)  -o $(BIN_DIR)/$@
 #
 $(SERVER_LIB): openoffload.pb.o openoffload.grpc.pb.o opof_session_server.o opof_server.o opof_util.o
 	ar ruv $(LIB_DIR)/$@ $(SERVER_OBJS)
