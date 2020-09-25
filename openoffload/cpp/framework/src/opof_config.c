@@ -79,9 +79,15 @@ sessionRequest_t **read_config(char *filename,int *nsessions){
 		    	inet_pton(AF_INET, srcaddr, &addr4);
 		    	request->srcIP = addr4;
 		    }
-		    config_setting_lookup_string(session, "nexthop",&nexthopaddr);
-		    inet_pton(AF_INET,nexthopaddr, &value);
-		    request->nextHop = value;
+		    if (request->ipver == _IPV6){
+		    	config_setting_lookup_string(session, "nexthop",&nexthopaddr);
+		    	inet_pton(AF_INET6, srcaddr, &addr6);
+		    	request->nextHopV6 = addr6;
+		    } else {
+		    	config_setting_lookup_string(session, "nexthop",&nexthopaddr);
+		    	inet_pton(AF_INET, srcaddr, &addr4);
+		    	request->nextHop = addr4;
+		    }
 		    config_setting_lookup_int(session, "protocolid",&value);
 		    request->proto = value;
 		    config_setting_lookup_int(session, "sourceport",&value);

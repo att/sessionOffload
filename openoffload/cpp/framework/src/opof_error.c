@@ -22,10 +22,9 @@
 *
 */
 
-#include "../include/opof_error.h"
+#include "opof_error.h"
 
-#define MAXLINE 4096
-#define LISTENQ 1024
+
 
 void opof_shutdown(){
   syslog(LOG_INFO, "Shutting down OPOF");

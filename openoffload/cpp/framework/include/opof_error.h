@@ -28,6 +28,7 @@
 #define OPOF_LOG_WARN 1
 #define OPOF_LOG_ERR 2
 
+#define MAXLINE 4096
 
 void err_info(FILE *fp, const char *, ...);
 void err_warn(FILE *fp, const char *, ...);

@@ -14,13 +14,19 @@
 #ifndef OPOF_TEST_H
 #define OPOF_TEST_H
 
-#include <stdio.h>
-
+/**
+* \defgroup testlibrary
+*
+* \brief gRPC Test Library for C/C++
+*
+* The test library is a set of code written using the C Interfaces for OpenOffload gRPC. The
+* intention is to provide a test framework to test the underlying client/server code and test
+* performance.
+*/
 #define OPOF_VERSION "0.1"
 #define LOG_DIR "log/opof"
 #define LOG_FILE "log/opof/opof.log"
-
-
-
+#define CERT_FILE "ssl/server.crt"
+#define KEY_FILE "ssl/server.key"
 
 #endif  /* OPOF_TEST_H */

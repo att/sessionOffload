@@ -113,7 +113,8 @@ typedef struct sessionRequestTuple {
     PROTOCOL_ID_T proto;
     IP_VERSION_T ipver;
     ACTION_VALUE_T actType;
-    unsigned int nextHop;
+    struct in_addr  nextHop;
+    struct in6_addr nextHopV6;
 } sessionRequest_t;
 
 

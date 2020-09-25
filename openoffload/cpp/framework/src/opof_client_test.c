@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-/**
-* \ingroup testlibrary
-*
-* \brief gRPC Test Library for C/C++
+/**  \ingroup testlibrary
 *
 */
 
@@ -56,7 +53,7 @@ void opof_client_test(const char *address, int max_sessions, unsigned int pageSi
   printf("\nNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
   clock_t begin = clock();
   //
-  for (unsigned long  i=0; i < max_sessions; i+=pageSize){
+  for (uint32_t  i=0; i < max_sessions; i+=pageSize){
     
     request = createSessionRequest(pageSize, i);
     status = opof_add_session(pageSize,handle, request, &addResp);
@@ -64,7 +61,7 @@ void opof_client_test(const char *address, int max_sessions, unsigned int pageSi
       printf("ERROR: Adding sessions: \n");
       for (i=0; i < pageSize; i++){
         if ((addResp.errorStatus & (error << i)) > 0) {
-          printf("Session index: %d failed code: %lu", i, (addResp.errorStatus & (error << i)));
+          printf("Session index: %u failed code: %lu", i, (addResp.errorStatus & (error << i)));
         }
       }
       exit(-1);

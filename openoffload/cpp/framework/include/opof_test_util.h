@@ -25,10 +25,14 @@ extern "C" {
 #include "opof_error.h"
 #include "opof_hash.h"
 
+
+/**  \ingroup testlibrary
+*
+*/
 int range(int low, int high);
+int get_key(const char *filename, char *key);
 sessionResponse_t **createSessionResponse(int size, int *sessionCount);
 sessionRequest_t **createSessionRequest(int size, unsigned long start_sessionId);
-sessionResponse_t *getClosedSessionsFromHash();
 void display_session_response(sessionResponse_t *response, const char *message);
 void display_session_request(sessionRequest_t *request, const char *message);
 #ifdef __cplusplus
