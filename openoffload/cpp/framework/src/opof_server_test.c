@@ -14,12 +14,6 @@
 //
 
 
-/**
-* \ingroup testlibrary
-*
-* \brief gRPC Test Library for C/C++
-*
-*/
 
 #include <stdlib.h>
 
@@ -30,7 +24,19 @@
 #include "opof_test_util.h"
 
 
-
+/** 
+* \ingroup servercinterface
+* \brief Utility fumction to get closed sessions from test hashtable
+*
+* This method hides the C++ constructor and returns the C__ instance as a void pointer in the 
+* sessionTable_t typedef struct. All methods of the sessionTable client class are passed this handle.
+*
+* \param address The address the server is listening on either the IP address or "localhost"
+* \param port    The port the port the server is listening on
+* \param cert    The pulbic key fo the TLS connection
+* \return        sessionTable_t, returns a handle to the C++ instance as a void handle.
+*
+*/
 sessionResponse_t **getClosedSessions(int size, int *sessionCount){
   record_t *r, *tmp;
   int i=0;
@@ -68,7 +74,19 @@ sessionResponse_t **getClosedSessions(int size, int *sessionCount){
   }
   return NULL;
 }
-
+/** 
+* \ingroup servercinterface
+* \brief Utility fumction to get all sessions from test hashtable
+*
+* This method hides the C++ constructor and returns the C__ instance as a void pointer in the 
+* sessionTable_t typedef struct. All methods of the sessionTable client class are passed this handle.
+*
+* \param address The address the server is listening on either the IP address or "localhost"
+* \param port    The port the port the server is listening on
+* \param cert    The pulbic key fo the TLS connection
+* \return        sessionTable_t, returns a handle to the C++ instance as a void handle.
+*
+*/
 sessionResponse_t **getAllSessions(int size, int *sessionCount){
   record_t *r, *tmp;
   int i=0;
@@ -99,6 +117,18 @@ sessionResponse_t **getAllSessions(int size, int *sessionCount){
    return responses;
 }
 
+/** 
+* \ingroup servercinterface
+* \brief Utility fumction to add sessions to the test hashtable
+*
+* The function is called from within the C++ server method. It is the responsiblity of the server developer
+* to implement this function. The code here is just an example.
+*
+* \param *parameters  A sessionRequest_t structure with the sesson information to add to the hardware device.
+* \param *response    The response from the server as a addSessionResponse_t
+* \return  SUCCESS or FAILURE
+*
+*/
 int opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *response ){
  
 #ifdef DEBUG
@@ -131,6 +161,19 @@ int opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *
     //
   return SUCCESS;
 }
+
+/** 
+* \ingroup servercinterface
+* \brief Utility fumction to get a session from test hashtable
+*
+* The function is called from within the C++ server method. It is the responsiblity of the server developer
+* to implement this function. The code here is just an example.
+*
+* \param  session     The session to get.
+* \param *response    The response from the server as a addSessionResponse_t
+* \return  SUCCESS or FAILURE
+*
+*/
 int opof_get_session_server(unsigned long sessionId, sessionResponse_t *response){
   record_t *r,l;
   l.key.sessionId = sessionId;
@@ -150,6 +193,18 @@ int opof_get_session_server(unsigned long sessionId, sessionResponse_t *response
     return FAILURE;  
 }
 
+/** 
+* \ingroup servercinterface
+* \brief Utility fumction to delete a session from the test hashtable
+*
+* The function is called from within the C++ server method. It is the responsiblity of the server developer
+* to implement this function. The code here is just an example.
+*
+* \param  session     The session to delete.
+* \param *response    The response from the server as a addSessionResponse_t
+* \return  SUCCESS or FAILURE
+*
+*/
 int opof_del_session_server(unsigned long sessionId, sessionResponse_t *response){
   record_t *r,l;
  
@@ -173,7 +228,18 @@ int opof_del_session_server(unsigned long sessionId, sessionResponse_t *response
   return FAILURE;
 }
 
-
+/** 
+* \ingroup servercinterface
+* \brief Utility fumction to get closed sessions from test hashtable
+*
+* The function is called from within the C++ server method. It is the responsiblity of the server developer
+* to implement this function. The code here is just an example.
+*
+* \param  *request        The session request struct
+* \param  *sesionCount    The number of sessions returned
+* \return sessionResponse_t
+*
+*/
 sessionResponse_t **opof_get_closed_sessions_server(statisticsRequestArgs_t *request, int *sessionCount){
   
   int count = 0;
@@ -187,6 +253,18 @@ sessionResponse_t **opof_get_closed_sessions_server(statisticsRequestArgs_t *req
   return responses;
 }
 
+/** 
+* \ingroup servercinterface
+* \brief Utility fumction to get all sessions from test hashtable
+*
+* The function is called from within the C++ server method. It is the responsiblity of the server developer
+* to implement this function. The code here is just an example.
+*
+* \param  *request        The session request struct
+* \param  *sesionCount    The number of sessions returned
+* \return sessionResponse_t
+*
+*/
 sessionResponse_t **opof_get_all_sessions_server(statisticsRequestArgs_t *request, int *sessionCount){
   
   int count = 0;

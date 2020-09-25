@@ -15,6 +15,11 @@
 #ifndef OPOF_SERVERLIB_H
 #define OPOF_SERVERLIB_H
 
+/** \defgroup servercinterface C Server Interface
+*
+*
+* \brief External C Server Interfaces called user applications
+*/
 #include "opof.h"
 #include "opof_error.h"
 

@@ -19,5 +19,4 @@ openoffload/cpp/tests/openoffload.grpc.pb.cc
 openoffload/cpp/tests/openoffload.grpc.pb.h
 openoffload/cpp/tests/openoffload.pb.cc
 openoffload/cpp/tests/openoffload.pb.h
-**/bck
-*.bak
+openoffload/cpp/framework/doc/html/**

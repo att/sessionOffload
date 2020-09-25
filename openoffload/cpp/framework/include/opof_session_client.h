@@ -17,6 +17,13 @@
 #ifndef __OPOF_SESSION_CLIENT_H
 #define __OPOF_SESSION_CLIENT_H
 
+/**
+* \defgroup clientlibrary  C++ Client Interfaces
+*
+* \brief Internal C++ Client Interfaces called by the external C Interfaces
+*
+*/
+
 extern "C" {
 #include "opof.h"
 #include "opof_error.h"

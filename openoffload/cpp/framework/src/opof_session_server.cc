@@ -33,7 +33,7 @@ extern "C" {
 #include "opof_grpc.h"
 #include "opof_session_server.h"
 
-/**
+/** \ingroup serverlibrary
 * \brief addSession
 *
 * \param context
@@ -67,7 +67,13 @@ Status SessionTableImpl::addSession(ServerContext* context, ServerReader<session
     return Status::OK;
   }
 
-
+/** \ingroup serverlibrary
+* \brief getSession
+*
+* \param context
+* \param reader
+* \param response
+*/
 Status SessionTableImpl::getSession(ServerContext* context, const sessionId* sid,
                   sessionResponse* response) {
         sessionResponse_t response_c;
@@ -82,6 +88,13 @@ Status SessionTableImpl::getSession(ServerContext* context, const sessionId* sid
         }
   }
 
+/** \ingroup serverlibrary
+* \brief deleteSession
+*
+* \param context
+* \param reader
+* \param response
+*/
 Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* sid,
                   sessionResponse* response) {
       int status;
@@ -96,6 +109,13 @@ Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* 
         }
   }
 
+/** \ingroup serverlibrary
+* \brief getAllSessions
+*
+* \param context
+* \param reader
+* \param response
+*/
   Status SessionTableImpl::getAllSessions(ServerContext* context, const statisticsRequestArgs* request, ServerWriter<sessionResponse>* writer) {
   
   sessionResponse response;
@@ -128,6 +148,13 @@ Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* 
   return Status::OK;
  }
 
+/** \ingroup serverlibrary
+* \brief getClosedSessions
+*
+* \param context
+* \param reader
+* \param response
+*/
 Status SessionTableImpl::getClosedSessions(ServerContext* context, const statisticsRequestArgs* request, ServerWriter<sessionResponse>* writer) {
   
   sessionResponse response;

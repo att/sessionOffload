@@ -61,7 +61,14 @@ convertAddSessionResponse2c(resp,&response);
 
 return status;
 }
-// getSession
+/**  \ingroup clientlibrary
+* \brief getSessionClient
+*
+* \param size
+* \param sessionRequest_t
+* \param addSeesionResponse_t
+*
+*/
 std::string SessionTableClient::getSessionClient(int sessionid,sessionResponse_t *resp){
 
   sessionId sid;
@@ -86,7 +93,14 @@ std::string SessionTableClient::getSessionClient(int sessionid,sessionResponse_t
   //std::cout << "session endtime is: " << response.endtime() << std::endl;
 }
 
-// deleteSession
+/**  \ingroup clientlibrary
+* \brief deleteSessionClient
+*
+* \param size
+* \param sessionRequest_t
+* \param addSeesionResponse_t
+*
+*/
 std::string SessionTableClient::deleteSessionClient(int sessionid,sessionResponse_t *resp){
 
 sessionId sid;
@@ -114,7 +128,14 @@ if (status.ok()) {
   }
 
 }
-
+/**  \ingroup clientlibrary
+* \brief getClosedSessions
+*
+* \param size
+* \param sessionRequest_t
+* \param addSeesionResponse_t
+*
+*/
 unsigned long SessionTableClient::getClosedSessions(statisticsRequestArgs_t *args){
   unsigned long sessionCount = 0;
   sessionResponse response;
@@ -146,7 +167,14 @@ unsigned long SessionTableClient::getClosedSessions(statisticsRequestArgs_t *arg
   }
   return sessionCount;
 }
-
+/**  \ingroup clientlibrary
+* \brief getAllSessions
+*
+* \param size
+* \param sessionRequest_t
+* \param addSeesionResponse_t
+*
+*/
 void SessionTableClient::getAllSessions(){
   sessionResponse response;
   statisticsRequestArgs request;

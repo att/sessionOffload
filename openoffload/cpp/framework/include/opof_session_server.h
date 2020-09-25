@@ -17,8 +17,15 @@
 #ifndef __OPOF_SESSION_SERVER_H
 #define __OPOF_SESSION_SERVER_H
 
-
+/**
+* \defgroup serverlibrary  C++ Server Interfaces
+*
+* \brief Internal C++ Server Interfaces called by the external C Interfaces
+*
+*/
+extern "C" {
 #include "opof.h"
+}
 #include "opof_grpc.h"
 
 
