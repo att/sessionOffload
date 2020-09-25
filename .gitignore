@@ -13,7 +13,7 @@ openoffload/cpp/framework/src/openoffload.grpc.pb.cc
 openoffload/cpp/framework/src/openoffload.grpc.pb.h
 openoffload/cpp/framework/src/openoffload.pb.cc
 openoffload/cpp/framework/src/openoffload.pb.h
-penoffload/cpp/framework/include/openoffload.grpc.pb.h
+openoffload/cpp/framework/include/openoffload.grpc.pb.h
 openoffload/cpp/framework/include/openoffload.pb.h
 openoffload/cpp/*.cc
 openoffload/cpp/*.h
