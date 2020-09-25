@@ -85,7 +85,7 @@ int main(int argc, char ** argv){
      */
     char cert[2048];
   
-    FILE *fp, *logfile;
+    FILE *logfile;
 #ifdef FORK
     pid_t pid,sid;
 #endif
@@ -210,19 +210,13 @@ int main(int argc, char ** argv){
             exit(EXIT_FAILURE);
         }
     }
-    fp = fopen(LOG_FILE, "w");
-    if (fp != NULL){
-       logfile = fp;
-    } else {
-        syslog(LOG_WARNING,"Opening logfile");
-        exit(EXIT_FAILURE);
-    }
+   
 #ifdef FORK
     /* 
     * Change the current working directory 
     */
     if (chdir(RUN_DIR) < 0) {
-        err_fatal(fp,"Changing to RUN_DIR: %s", RUN_DIR);    
+        fprintf(stderr,"Changing to RUN_DIR: %s", RUN_DIR);    
     }
 #endif
 #ifdef FORK
