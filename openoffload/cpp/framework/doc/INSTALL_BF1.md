@@ -72,6 +72,18 @@ $ make
 #
 $ make install
 ```
+
+### Install and build OpenOffload code
+
+```bash
+$ cd /home 
+$ git clone https://github.com/att/sessionOffload.git
+$ cd sessionOffload
+$ git checkout v1alpha4
+$ cd openoffload/cpp/framework
+$ make all -j 8
+$ cp lib/libopof_server.a /home/firewall_offload/daemon/lib
+```
 ### Build the BF-1 Server
 Get the code from the [github repository](https://github.com/BodongWang/firewall_offload)
 ```bash
@@ -79,6 +91,8 @@ $ cd /home
 $ git clone https://github.com/BodongWang/firewall_offload
 $ cd firewall_offload
 $ git checkout v1.0
+$ export RTE_SDK=/home/firewall_offload/
+$ export RTE_TARGET=arm64-armv8a-linux-gcc
 ```
 The Makefile in firewall_offload/daemon needs one change
 
