@@ -4,9 +4,9 @@
 This is a series of notes to help with the installation of software onto the Bluefield-1 card for OpenOffload. The documentation assumes that the
 BF-1 card is installed with IP address 192.168.100.2 which is connected to the tmfifo_net0: on the host with IP Address 192.168.100.1
 
-##Prerequsites
+## Prerequsites
 
-## Check the software version
+### Check the software version
 
 
 ```bash
@@ -42,7 +42,7 @@ To make external servers available netplan may need to be updated with external 
 ## Install Software
 
 
-#### Install gRPC Libraries
+### Install gRPC Libraries
 ```bash
 $ sudo -i
 $ cd /root
@@ -60,8 +60,8 @@ $ make install
 ```
 ### Install Libconfig Libraries
 ```bash
-$ mkdir -p /home/ubuntu/tmp
-$ cd /home/grpc/tmp
+$ mkdir -p /root/tmp
+$ cd /root/tmp
 $ wget http://hyperrealm.github.io/libconfig/dist/libconfig-1.7.2.tar.gz
 $ tar xvzf libconfig-1.7.2.tar.gz
 $ cd libconfig-1.7.2
