@@ -80,10 +80,9 @@ $ git clone https://github.com/BodongWang/firewall_offload
 $ cd firewall_offload
 $ git checkout v1.0
 ```
-The Makefile in firewall_offload/daemon needs two changes
+The Makefile in firewall_offload/daemon needs one change
 
-1. Add HOME=/home/ubuntu in the build.sh file in firewall_offload to point to the installed files
-2. Change line 9 of the makefile from   LIB64DIR := $(GRPC_DIR)/lib64 to LIB64DIR := $(GRPC_DIR)/lib for some reason Ubuntu does not install files in lib64
+1. Change line 9 of the makefile from   LIB64DIR := $(GRPC_DIR)/lib64 to LIB64DIR := $(GRPC_DIR)/lib for some reason Ubuntu does not install files in lib64
 
 build the software packages
 ```bash
