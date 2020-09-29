@@ -44,8 +44,10 @@ To make external servers available netplan may need to be updated with external 
 
 #### Install gRPC Libraries
 ```bash
-$ mkdir -p /home/ubuntu/local
-$ export GRPC_INSTALL=/home/ubuntu/local
+$ sudo -i
+$ cd /root
+$ mkdir -p /root/local
+$ export GRPC_INSTALL=/root/local
 $ export PATH=$GRPC_INSTALL/bin:$PATH
 $ git config --global  http.sslVerify false
 $ git clone --recurse-submodules -b v1.30.0 https://github.com/grpc/grpc
@@ -73,6 +75,7 @@ $ make install
 ### Build the BF-1 Server
 Get the code from the [github repository](https://github.com/BodongWang/firewall_offload)
 ```bash
+$ cd /home
 $ git clone https://github.com/BodongWang/firewall_offload
 $ cd firewall_offload
 $ git checkout v1.0
