@@ -140,7 +140,7 @@ LIBS ?= \
   	$(ABSL_TIME_LIB) \
   	$(ABSL_TIME_ZONE_LIB)  
 #           
-all: $(DIRECTORIES) $(PROTOS) $(SERVER_LIB) $(CLIENT_LIB) $(COMBINED_NAME) $(SERVER_NAME) $(CLIENT_NAME) 
+all: $(DIRECTORIES) $(PROTOS) $(SERVER_LIB) $(CLIENT_LIB) $(SERVER_NAME) $(CLIENT_NAME) 
 #
 # Create documentation
 #

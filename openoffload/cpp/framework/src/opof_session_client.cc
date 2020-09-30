@@ -136,36 +136,31 @@ if (status.ok()) {
 * \param addSeesionResponse_t
 *
 */
-unsigned long SessionTableClient::getClosedSessions(statisticsRequestArgs_t *args){
+unsigned long SessionTableClient::getClosedSessions(statisticsRequestArgs_t *args, sessionResponse_t *responsec ){
   unsigned long sessionCount = 0;
   sessionResponse response;
   statisticsRequestArgs request;
   ClientContext context;
-  sessionResponse_t responsec;
   request.set_pagesize(args->pageSize);
 
   std::unique_ptr<ClientReader <sessionResponse> > reader(
         stub_->getClosedSessions(&context, request));
-    while (reader->Read(&response)) {
-      if (response.requeststatus() == REQUEST_STATUS::_NO_CLOSED_SESSIONS){
-        return sessionCount;
-      }
-      convertSessionResponse2c(&response, &responsec);
-#ifdef DEBUG
-      display_session_response(&responsec, "getClosedSessionClient");
-#endif
-
-      //display_session_response(&responsec);
-      sessionCount++;
+  while (reader->Read(&response)) {
+    if (response.requeststatus() == REQUEST_STATUS::_NO_CLOSED_SESSIONS){
+      return sessionCount;
     }
-
+    convertSessionResponse2c(&response, responsec);
+    sessionCount++;
+  }
   Status status = reader->Finish();
   if (status.ok()) {
-    //std::cout << "getClosedSessions rpc succeeded." << std::endl;
+    return sessionCount;
+    //std::cout << "getClosedSessions rpc succeeded sesssion count " << sessionCount << std::endl;
   } else {
     std::cout << "getClosedSessions rpc failed." << std::endl;
+    return sessionCount;
   }
-  return sessionCount;
+  
 }
 /**  \ingroup clientlibrary
 * \brief getAllSessions

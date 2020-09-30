@@ -227,7 +227,7 @@ int main(int argc, char ** argv){
 #endif
         if (status != FAILURE){
             if (test_config[0]=='\0'){
-                opof_client_test(address, number, pageSize, port, cert);
+                opof_client_speed_test(address, number, pageSize, port, cert);
             } else {
                 opof_run_tests(address, number, pageSize, port, cert,test_config);
             }

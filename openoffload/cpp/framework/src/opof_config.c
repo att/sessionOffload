@@ -81,7 +81,7 @@ sessionRequest_t **read_config(char *filename,int *nsessions){
 		    }
 		    if (request->ipver == _IPV6){
 		    	config_setting_lookup_string(session, "nexthop",&nexthopaddr);
-		    	inet_pton(AF_INET6, srcaddr, &addr6);
+		    	inet_pton(AF_INET6, nexthopaddr, &addr6);
 		    	request->nextHopV6 = addr6;
 		    } else {
 		    	config_setting_lookup_string(session, "nexthop",&nexthopaddr);

@@ -159,7 +159,7 @@ int opof_del_session(sessionTable_t *sessionHandle,  unsigned long  sessionId, s
 * \return void
 *
 */
-void opof_get_closed_sessions(sessionTable_t *sessionHandle, streamArgs_t *args ){
+unsigned long opof_get_closed_sessions(sessionTable_t *sessionHandle, streamArgs_t *args, sessionResponse_t *response){
 	//void opof_get_closed_sessions(sessionTable_t *sessionHandle, unsigned int size){
 	int status= SUCCESS;
 	SessionTableClient *client;
@@ -171,10 +171,8 @@ void opof_get_closed_sessions(sessionTable_t *sessionHandle, streamArgs_t *args 
 	sessionHandle = (sessionTable_t *)args->handle;
 	
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
-	while(closed_sessions > 0){
-		closed_sessions = client->getClosedSessions(&sessionArgs);
-	}
-	//return status;
+	closed_sessions = client->getClosedSessions(&sessionArgs, response);
+	return closed_sessions;
 }
 /**  \ingroup clientcinterface
 * \brief Get a stream of all sessions from the offload device

@@ -33,20 +33,17 @@
 
 //int get_key(char *location, char *public_key);
 
-void opof_client_test(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert){
+void opof_client_speed_test(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert){
 
   int status;
   streamArgs_t args;
   sessionTable_t *handle;
   unsigned long error = 1;
+  unsigned long closed_sessions=1;
   sessionRequest_t **request;
   addSessionResponse_t addResp;
-#ifdef FAST
-  sessionResponse_t resp;
-#endif
   args.pageSize = pageSize;
-
- 
+  sessionResponse_t response;
   handle = opof_create_sessionTable(address, port, cert);
   args.handle = handle;
  
@@ -68,25 +65,17 @@ void opof_client_test(const char *address, int max_sessions, unsigned int pageSi
       //printf("Success on add session test\n");
     }
   }
-#ifdef FAST
-  for (int i=0; i < max_sessions; i++){
-    //printf("\n\nGetting session\n");
-    status = opof_get_session(handle, i, &resp);
-    if (status == FAILURE){
-      printf("ERROR: getting sessions: %ld\n",i);
-      exit(-1);
-    }
-
-    status = opof_del_session(handle, i, &resp);
-    if (status == FAILURE){
-      printf("ERROR: deleting sessions: %ld\n",i);
-      exit(-1);
-    }
-  }
-#endif
   
-  opof_get_closed_sessions(handle,&args);
- 
+  while(closed_sessions > 0){
+      closed_sessions = opof_get_closed_sessions(handle,&args,&response);
+      if (closed_sessions > 0){
+#ifdef DEBUG
+      display_session_response(&response, "Test 1");
+#endif
+      printf("INFO: Closed Sessions: %lu\n",closed_sessions);
+    }
+   }
+  printf("INFO: Closed Sessions %lu\n",closed_sessions);
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("\n\nSessions per second: %lf\n\n", (2.0 * (double)max_sessions)/(time_spent));
