@@ -67,7 +67,7 @@ void opof_client_speed_test(const char *address, int max_sessions, unsigned int 
   }
   
   while(closed_sessions > 0){
-      closed_sessions = opof_get_closed_sessions(handle,&args,&response);
+      closed_sessions = opof_get_closed_sessions(&args,&response);
       if (closed_sessions > 0){
 #ifdef DEBUG
       display_session_response(&response, "Test 1");

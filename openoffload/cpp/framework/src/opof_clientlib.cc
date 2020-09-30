@@ -159,13 +159,13 @@ int opof_del_session(sessionTable_t *sessionHandle,  unsigned long  sessionId, s
 * \return void
 *
 */
-unsigned long opof_get_closed_sessions(sessionTable_t *sessionHandle, streamArgs_t *args, sessionResponse_t *response){
+unsigned long opof_get_closed_sessions(streamArgs_t *args, sessionResponse_t *response){
 	//void opof_get_closed_sessions(sessionTable_t *sessionHandle, unsigned int size){
 	int status= SUCCESS;
 	SessionTableClient *client;
 	std::string reply;
 	unsigned long closed_sessions =1;
-	
+	sessionTable_t *sessionHandle;
 	statisticsRequestArgs_t sessionArgs;
 	sessionArgs.pageSize = args->pageSize;
 	sessionHandle = (sessionTable_t *)args->handle;
