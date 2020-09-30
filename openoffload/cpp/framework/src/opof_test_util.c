@@ -265,7 +265,7 @@ void display_session_request(sessionRequest_t *request, const char * message){
       printf( "IP Version: V4\n");
       printf( "Source IP: %s\n", inet_ntop(AF_INET, &request->srcIP, str, INET6_ADDRSTRLEN));
       printf( "Destination IP: %s\n",inet_ntop(AF_INET, &request->dstIP, str, INET6_ADDRSTRLEN));
-      printf( "NextHop IP: %s\n",inet_ntop(AF_INET6, &request->nextHop, str, INET6_ADDRSTRLEN));
+      printf( "NextHop IP: %s\n",inet_ntop(AF_INET, &request->nextHop, str, INET6_ADDRSTRLEN));
     }
     printf( "Source Port: %d\n",request->srcPort);
     printf( "Destination Port: %d\n",request->dstPort);
