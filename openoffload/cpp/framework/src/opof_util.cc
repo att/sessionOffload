@@ -175,6 +175,3 @@ void convertSessionRequest2c(sessionRequest request, sessionRequest_t *request_c
       request_c->nextHop.s_addr = action.actionnexthop();
     }
  }
-
-
-
