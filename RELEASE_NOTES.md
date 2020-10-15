@@ -42,3 +42,24 @@
 - Changed Activation Service to have simpler API
 
 ### Minor Protocol Changes
+
+## Release v1alpha4
+
+### Bug Fixes
+
+- None
+
+### Feature Changes
+
+- Added C++ libraries and bindings
+- Added C libraries for server and client
+- Added Doxygen for C/C++ code
+
+### Major Protocol Changes
+
+- Changed addSession to be a streaming interface.
+- Changed IP V4 and V6 to network byte order format instead of string.
+
+### Minor Protocol Changes
+
+- None
