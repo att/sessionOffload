@@ -13,4 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #============LICENSE_END===============================================================================================================
-python activation_server.py
+python3 activation_server.py
