@@ -53,7 +53,68 @@ Note: The PythonSimulator has more functional testing of error conditions and fo
 $ ./builditBasic.sh
 ```
 
-## Testing the sample code
+## Testing the sample code with robot
+
+A set of Robotframework tests are provided to quickly run the client and server tests.
+
+
+```bash
+$ cd robot
+$ mvn clean install
+
+==============================================================================
+Acceptance                                                                    
+==============================================================================
+Acceptance.pythonBasicTests :: Executes the python basic gRPC Tests           
+==============================================================================
+Setup gRPC Tests                                                      | PASS |
+------------------------------------------------------------------------------
+Full Client Tests                                                     | PASS |
+------------------------------------------------------------------------------
+Add IPv4 Session Test                                                 | PASS |
+------------------------------------------------------------------------------
+Add IPV6 Session Test                                                 | PASS |
+------------------------------------------------------------------------------
+Get Session Test                                                      | PASS |
+------------------------------------------------------------------------------
+Delete Session Test                                                   | PASS |
+------------------------------------------------------------------------------
+Add Mirror Session Test                                               | PASS |
+------------------------------------------------------------------------------
+Get Closed Sessions Test                                              | PASS |
+------------------------------------------------------------------------------
+Get All Closed Sessions Test                                          | PASS |
+------------------------------------------------------------------------------
+Activation Tests                                                      | PASS |
+------------------------------------------------------------------------------
+Suite Teardown                                                        | PASS |
+------------------------------------------------------------------------------
+Acceptance.pythonBasicTests :: Executes the python basic gRPC Tests   | PASS |
+11 critical tests, 11 passed, 0 failed
+11 tests total, 11 passed, 0 failed
+==============================================================================
+Acceptance                                                            | PASS |
+11 critical tests, 11 passed, 0 failed
+11 tests total, 11 passed, 0 failed
+==============================================================================
+Output:  /home/bf1936/WB/sessionOffload.v1alpha4/tests/robot/target/robotframework-reports/output.xml
+XUnit:   /home/bf1936/WB/sessionOffload.v1alpha4/tests/robot/target/robotframework-reports/TEST-acceptance.xml
+Log:     /home/bf1936/WB/sessionOffload.v1alpha4/tests/robot/target/robotframework-reports/log.html
+Report:  /home/bf1936/WB/sessionOffload.v1alpha4/tests/robot/target/robotframework-reports/report.html
+[INFO] 
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ sessionOffload ---
+[INFO] Installing /home/bf1936/WB/sessionOffload.v1alpha4/tests/robot/pom.xml to /root/.m2/repository/com/att/app/sessionOffload/1/sessionOffload-1.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  7.996 s
+[INFO] Finished at: 2020-10-16T19:36:40Z
+[INFO] ------------------------------------------------------------------------
+```
+
+
+
+## Testing the sample code with python directly
 
 Create four separate terminal windows a client and three server windows
 
