@@ -65,16 +65,7 @@ Start the offload server in one window by going to the build directory and runni
 $ cd buildBasic
 $ ./runOffloadServer.sh
 ```
-### Server 2 Window (statistics)
-
-Start the statistics server in another window by going to the build directory and running the script below.
-
-```bash
-$ cd buildBasic
-$ ./runStatsServer.sh
-```
-
-### Server 3 Window (activation)
+### Server 2 Window (activation)
 
 Start the activation server in another window by going to the build directory and running the script below.
 
