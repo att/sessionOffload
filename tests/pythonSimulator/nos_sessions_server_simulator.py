@@ -29,6 +29,7 @@ import random
 import logging
 import threading
 import socket
+import sys
 
 import grpc
 import google.protobuf.timestamp_pb2
@@ -44,6 +45,8 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
     """ rpc addSession(sessionRequest) returns (addSessionResponse) {} """
     """ rpc getSession(sessionId) returns (sessionResponse) {}      """
     """ rpc deleteSession(sessionId) returns (sessionResponse) {}   """
+    """ rpc getAllSessions(sessionStatisticsArgs) returns (sessionResponse) {}   """
+    """ rpc getClosedSessions(sessionStatisticsArgs) returns (sessionResponse) {}   """
     global offloadSessionTable
     lastSessionId = 1
 
@@ -74,19 +77,20 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
               return self.lastSessionId
 
 
-    def addSession(self, request, context):
+    def addSession(self, request_iterator, context):
+        for request in request_iterator:
             print("############ ADD SESSION ##################");
             print("Client Session ID:", request.sessionId)
             print("IP Version:", openoffload_pb2._IP_VERSION.values_by_number[request.ipVersion].name)
             if request.ipVersion == openoffload_pb2._IPV4:
-              print("sourceIp:",socket.inet_ntop(socket.AF_INET, request.sourceIp));
+              print("sourceIp:",socket.inet_ntop(socket.AF_INET, request.sourceIp.to_bytes(4,byteorder=sys.byteorder)));
             else:
-              print("sourceIp:",socket.inet_ntop(socket.AF_INET6, request.sourceIp));
+              print("sourceIpV6:",socket.inet_ntop(socket.AF_INET6, request.sourceIpV6));
             print("sourcePort:", request.sourcePort);
             if request.ipVersion == openoffload_pb2._IPV4:
-              print("destinationIp:",socket.inet_ntop(socket.AF_INET, request.destinationIp));
+              print("destinationIp:",socket.inet_ntop(socket.AF_INET, request.destinationIp.to_bytes(4,byteorder=sys.byteorder)));
             else:
-              print("destinationIp:",socket.inet_ntop(socket.AF_INET6, request.destinationIp));
+              print("destinationIpV6:",socket.inet_ntop(socket.AF_INET6, request.destinationIpV6));
             print("destinationPort:", request.destinationPort);
             print("protocolId:", request.protocolId);
             print("ActionType 0=DROP,1=FORWARD,2=MIRROR,3=SNOOP:" , request.action.actionType)
@@ -133,8 +137,10 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
                                                 "action": request.action,
                                                 "protocolId": request.protocolId,
                                                 "sourceIp": request.sourceIp,
+                                                "sourceIpV6": request.sourceIpV6,
                                                 "sourcePort": request.sourcePort,
                                                 "destinationIp": request.destinationIp,
+                                                "destinationIpV6": request.destinationIpV6,
                                                 "destinationPort": request.destinationPort,
                                                 "state": openoffload_pb2._ESTABLISHED,
                                                 "inPackets": 0,
@@ -289,12 +295,6 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
           print(f"----- END simulateSessionsTraffic() total sessions ACTIVE={activeCnt} & CLOSED={closedCnt} -----")
           time.sleep(2)
 
-class SessionStatisticsTableServicer(openoffload_pb2_grpc.SessionStatisticsTableServicer):
-    """Provides methods that implement functionality of session statistics table server."""
-    """ rpc getAllSessions(sessionStatisticsArgs) returns (sessionResponse) {}   """
-    """ rpc getClosedSessions(sessionStatisticsArgs) returns (sessionResponse) {}   """
-    global offloadSessionTable
-
     def getClosedSessions(self, request, context):
             print("############ GET CLOSED SESSIONS ##################");
 
@@ -337,7 +337,6 @@ class SessionStatisticsTableServicer(openoffload_pb2_grpc.SessionStatisticsTable
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
     openoffload_pb2_grpc.add_SessionTableServicer_to_server(SessionTableServicer(), server)
-    openoffload_pb2_grpc.add_SessionStatisticsTableServicer_to_server(SessionStatisticsTableServicer(), server)
     with open('ssl/server.key', 'rb') as f:
          private_key = f.read()
     with open('ssl/server.crt', 'rb') as f:

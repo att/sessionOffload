@@ -25,29 +25,72 @@ import time
 from random import getrandbits
 from ipaddress import IPv4Network, IPv4Address
 import socket
+import sys
 
 import grpc
 
 import openoffload_pb2
 import openoffload_pb2_grpc
 
+##################################################################################
+#
+#  Sessions class is used for stream interface to create an iterator
+#
+##################################################################################
+class Sessions:
+   '''
+   '''
+   def __init__(self):
+       self._sessions= list()
+   def addSessionMembers(self, session):
+       self._sessions.append(session)
+   def __iter__(self):
+       ''' Returns the Iterator object '''
+       return SessionsIterator(self)
+
+class SessionsIterator:
+   ''' Iterator class '''
+   def __init__(self, session_list):
+       # Sessions object reference
+       self._session_list = session_list
+       # member variable to keep track of current index
+       self._index = 0
+   def __next__(self):
+       ''''Returns the next value from team object's lists '''
+       if self._index < (len(self._session_list._sessions) ) :
+           result = (self._session_list._sessions[self._index])
+           self._index +=1
+           return result
+       # End of Iteration
+       raise StopIteration
+
 
 def session_addSession(stub):
     session=openoffload_pb2.sessionRequest()
+    session.sessionId = 1001
     session.inLif= 1
     session.outLif= 2
     session.ipVersion=openoffload_pb2._IPV4
-    session.sourceIp=socket.inet_pton(socket.AF_INET, '10.2.2.4')
+    #session.sourceIp=socket.inet_pton(socket.AF_INET, '10.2.2.4')
+    session.sourceIp=int.from_bytes(socket.inet_pton(socket.AF_INET, '10.2.2.4'), byteorder=sys.byteorder)
     session.sourcePort=12345
-    session.destinationIp=socket.inet_pton(socket.AF_INET, '172.16.2.3')
+    #session.destinationIp=socket.inet_pton(socket.AF_INET, '172.16.2.3')
+    session.destinationIp=int.from_bytes(socket.inet_pton(socket.AF_INET, '172.16.2.3'), byteorder=sys.byteorder)
     session.destinationPort=443
     session.protocolId=openoffload_pb2._TCP
     session.action.actionType=openoffload_pb2._FORWARD
-    session.action.actionNextHop = "12.2.3.4"
+    #session.action.actionNextHop = "12.2.3.4"
+    session.action.actionNextHop=int.from_bytes(socket.inet_pton(socket.AF_INET, "12.2.3.4"), byteorder=sys.byteorder)
 
     print("Adding Session to Offload Engine...")
     try:
-      sessionResponse =  stub.addSession(session)
+      #sessionResponse =  stub.addSession(session)
+      sessions_value=Sessions()
+      sessions_value.addSessionMembers(session)
+      session_iterator=iter(sessions_value)
+      sessionResponse =  stub.addSession( session_iterator)
+
+
     except grpc.RpcError as e:
       print(f"ERROR Exception Caught: {e}")
       print(f"exception details: {e.details()}")
@@ -61,7 +104,8 @@ def session_addSession(stub):
       elif sessionResponse.requestStatus == openoffload_pb2._REJECTED_SESSION_TABLE_FULL:
           print(f"WARNING session table is full")
       else:
-          print(f"new offload session added id: {sessionResponse.sessionId}")
+          #print(f"new offload session added id: {sessionResponse.sessionId}")
+          print(f"new offload session added id: {session.sessionId}")
 
 
 
