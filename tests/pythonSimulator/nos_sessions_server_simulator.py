@@ -331,7 +331,7 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
               sessionId = list(offloadSessionTable)[x]
               session = offloadSessionTable[sessionId]
               #print(f"index = {x} returning session {sessionId}")
-              yield openoffload_pb2.sessionResponse(sessionId=sessionId, sessionState=session["state"], requestStatus=openoffload_pb2._ACCEPTED, inPackets=session["inPackets"], inBytes=session["inBytes"], outPackets=session["outPackets"], outBytes=session["outBytes"], startTime=session["startTime"], endTime=session["endTime"], sessionCloseCode=session["sessionCloseCode"]);
+              yield openoffload_pb2.sessionResponse(sessionId=session["clientSessionId"], sessionState=session["state"], requestStatus=openoffload_pb2._ACCEPTED, inPackets=session["inPackets"], inBytes=session["inBytes"], outPackets=session["outPackets"], outBytes=session["outBytes"], startTime=session["startTime"], endTime=session["endTime"], sessionCloseCode=session["sessionCloseCode"]);
                 
 
 def serve():
