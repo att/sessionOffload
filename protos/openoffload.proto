@@ -20,9 +20,9 @@ syntax = "proto3";
 // will move to v1 at release 
 // increment beta1 to beta2 , etc for changes during development
 
-package openoffload.v1alpha3;
+package openoffload.v1alpha4;
 
-option go_package = ".;openoffload_v1alpha3";
+option go_package = ".;openoffload_v1alpha4";
 
 import "google/protobuf/timestamp.proto";
 
@@ -51,13 +51,33 @@ enum SESSION_CLOSE_CODE {
   _RST        = 2;
   _TIMEOUT    = 3;
 }
-
+//
+// Errors for adding a session
+// If all sessions are successful inserted return _ACCEPTED
+//
+// If check of session capacity in offload device is insufficient to add all sessions 
+// do not insert any sessions and return  _REJECTED_SESSION_TABLE_FULL. It is the 
+// responsibility of the client to re-try
+//
+// If the server is unavailable for some other reason then return _REJECTED_SESSION_TABLE_UNAVAILABLE.
+// It is the  responsibility of the client to re-try
+//
+// All other errors will return _REJECTED with a buit mask of the failed sessions and it is the responsibility
+// of the client to address the issues
+//
+enum ADD_SESSION_STATUS{
+  _SESSION_ACCEPTED = 0;
+  _SESSION_REJECTED = 1;
+  _SESSION_TABLE_FULL = 2;
+  _SESSION_TABLE_UNAVAILABLE =3;
+}
 enum REQUEST_STATUS{
    _ACCEPTED = 0;
    _REJECTED = 1;
    _REJECTED_SESSION_NONEXISTENT = 2;
    _REJECTED_SESSION_TABLE_FULL = 3;
    _REJECTED_SESSION_ALREADY_EXISTS = 4;
+   _NO_CLOSED_SESSIONS = 5;
 }
 
 enum ACTION_TYPE{
@@ -67,12 +87,17 @@ enum ACTION_TYPE{
    _SNOOP = 3;
 }
 
-
+//
+// The session table was combined with the statistices service
+// in v1alpha4 to simplfy the code.
+//
 service SessionTable {
 
 
 // Adds a session
-rpc addSession(sessionRequest) returns (addSessionResponse) {}
+// This was changed in v1alpha4 to be a streaming API, for performance
+// reasons.
+rpc addSession(stream sessionRequest) returns (addSessionResponse) {}
 
 // Obtains the session 
 rpc getSession(sessionId) returns (sessionResponse) {}
@@ -80,10 +105,6 @@ rpc getSession(sessionId) returns (sessionResponse) {}
 // Delete a session
 rpc deleteSession(sessionId) returns (sessionResponse) {}
 
-}
-
-
-service SessionStatisticsTable {
 // Stream back all current sessions
 rpc getAllSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
 
@@ -103,30 +124,39 @@ message sessionId{
 
 // MIRROR and SNOOP require an actionNextHop
 // DROP and FORWARD do not have an actionNextHop
+// The IPV4 nextHop definition maps to the V4 struct returned by inet_pton whcih is a uint32_t.
+// The IPV6 nextHop definition maps to the V6 struct returned by inet_ptoN which is a uint8_t s6_addr[16]
 message actionParameters{
      ACTION_TYPE  actionType = 1;
-     string actionNextHop = 2;
+     uint32 actionNextHop = 2;
+     bytes actionNextHopV6 = 3;
 }
 
 // sessionId is returned by server side upon successful addSession
+// The IPV4 definition maps to the V4 struct returned by inet_pton whcih is a uint32_t.
+// The IPV6 definition maps to the V6 struct returned by inet_ptoN which is a uint8_t s6_addr[16]
 message sessionRequest{
   uint64  sessionId = 1 ;
   int32  inLif = 2;
   int32  outLif = 3;
   IP_VERSION ipVersion = 4;
-  bytes sourceIp = 5;
-  uint32 sourcePort = 6;
-  bytes destinationIp = 7;
-  uint32 destinationPort = 8;
-  PROTOCOL_ID protocolId = 9;
-  actionParameters action = 10;
+  uint32 sourceIp = 5;
+  bytes sourceIpV6 =6;
+  uint32 sourcePort = 7;
+  uint32 destinationIp = 8;
+  bytes destinationIpV6 =9;
+  uint32 destinationPort = 10;
+  PROTOCOL_ID protocolId = 11;
+  actionParameters action = 12;
 }
-
-
-
+//
+// In v1apha4 the errorstatus was added to act as a bitmask
+// of errors for each of the sesssions sent in a stream (max 64).
+//
 message addSessionResponse{
-  REQUEST_STATUS requestStatus = 1;
-  google.protobuf.Timestamp startTime = 2;
+  ADD_SESSION_STATUS requestStatus = 1;
+  uint64 errorStatus = 2;
+  google.protobuf.Timestamp startTime = 3;
 }
 
 message sessionResponse{
@@ -146,8 +176,8 @@ message statisticsRequestArgs{
   //  pageSize = 0 will turn off paging
   //  does paging make sense for a stream ?
   //  the client should read/process each event on the stream anyway.
-  uint32  pageSize=100;
-  uint32  page=1;
+  uint32  pageSize=1;
+  uint32  page=2;
   //  what other arguments make sense for retrieving or filtering streams 
 }
 //////////////////////////////////////////////////////////////////////////////////

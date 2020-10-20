@@ -13,4 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #============LICENSE_END===============================================================================================================
-python sessions_stats_server.py
+
+#The following self-signed certificates were created for testing only.
+#You can replace them with your own if appropriate using this process or official certificates using what ever process is appropriate.
+
+
+# create key and certificate files
+# it will prompt for Country, location and importanly CN or Common Name/ FQDN
+# Enter 'localhost' to set  CN=localhost so that the client session to the server
+# matches the certificate
+openssl req -newkey rsa:2048 -nodes -keyout server.key -x509 -days 365 -out server.crt
+
+

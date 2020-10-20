@@ -21,29 +21,60 @@ import random
 import logging
 import socket
 import struct
+import sys
 
 import grpc
 
 import openoffload_pb2
 import openoffload_pb2_grpc
 
+
+class Sessions:
+   '''
+   '''
+   def __init__(self):
+       self._sessions= list()
+   def addSessionMembers(self, session):
+       self._sessions.append(session)
+   def __iter__(self):
+       ''' Returns the Iterator object '''
+       return SessionsIterator(self)
+
+class SessionsIterator:
+   ''' Iterator class '''
+   def __init__(self, session_list):
+       # Sessions object reference
+       self._session_list = session_list
+       # member variable to keep track of current index
+       self._index = 0
+   def __next__(self):
+       ''''Returns the next value from team object's lists '''
+       if self._index < (len(self._session_list._sessions) ) :
+           result = (self._session_list._sessions[self._index])
+           self._index +=1
+           return result
+       # End of Iteration
+       raise StopIteration
+
+
 def session_addSession(stub):
     session=openoffload_pb2.sessionRequest()
     session.sessionId= 12345678910
     session.inLif= 1
     session.outLif= 2
-    session.sourceIp=socket.inet_pton(socket.AF_INET, "10.0.0.1")
+    session.sourceIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.0.0.1"), byteorder=sys.byteorder)
     session.sourcePort=12345
-    session.destinationIp=socket.inet_pton(socket.AF_INET, "10.1.0.3")
+    session.destinationIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.1.0.3"), byteorder=sys.byteorder)
     session.destinationPort=80
     session.protocolId=openoffload_pb2._TCP
     session.ipVersion=openoffload_pb2._IPV4
     session.action.actionType=openoffload_pb2._FORWARD
-    session.action.actionNextHop = "12.2.3.4"
-    addSessionResponse =  stub.addSession( session)
-    print("Adding Session")
-    print(addSessionResponse.requestStatus)
-    print("Request Status: ",openoffload_pb2._REQUEST_STATUS.values_by_number[addSessionResponse.requestStatus].name)
+    session.action.actionNextHop = int.from_bytes(socket.inet_pton(socket.AF_INET,"12.2.3.4"),byteorder=sys.byteorder)
+    sessions_value=Sessions()
+    sessions_value.addSessionMembers(session)
+    session_iterator=iter(sessions_value)
+    addSessionResponse =  stub.addSession( session_iterator)
+    print("addSessionResponse:",addSessionResponse.requestStatus)
     return addSessionResponse.requestStatus
 
 def session_addSession_ipv6(stub):
@@ -51,18 +82,19 @@ def session_addSession_ipv6(stub):
     session.sessionId= 12345678910
     session.inLif= 1
     session.outLif= 2
-    session.sourceIp=socket.inet_pton(socket.AF_INET6, "2001:0db8:85a3:0000:0000:8a2e:0370:7332")
+    session.sourceIpV6=socket.inet_pton(socket.AF_INET6, "2001:0db8:85a3:0000:0000:8a2e:0370:7332")
     session.sourcePort=4430
-    session.destinationIp=socket.inet_pton(socket.AF_INET6, "2001:0db8:85a3:0000:0000:8a03:0370:234F")
+    session.destinationIpV6=socket.inet_pton(socket.AF_INET6, "2001:0db8:85a3:0000:0000:8a03:0370:234F")
     session.destinationPort=80
     session.protocolId=openoffload_pb2._TCP
     session.ipVersion=openoffload_pb2._IPV6
     session.action.actionType=openoffload_pb2._FORWARD
-    session.action.actionNextHop = "12.2.3.4"
-    addSessionResponse =  stub.addSession( session)
-    print("Adding Session")
-    print(addSessionResponse.requestStatus)
-    print("Request Status: ",openoffload_pb2._REQUEST_STATUS.values_by_number[addSessionResponse.requestStatus].name)
+    session.action.actionNextHop =int.from_bytes(socket.inet_pton(socket.AF_INET, "12.2.3.4"), byteorder=sys.byteorder)
+    sessions_value=Sessions()
+    sessions_value.addSessionMembers(session)
+    session_iterator=iter(sessions_value)
+    addSessionResponse =  stub.addSession( session_iterator)
+    print("addSessionResponse:",addSessionResponse.requestStatus)
     return addSessionResponse.requestStatus
 
 def session_getSession(stub):
@@ -95,17 +127,18 @@ def session_addMirrorSession(stub):
     session.sessionId= 12345678910
     session.inLif= 1
     session.outLif= 2
-    session.sourceIp=socket.inet_pton(socket.AF_INET, "10.0.0.1")
+    session.sourceIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.0.0.1"), byteorder=sys.byteorder)
     session.sourcePort=12345
-    session.destinationIp=socket.inet_pton(socket.AF_INET, "10.1.0.3")
+    session.destinationIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.1.0.4"), byteorder=sys.byteorder)
     session.destinationPort=80
     session.protocolId=openoffload_pb2._UDP
     session.action.actionType=openoffload_pb2._MIRROR
-    session.action.actionNextHop = "12.2.3.4"
-    sessionResponse =  stub.addSession( session)
-    print("Adding Session")
-    print(sessionResponse.requestStatus)
-    print("Request Status: ",openoffload_pb2._REQUEST_STATUS.values_by_number[sessionResponse.requestStatus].name)  
+    session.action.actionNextHop=int.from_bytes(socket.inet_pton(socket.AF_INET, "12.2.3.4"), byteorder=sys.byteorder)
+    sessions_value=Sessions()
+    sessions_value.addSessionMembers(session)
+    session_iterator=iter(sessions_value)
+    sessionResponse =  stub.addSession( session_iterator)
+    print("SessionResponse:",sessionResponse.requestStatus)
     return sessionResponse.requestStatus
 
 
@@ -228,17 +261,17 @@ def run_add_mirror_session():
 def run_get_closed_sessions():
     with open('ssl/server.crt', 'rb') as f:
         creds = grpc.ssl_channel_credentials(f.read())
-        statsChannel = grpc.secure_channel('localhost:3444', creds)
-        statsStub = openoffload_pb2_grpc.SessionStatisticsTableStub(statsChannel)
+        channel = grpc.secure_channel('localhost:3443', creds)
+        stub = openoffload_pb2_grpc.SessionTableStub(channel)
         print("-------------- Check for Closed Sessions --------------")
-        session_getClosedSessions(statsStub)
+        session_getClosedSessions(stub)
 def run_get_all_sessions():
     with open('ssl/server.crt', 'rb') as f:
         creds = grpc.ssl_channel_credentials(f.read())
-        statsChannel = grpc.secure_channel('localhost:3444', creds)
-        statsStub = openoffload_pb2_grpc.SessionStatisticsTableStub(statsChannel)
+        channel = grpc.secure_channel('localhost:3443', creds)
+        stub = openoffload_pb2_grpc.SessionTableStub(channel)
         print("-------------- Get All Sessions --------------")
-        session_getAllSessions(statsStub)
+        session_getAllSessions(stub)
 
 def run_activation_sequence():
     with open('ssl/server.crt', 'rb') as f:
@@ -271,14 +304,9 @@ def run():
         session_deleteSession(stub)
         print("-------------- Add Mirror and Forward Session --------------")
         session_addMirrorSession(stub)
-
-    with open('ssl/server.crt', 'rb') as f:
-        creds = grpc.ssl_channel_credentials(f.read())
-        statsChannel = grpc.secure_channel('localhost:3444', creds)
-        statsStub = openoffload_pb2_grpc.SessionStatisticsTableStub(statsChannel)
         print("-------------- Check for Closed Sessions --------------")
-        session_getClosedSessions(statsStub)
-        session_getAllSessions(statsStub)
+        session_getClosedSessions(stub)
+        session_getAllSessions(stub)
 
     with open('ssl/server.crt', 'rb') as f:
         creds = grpc.ssl_channel_credentials(f.read())

@@ -2,27 +2,29 @@
 
 ## Supported Operating Systems
 
-### Redhat
+* Centos 8
+* Ubuntu 18.04
 
-### Ubunutu
-
-## Release v1alpha1
+## Release v1alpha4
 
 ### Bug Fixes
 
-- Original Version
+- None
 
 ### Feature Changes
 
-- Original Version
--
+- Added C++ libraries and bindings
+- Added C libraries for server and client
+- Added Doxygen for C/C++ code
+
 ### Major Protocol Changes
 
-- Original Version
+- Changed addSession to be a streaming interface.
+- Changed IP V4 and V6 to network byte order format instead of string.
 
 ### Minor Protocol Changes
 
-- Original Version
+- None 
 
 ## Release v1alpha2
 
@@ -42,3 +44,23 @@
 - Changed Activation Service to have simpler API
 
 ### Minor Protocol Changes
+
+- None
+
+## Release v1alpha1
+
+### Bug Fixes
+
+- Original Version
+
+### Feature Changes
+
+- Original Version
+-
+### Major Protocol Changes
+
+- Original Version
+
+### Minor Protocol Changes
+
+- Original Version

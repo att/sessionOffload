@@ -50,15 +50,15 @@ def run():
     with open('ssl/server.crt', 'rb') as f:
         creds = grpc.ssl_channel_credentials(f.read())
         channel = grpc.secure_channel('localhost:3443', creds)
-        statsStub = openoffload_pb2_grpc.SessionStatisticsTableStub(channel)
+        stub = openoffload_pb2_grpc.SessionTableStub(channel)
         print("\n\n-------------- Watch the Sessions --------------")
         while True:
           print("\n\n-------------- Get All the Sessions --------------")
-          session_getOffloadedSessions(statsStub, 0, 0)
+          session_getOffloadedSessions(stub, 0, 0)
 
           # lets try out Paging
           print("\n\n-------------- Get the second five Sessions --------------")
-          session_getOffloadedSessions(statsStub, 5, 2)
+          session_getOffloadedSessions(stub, 5, 2)
           time.sleep(3)
 
           print("\n")
