@@ -1,6 +1,7 @@
 # Installing gRPC build environment on CENTOS
 
 The following scripts are taken from Reference 1. The scripts have been built into a Dockerfile that is the same directory as this README.
+The framework directory has the latest build instructions.
 
 ## Running Docker 
 

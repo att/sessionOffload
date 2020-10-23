@@ -6,6 +6,8 @@ There are simple test programs for the client and server. The server code includ
 # System Requirements
 The current version of the programs are built for Centos 8. gRPC C++ must be installed and developer tools to build the system. A Vagrantfile is included in the distribution as an example of how to create a development environment. In addition a Dockerfile is included to build from a container.
 
+It is recommended that the Dockerfile or Vagrant method be used at first to get up and running the quickest.
+
 ## Install Development tools
 
 ```bash
@@ -292,12 +294,26 @@ $ docker build -t opofbld:0.3 .
 Access the container to get the files
 
 ```bash
-$ mkdir dockerresults
+$ mkdir results
 $ docker create -it --name results opofbld:0.3 /bin/bash
 $ docker cp results:/home/grpc/local/tests/bin/ results/
+$ cd results
+$ mkdir log
 ```
+
+Start the server  (optionally set -p port, -a address )
+```bash
+$ ./opof_server_test
+
+OPOF: Starting OPOF Version  0.1
+Info: Creating Insecure Server
+Server listening on: localhost:3443
+
+```
+Check the client main program for the available performance and config tests to run
 
 # References
 
 1. [gRPC Quick Start Install](https://grpc.io/docs/languages/cpp/quickstart/)
 2. [uthash Documentation](https://troydhanson.github.io/uthash/userguide.html)
+

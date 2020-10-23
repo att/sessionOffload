@@ -6,7 +6,6 @@ Resource         ./resources/python/basic.robot
 Setup gRPC Tests
     Run buildBasic Script
     Start Offload Server 
-    Start Stats Server 
     Start Activation Server 
 Full Client Tests
     Run Client
@@ -28,5 +27,4 @@ Activation Tests
     Run Activation Sequence
 Suite Teardown
     Stop Activation Server
-    Stop Stats Server
     Stop Offload Server
