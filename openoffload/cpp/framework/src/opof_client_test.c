@@ -66,14 +66,12 @@ void opof_client_speed_test(const char *address, int max_sessions, unsigned int 
     }
   }
   
+  print_response_header();
   while(closed_sessions > 0){
       closed_sessions = opof_get_closed_sessions(&args,&response);
       if (closed_sessions > 0){
-#ifdef DEBUG
-      display_session_response(&response, "Test 1");
-#endif
-      printf("INFO: Closed Sessions: %lu\n",closed_sessions);
-    }
+        print_response( &response);
+      }
    }
   printf("INFO: Closed Sessions %lu\n",closed_sessions);
   clock_t end = clock();

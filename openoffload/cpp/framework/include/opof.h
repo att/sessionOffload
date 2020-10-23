@@ -17,6 +17,7 @@
 #define SUCCESS 0
 #define FAILURE -1
 
+#define BUFFER_MAX 64
 
 #include <sys/socket.h>
 #include <netinet/in.h>
