@@ -71,7 +71,7 @@ void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *requ
     request->set_inlif(request_c->inlif);
     request->set_outlif(request_c->outlif);
     request->set_ipversion((IP_VERSION)request_c->ipver);
-    request->set_sourceport(request_c->srcPort);
+    request->set_sourceport((unsigned int)request_c->srcPort);
     if (request_c->ipver == _IPV6){
        s.assign(request_c->srcIPV6.s6_addr, request_c->srcIPV6.s6_addr+ 16);
       request->set_sourceipv6(s);
@@ -84,7 +84,7 @@ void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *requ
     } else {
       request->set_destinationip(request_c->dstIP.s_addr);
     } 
-    request->set_destinationport(request_c->dstPort);
+    request->set_destinationport((unsigned int)request_c->dstPort);
     request->set_protocolid((PROTOCOL_ID)request_c->proto);
     action.set_actiontype((ACTION_TYPE)request_c->actType);
     if (request_c->ipver == _IPV6){
@@ -162,8 +162,8 @@ void convertSessionRequest2c(sessionRequest request, sessionRequest_t *request_c
     } else {
       request_c->dstIP.s_addr = request.destinationip();
     }
-    request_c->srcPort = request.sourceport();
-    request_c->dstPort = request.destinationport();
+    request_c->srcPort = (unsigned short)request.sourceport();
+    request_c->dstPort = (unsigned short)request.destinationport();
     request_c->proto = (PROTOCOL_ID_T)request.protocolid();
     action = request.action();
     request_c->actType= (ACTION_VALUE_T)action.actiontype();

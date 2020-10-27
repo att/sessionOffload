@@ -124,7 +124,7 @@ int opof_get_session(sessionTable_t *sessionHandle, unsigned long  session, sess
 
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
 	reply = client->getSessionClient(session, resp);
- 	std::cout << "Get Session received: " << reply << std::endl;
+ 	//std::cout << "Get Session received: " << reply << std::endl;
 	return status;
 }
 /**  \ingroup clientcinterface
@@ -146,7 +146,7 @@ int opof_del_session(sessionTable_t *sessionHandle,  unsigned long  sessionId, s
 
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
 	reply = client->deleteSessionClient(sessionId, resp);
-	std::cout << "Delete Session received: " << reply << std::endl;
+	//std::cout << "Delete Session received: " << reply << std::endl;
 	return status;
 }
 /**  \ingroup clientcinterface
@@ -159,7 +159,7 @@ int opof_del_session(sessionTable_t *sessionHandle,  unsigned long  sessionId, s
 * \return void
 *
 */
-unsigned long opof_get_closed_sessions(streamArgs_t *args, sessionResponse_t *response){
+unsigned long opof_get_closed_sessions(streamArgs_t *args, sessionResponse_t responses[]){
 	//void opof_get_closed_sessions(sessionTable_t *sessionHandle, unsigned int size){
 	int status= SUCCESS;
 	SessionTableClient *client;
@@ -171,7 +171,7 @@ unsigned long opof_get_closed_sessions(streamArgs_t *args, sessionResponse_t *re
 	sessionHandle = (sessionTable_t *)args->handle;
 	
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
-	closed_sessions = client->getClosedSessions(&sessionArgs, response);
+	closed_sessions = client->getClosedSessions(&sessionArgs, responses);
 	return closed_sessions;
 }
 /**  \ingroup clientcinterface
@@ -184,14 +184,29 @@ unsigned long opof_get_closed_sessions(streamArgs_t *args, sessionResponse_t *re
 * \return void
 *
 */
-void opof_get_all_sessions(sessionTable_t *sessionHandle){
-	int status= SUCCESS;
+unsigned long opof_get_all_sessions(sessionTable_t *sessionHandle, uint64_t *startSession,int pageSize, sessionResponse_t responses[]){
+	//void opof_get_closed_sessions(sessionTable_t *sessionHandle, unsigned int size){
+	Status status;
 	SessionTableClient *client;
 	std::string reply;
+	unsigned long  number_sessions;
 
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
 
-	client->getAllSessions();
+	status = client->getAllSessions(pageSize, startSession, &number_sessions,responses);
+
+
+	if (status.ok() == true){
+		//printf("Status ok, sessions: %d\n", number_sessions);
+		return number_sessions;
+	} else if (status.error_code() == grpc::StatusCode::CANCELLED){
+		//printf("Status not ok, sessions: %d\n", number_sessions);
+		return number_sessions;
+	}
+
+		//std::cout << "Info get_all_sessions: " << status.error_code() <<" "<< status.error_message() << std::endl;
+	return 0;
+	//}
 
 	//return status;
 }

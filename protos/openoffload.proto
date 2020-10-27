@@ -20,9 +20,9 @@ syntax = "proto3";
 // will move to v1 at release 
 // increment beta1 to beta2 , etc for changes during development
 
-package openoffload.v1alpha4;
+package openoffload.v1alpha5;
 
-option go_package = ".;openoffload_v1alpha4";
+option go_package = ".;openoffload_v1alpha5";
 
 import "google/protobuf/timestamp.proto";
 
@@ -106,8 +106,8 @@ rpc getSession(sessionId) returns (sessionResponse) {}
 rpc deleteSession(sessionId) returns (sessionResponse) {}
 
 // Stream back all current sessions
-rpc getAllSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
-
+//rpc getAllSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
+rpc getAllSessions(statisticsRequestArgs) returns (sessionResponseArray) {}
 // statistics as a outgoing session from the WB to Applications ?
 // grpc seems to need a request input streamId is a placeholder
 rpc getClosedSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
@@ -149,6 +149,11 @@ message sessionRequest{
   PROTOCOL_ID protocolId = 11;
   actionParameters action = 12;
 }
+
+message sessionResponseArray {
+  repeated sessionResponse responseArray = 1;
+  uint64 nextkey =2;
+}
 //
 // In v1apha4 the errorstatus was added to act as a bitmask
 // of errors for each of the sesssions sent in a stream (max 64).
@@ -178,6 +183,7 @@ message statisticsRequestArgs{
   //  the client should read/process each event on the stream anyway.
   uint32  pageSize=1;
   uint32  page=2;
+  uint64  startSession=3;
   //  what other arguments make sense for retrieving or filtering streams 
 }
 //////////////////////////////////////////////////////////////////////////////////

@@ -78,9 +78,6 @@ std::string SessionTableClient::getSessionClient(int sessionid,sessionResponse_t
 
   Status status = stub_->getSession(&context, sid, &response);
   convertSessionResponse2c(&response, resp);
-#ifdef DEBUG
-  display_session_response(resp, "getSessionClient");
-#endif
   if (status.ok()) {
     return "Success";
   } else {
@@ -136,31 +133,32 @@ if (status.ok()) {
 * \param addSeesionResponse_t
 *
 */
-unsigned long SessionTableClient::getClosedSessions(statisticsRequestArgs_t *args, sessionResponse_t *responsec ){
+unsigned long SessionTableClient::getClosedSessions(statisticsRequestArgs_t *args, sessionResponse_t responses[] ){
   unsigned long sessionCount = 0;
   sessionResponse response;
   statisticsRequestArgs request;
   ClientContext context;
   request.set_pagesize(args->pageSize);
-
+  
   std::unique_ptr<ClientReader <sessionResponse> > reader(
         stub_->getClosedSessions(&context, request));
   while (reader->Read(&response)) {
     if (response.requeststatus() == REQUEST_STATUS::_NO_CLOSED_SESSIONS){
-      return sessionCount;
+      return 0;
     }
-    convertSessionResponse2c(&response, responsec);
+    convertSessionResponse2c(&response, &responses[sessionCount]);
     sessionCount++;
   }
   Status status = reader->Finish();
   if (status.ok()) {
     return sessionCount;
-    //std::cout << "getClosedSessions rpc succeeded sesssion count " << sessionCount << std::endl;
-  } else {
-    std::cout << "getClosedSessions rpc failed." << std::endl;
-    return sessionCount;
   }
-  
+    //std::cout << "getClosedSessions rpc succeeded sesssion count " << sessionCount << std::endl;
+  if (status.error_code() == grpc::StatusCode::NOT_FOUND ){
+    std::cout << "Get all sessions complete" << std::endl;
+    return 0;
+  }
+  return 0;
 }
 /**  \ingroup clientlibrary
 * \brief getAllSessions
@@ -170,27 +168,29 @@ unsigned long SessionTableClient::getClosedSessions(statisticsRequestArgs_t *arg
 * \param addSeesionResponse_t
 *
 */
-void SessionTableClient::getAllSessions(){
-  sessionResponse response;
+Status SessionTableClient::getAllSessions(int pageSize, uint64_t *session_start_id, uint64_t *session_count, sessionResponse_t responses[]){
+  unsigned long sessionCount=0;
+  Status status;
+  sessionResponseArray response;
   statisticsRequestArgs request;
   ClientContext context;
   sessionResponse_t responsec;
+  int array_size;
 
-  std::cout << "Getting all Sessions" << std::endl;
+  
+  request.set_pagesize(pageSize);
+  request.set_startsession(*session_start_id);
+  
+  status = stub_->getAllSessions(&context, request, &response);
+  array_size = response.responsearray_size();
+  *session_start_id = response.nextkey();
+ 
 
-  std::unique_ptr<ClientReader <sessionResponse> > reader(
-        stub_->getAllSessions(&context, request));
-    while (reader->Read(&response)) {
-      convertSessionResponse2c(&response, &responsec);
-#ifdef DEBUG
-      display_session_response(&responsec, "getAllSessionClient");
-#endif
-    }
-
-  Status status = reader->Finish();
-  if (status.ok()) {
-    std::cout << "getAllSessions rpc succeeded." << std::endl;
-  } else {
-    std::cout << "getAllSessions rpc failed no closed sessions." << std::endl;
+  for (int i = 0; i < array_size; i++ ){
+    convertSessionResponse2c(response.mutable_responsearray(i), &responses[i]);
   }
+
+  *session_count = array_size;
+  
+  return status;
 }

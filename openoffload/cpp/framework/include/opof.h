@@ -17,6 +17,7 @@
 #define SUCCESS 0
 #define FAILURE -1
 
+#define BUFFER_MAX 64
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -108,8 +109,8 @@ typedef struct sessionRequestTuple {
     struct in6_addr srcIPV6;
     struct in_addr dstIP;
     struct in6_addr dstIPV6;
-    unsigned int srcPort;
-    unsigned int dstPort;
+    unsigned short srcPort;
+    unsigned short dstPort;
     PROTOCOL_ID_T proto;
     IP_VERSION_T ipver;
     ACTION_VALUE_T actType;

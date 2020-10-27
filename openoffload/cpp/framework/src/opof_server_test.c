@@ -16,6 +16,7 @@
 
 
 #include <stdlib.h>
+#include <limits.h>
 
 #include "opof.h"
 #include "opof_error.h"
@@ -23,10 +24,9 @@
 #include "opof_hash.h"
 #include "opof_test_util.h"
 
-
 /** 
 * \ingroup servercinterface
-* \brief Utility fumction to get closed sessions from test hashtable
+* \brief Utility fumction to get all sessions from test hashtable
 *
 * This method hides the C++ constructor and returns the C__ instance as a void pointer in the 
 * sessionTable_t typedef struct. All methods of the sessionTable client class are passed this handle.
@@ -37,43 +37,45 @@
 * \return        sessionTable_t, returns a handle to the C++ instance as a void handle.
 *
 */
-sessionResponse_t **getClosedSessions(int size, int *sessionCount){
-  record_t *r, *tmp;
+static record_t *start;
+int getAllSessionsPage(int size, uint64_t *sessionStart, sessionResponse_t **responses){
   int i=0;
 
-  int count = 0;
-  sessionResponse_t **responses = NULL;
-  sessionResponse_t *response;
-  responses = (sessionResponse_t **)malloc(size * (sizeof(sessionResponse_t *)));
-  *sessionCount = 0;
-
-  HASH_ITER(hh, sessions, r, tmp) {
-     if (r->sessionState == _CLOSED){
-        count++;
-        response = (sessionResponse_t *)malloc(sizeof(sessionResponse_t));
-        response->sessionId = r->key.sessionId;
-        response->inPackets = range(100,1000);
-        response->outPackets = range(110,1500);
-        response->inBytes = range(1000,5000);
-        response->outBytes = range(1000,5000);
-        response->sessionState = r->sessionState;
-        response->sessionCloseCode = _TIMEOUT;
-        response->requestStatus = _ACCEPTED;
-        HASH_DEL(sessions, r);  /* delete it (users advances to next) */
-        free(r);             /* free it */
-        responses[i] = response;
-        i++;
-        if (i == size){
-          *sessionCount = count;
-          return responses;
-        }
-      }
-   }
-  if (i == 0) {
-    return NULL;
+  record_t *r;
+  if (*sessionStart == UINT_MAX){
+    start = sessions;
   }
-  return NULL;
+#ifdef DEBUG
+  int max_size;
+  max_size = HASH_COUNT(sessions);
+  printf("DEBUG: getAllSessions number of sessions: %d\n", max_size);
+#endif
+  if (!start)
+  {
+    return i;
+  }
+  //HASH_ITER(hh, sessions, r, tmp) {
+  for (r=start; r != NULL; r=r->hh.next){
+    responses[i]->sessionId = r->key.sessionId;
+    responses[i]->inPackets = range(100,1000);
+    responses[i]->outPackets = range(110,1500);
+    responses[i]->inBytes = range(1000,5000);
+    responses[i]->outBytes = range(1000,5000);
+    responses[i]->sessionState = r->sessionState;
+    responses[i]->sessionCloseCode = _TIMEOUT;
+    responses[i]->requestStatus = _ACCEPTED;
+    i++;
+    if (i == size){
+      start = r->hh.next;
+      *sessionStart = r->key.sessionId;
+      return i;
+    }
+  }
+  start = NULL;
+  //*sessionStart = ;
+  return i;
 }
+#if 0
 /** 
 * \ingroup servercinterface
 * \brief Utility fumction to get all sessions from test hashtable
@@ -116,7 +118,7 @@ sessionResponse_t **getAllSessions(int size, int *sessionCount){
    }
    return responses;
 }
-
+#endif
 /** 
 * \ingroup servercinterface
 * \brief Utility fumction to add sessions to the test hashtable
@@ -211,17 +213,16 @@ int opof_del_session_server(unsigned long sessionId, sessionResponse_t *response
   l.key.sessionId = sessionId;
   HASH_FIND(hh,sessions, &l.key, sizeof(record_key_t),r);
   if (r !=NULL){
-    HASH_DEL(sessions,r);
-    r->sessionState = _CLOSED;
-    HASH_ADD(hh, sessions, key, sizeof(record_key_t),r);
     response->sessionId = sessionId;
     response->inPackets = r->inPackets;
     response->outPackets = r->outPackets;
     response->inBytes = r->inBytes;
     response->outBytes = r->outBytes;
-    response->sessionState = r->sessionState;
+    response->sessionState = _CLOSED;
     response->sessionCloseCode = r->sessionClose;
     response->requestStatus = _ACCEPTED;
+    HASH_DEL(sessions,r);
+    free(r);
     return SUCCESS;
   }
   response = NULL;
@@ -240,17 +241,31 @@ int opof_del_session_server(unsigned long sessionId, sessionResponse_t *response
 * \return sessionResponse_t
 *
 */
-sessionResponse_t **opof_get_closed_sessions_server(statisticsRequestArgs_t *request, int *sessionCount){
+int opof_get_closed_sessions_server(statisticsRequestArgs_t *request, sessionResponse_t responses[]){
   
-  int count = 0;
-  int nresponses = request->pageSize;
-  sessionResponse_t **responses;
-  *sessionCount = 0;
-
-  responses = getClosedSessions(nresponses, &count);
-  *sessionCount = count;
+  record_t *r, *tmp;
+  int i = 0;
+  int size = request->pageSize;
  
-  return responses;
+  HASH_ITER(hh, sessions, r, tmp) {
+     if (r->sessionState == _CLOSED){
+        responses[i].sessionId = r->key.sessionId;
+        responses[i].inPackets = range(100,1000);
+        responses[i].outPackets = range(110,1500);
+        responses[i].inBytes = range(1000,5000);
+        responses[i].outBytes = range(1000,5000);
+        responses[i].sessionState = r->sessionState;
+        responses[i].sessionCloseCode = _TIMEOUT;
+        responses[i].requestStatus = _ACCEPTED;
+        HASH_DEL(sessions, r);  /* delete it (users advances to next) */
+        free(r);             /* free it */
+        i++;
+        if (i == size){
+          return i;
+        }
+      }
+   }
+  return i;
 }
 
 /** 
@@ -265,17 +280,13 @@ sessionResponse_t **opof_get_closed_sessions_server(statisticsRequestArgs_t *req
 * \return sessionResponse_t
 *
 */
-sessionResponse_t **opof_get_all_sessions_server(statisticsRequestArgs_t *request, int *sessionCount){
+int opof_get_all_sessions_server(int pageSize, uint64_t *sessionStart,int pageCount, sessionResponse_t **responses){
   
-  int count = 0;
-  int nresponses = request->pageSize;
-  sessionResponse_t **responses;
-  *sessionCount = 0;
+  int itemCount = 0;
 
-  responses = getAllSessions(nresponses, &count);
-  *sessionCount = count;
- 
-  return responses;
+  itemCount = getAllSessionsPage(pageSize, sessionStart, responses);
+  //sessionCount = getAllSessionsPage(pageSize, pageCount,responses,r);
+  return itemCount;
 }
 
 

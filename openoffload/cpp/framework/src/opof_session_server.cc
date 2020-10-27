@@ -78,8 +78,9 @@ Status SessionTableImpl::getSession(ServerContext* context, const sessionId* sid
                   sessionResponse* response) {
         sessionResponse_t response_c;
         int status;
-
-        status = opof_get_session_server(sid->sessionid(), &response_c);
+        uint64_t session;
+        session = sid->sessionid();
+        status = opof_get_session_server(session, &response_c);
         if (status == SUCCESS){
           convertSessionResponse2cpp(response, &response_c);
           return Status::OK;
@@ -116,36 +117,66 @@ Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* 
 * \param reader
 * \param response
 */
-  Status SessionTableImpl::getAllSessions(ServerContext* context, const statisticsRequestArgs* request, ServerWriter<sessionResponse>* writer) {
+  Status SessionTableImpl::getAllSessions(ServerContext* context, const statisticsRequestArgs* request, sessionResponseArray *responses) {
   
-  sessionResponse response;
-  sessionResponse_t **closedSessions= NULL;
+  Status status;
+  sessionResponse_t **allSessions= NULL;
   sessionResponse_t *closedResponse;
-  statisticsRequestArgs_t request_c;
-  int sessionCount = 0;
-  int nresponses = request->pagesize();
-  request_c.pageSize = nresponses;
-  closedSessions = opof_get_all_sessions_server(&request_c, &sessionCount);
-  if (closedSessions == NULL){
-    response.set_requeststatus(REQUEST_STATUS::_NO_CLOSED_SESSIONS);
-    return Status::OK;
-  }
-  for (int i=0; i < sessionCount; i++){
-    closedResponse = closedSessions[i];
-    response.set_sessionid(closedResponse->sessionId);
-    response.set_sessionstate((SESSION_STATE)closedResponse->sessionState);
-    response.set_inpackets(closedResponse->inPackets);
-    response.set_outpackets(closedResponse->outPackets);
-    response.set_inbytes(closedResponse->inBytes);
-    response.set_outbytes(closedResponse->outBytes);
-    response.set_sessionclosecode((SESSION_CLOSE_CODE)closedResponse->sessionCloseCode);
-    response.set_requeststatus(REQUEST_STATUS::_ACCEPTED);
-    writer->Write(response);
-    free(closedResponse);
-  }
-  free(closedSessions);
+  sessionResponse *response;
+  //statisticsRequestArgs_t request_c;
+  int sessionCount;
+  int pageCount = 0;
+  //int nresponses = request->pagesize();
+  int nresponses = BUFFER_MAX;
+  uint64_t start_session;
+  start_session = request->startsession();
+  //printf("Start session from request: %lu\n", start_session);
 
+  //request_c.pageSize = nresponses;
+  allSessions = (sessionResponse_t **)malloc(nresponses * sizeof(sessionResponse_t *));
+  for (int i = 0; i < nresponses; i++){
+    allSessions[i] = (sessionResponse_t *)malloc(sizeof(sessionResponse_t));
+  }
+  
+  sessionCount = opof_get_all_sessions_server(nresponses, &start_session, pageCount, allSessions);
+
+  responses->set_nextkey(start_session);
+  //printf("Start Session from response: %lu\n", start_session);
+  //printf("session count: %d\n", sessionCount);
+  if (sessionCount > 0){
+      pageCount++;
+      for (int i=0; i < sessionCount; i++){
+        closedResponse = allSessions[i];
+        //std::cout << "session count i: " << i << std::endl;
+        responses->add_responsearray();
+        response = responses->mutable_responsearray(i);
+        response->set_sessionid(closedResponse->sessionId);
+        response->set_sessionstate((SESSION_STATE)closedResponse->sessionState);
+        response->set_inpackets(closedResponse->inPackets);
+        response->set_outpackets(closedResponse->outPackets);
+        response->set_inbytes(closedResponse->inBytes);
+        response->set_outbytes(closedResponse->outBytes);
+        response->set_sessionclosecode((SESSION_CLOSE_CODE)closedResponse->sessionCloseCode);
+        response->set_requeststatus((REQUEST_STATUS)closedResponse->requestStatus);
+      }
+    }
+  for (int i=0; i <nresponses; i++){
+    free(allSessions[i]);
+  }
+  free(allSessions);
+  //if (sessionCount == 0){
+   // printf("Sending cancel message\n");
+  ////  //Status(StatusCode::INVALID_ARGUMENT, "Ouch!");
+   // return Status::CANCELLED;
+ // } else {
+  //if (sessionCount == 0){
+   // printf("finished get all sessions\n");
+   // return Status::CANCELLED;
+  //}
+  //printf("Sending success message\n");
   return Status::OK;
+    
+ // }
  }
 
 /** \ingroup serverlibrary
@@ -158,31 +189,28 @@ Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* 
 Status SessionTableImpl::getClosedSessions(ServerContext* context, const statisticsRequestArgs* request, ServerWriter<sessionResponse>* writer) {
   
   sessionResponse response;
-  sessionResponse_t **closedSessions= NULL;
-  sessionResponse_t *closedResponse;
+  sessionResponse_t closedResponse;
   statisticsRequestArgs_t request_c;
   int sessionCount = 0;
   int nresponses = request->pagesize();
   request_c.pageSize = nresponses;
-  closedSessions = opof_get_closed_sessions_server(&request_c, &sessionCount);
-  if (closedSessions == NULL){
-    response.set_requeststatus(REQUEST_STATUS::_NO_CLOSED_SESSIONS);
-    return Status::OK;
-  }
+  sessionResponse_t closedSessions[BUFFER_MAX];
+
+  sessionCount = opof_get_closed_sessions_server(&request_c, closedSessions);
+
   for (int i=0; i < sessionCount; i++){
     closedResponse = closedSessions[i];
-    response.set_sessionid(closedResponse->sessionId);
-    response.set_sessionstate((SESSION_STATE)closedResponse->sessionState);
-    response.set_inpackets(closedResponse->inPackets);
-    response.set_outpackets(closedResponse->outPackets);
-    response.set_inbytes(closedResponse->inBytes);
-    response.set_outbytes(closedResponse->outBytes);
-    response.set_sessionclosecode((SESSION_CLOSE_CODE)closedResponse->sessionCloseCode);
+    response.set_sessionid(closedResponse.sessionId);
+    response.set_sessionstate((SESSION_STATE)closedResponse.sessionState);
+    response.set_inpackets(closedResponse.inPackets);
+    response.set_outpackets(closedResponse.outPackets);
+    response.set_inbytes(closedResponse.inBytes);
+    response.set_outbytes(closedResponse.outBytes);
+    response.set_sessionclosecode((SESSION_CLOSE_CODE)closedResponse.sessionCloseCode);
     response.set_requeststatus(REQUEST_STATUS::_ACCEPTED);
     writer->Write(response);
-    free(closedResponse);
+    
   }
-  free(closedSessions);
-
+  
   return Status::OK;
  }

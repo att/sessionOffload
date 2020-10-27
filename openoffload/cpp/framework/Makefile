@@ -76,10 +76,10 @@ CC := gcc -g
 CPP := g++ -g
 
 #CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DDEBUG -DVISIBLE
-CFLAGS := -c -O2 -I include -Wno-undef -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DDEBUG
+CFLAGS := -c -O2 -I include -Wno-undef -I $(ROOT_DIR)/local/include -std=gnu99 -Wall
 #CPPFLAGS := -c -O2 -std=c++11 -I ./ -I include  -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations  -DDEBUG -DVISIBLE
 #CPPFLAGS := -c -O2 -std=c++11 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations -DSSL -DDEBUG
-CPPFLAGS := -c -O2 -std=c++11 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-decl -DDEBUG
+CPPFLAGS := -c -O2 -std=c++11 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-decl
 #
 #
 # Link Flags
@@ -175,7 +175,6 @@ OBJS = \
 	$(OBJ_DIR)/opof_error.o \
 	$(OBJ_DIR)/opof_session_server.o \
 	$(OBJ_DIR)/opof_session_client.o \
-	$(OBJ_DIR)/opof_client_test.o \
 	$(OBJ_DIR)/opof_run_tests.o \
 	$(OBJ_DIR)/opof_server_test.o \
 	$(OBJ_DIR)/opof_clientlib.o \
@@ -220,9 +219,6 @@ opof_server_main.o: opof_server_main.c opof.h opof_error.h
 #
 opof_client_main.o: opof_client_main.c opof.h opof_error.h
 	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
-#
-opof_client_test.o: opof_client_test.c opof.h opof_error.h opof_clientlib.h
-	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
 
 opof_run_tests.o: opof_run_tests.c opof.h opof_error.h opof_clientlib.h
 	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
@@ -248,11 +244,9 @@ opof_util.o: opof_util.cc opof.h opof_error.h opof_util.h
 opof_test_util.o: opof_test_util.c opof.h opof_error.h opof_test_util.h
 	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
 
-$(COMBINED_NAME): openoffload.pb.o openoffload.grpc.pb.o opof_error.o opof_main.o opof_session_server.o opof_session_client.o opof_client_test.o opof_server_test.o opof_clientlib.o opof_server.o opof_util.o opof_test_util.o opof_run_tests.o opof_config.o
-	$(LD) $(LDFLAGS) $(OBJS) $(LIBCONFIG) $(LIBS) -o $(BIN_DIR)/$@
 #
-$(CLIENT_NAME): opof_client_main.o opof_client_test.o opof_config.o opof_error.o opof_test_util.o opof_run_tests.o
-	$(LD) $(LDFLAGS)  $(OBJ_DIR)/opof_client_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_client_test.o $(OBJ_DIR)/opof_run_tests.o $(OBJ_DIR)/opof_config.o  $(OBJ_DIR)/opof_test_util.o  $(CLIENTFLAGS)  $(LIBCONFIG) $(LIBS) -o $(BIN_DIR)/$@
+$(CLIENT_NAME): opof_client_main.o opof_config.o opof_error.o opof_test_util.o opof_run_tests.o
+	$(LD) $(LDFLAGS)  $(OBJ_DIR)/opof_client_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_run_tests.o $(OBJ_DIR)/opof_config.o  $(OBJ_DIR)/opof_test_util.o  $(CLIENTFLAGS)  $(LIBCONFIG) $(LIBS) -o $(BIN_DIR)/$@
 #
 $(SERVER_NAME): opof_server_main.o opof_server_test.o opof_error.o opof_test_util.o
 	$(LD) $(LDFLAGS)  $(OBJ_DIR)/opof_server_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_server_test.o  $(OBJ_DIR)/opof_test_util.o $(SERVERFLAGS) $(LIBCONFIG) $(LIBS)  -o $(BIN_DIR)/$@

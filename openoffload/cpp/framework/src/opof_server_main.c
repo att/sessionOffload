@@ -105,7 +105,7 @@ int main(int argc, char ** argv){
     */
     setlogmask(LOG_UPTO(LOG_INFO));
     openlog("OPOF", LOG_CONS | LOG_PERROR, LOG_USER);
-    syslog(LOG_INFO,"Starting OPOF Version  %s", OPOF_VERSION);
+    syslog(LOG_INFO,"Starting OPOF Test Server: Version  %s", OPOF_VERSION);
     /*
      * Set up a signal handler 
      */
