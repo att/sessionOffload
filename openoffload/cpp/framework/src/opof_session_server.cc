@@ -47,23 +47,20 @@ Status SessionTableImpl::addSession(ServerContext* context, ServerReader<session
     int index=0;
     ADD_SESSION_STATUS reqStatus;
     addSessionResponse_t addResponse_c;
+    sessionResponseError *errorMessage;
     sessionRequest_t request_c;
     sessionRequest request;
     while(reader->Read(&request)){
       convertSessionRequest2c(request, &request_c);
       status = opof_add_session_server(&request_c, &addResponse_c);
-      if (status == FAILURE){
-        errorCode = errorCode ^ (error << index);
+      if (status != _SESSION_ACCEPTED){
+          errorMessage = response->add_responseerror();
+          errorMessage->set_sessionid(request.sessionid());
+          errorMessage->set_errorstatus((ADD_SESSION_STATUS)status);
       }
       index++;
     }
-    if (errorCode > 0){
-      reqStatus = ADD_SESSION_STATUS::_SESSION_REJECTED;
-    }else {
-      reqStatus = ADD_SESSION_STATUS::_SESSION_ACCEPTED;
-    }
     response->set_requeststatus(reqStatus);
-    response->set_errorstatus(errorCode);
     return Status::OK;
   }
 

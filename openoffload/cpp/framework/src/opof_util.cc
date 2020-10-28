@@ -107,9 +107,18 @@ void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *requ
 * \return void
 */
 void convertAddSessionResponse2c(addSessionResponse_t *response_c, addSessionResponse *response){
-
+  sessionResponseError responseError;
   response_c->requestStatus = (REQUEST_STATUS_T)response->requeststatus();
-  response_c->errorStatus = response->errorstatus();
+  if (response->responseerror_size() > 0){
+    response_c->number_errors = response->responseerror_size();
+    for (int i=0; i< response_c->number_errors; i++){
+      responseError = response->responseerror(i);
+      response_c->sessionErrors[i].sessionId = responseError.sessionid();
+      response_c->sessionErrors[i].errorStatus = (ADD_SESSION_STATUS_T)responseError.errorstatus();
+    }
+  } else {
+    response_c->number_errors = 0;
+  }
 }
 /** \ingroup utilities
 *

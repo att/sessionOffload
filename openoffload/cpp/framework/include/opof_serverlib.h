@@ -29,7 +29,7 @@
 //
 //void opof_server(const char *address, unsigned short port, const char* cert, const char* key);
 
-int opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *response);
+ADD_SESSION_STATUS_T opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *response);
 int opof_get_session_server(unsigned long sessionId, sessionResponse_t *response);
 int opof_del_session_server(unsigned long sessionId, sessionResponse_t *response);
 int opof_get_closed_sessions_server(statisticsRequestArgs_t *request, sessionResponse_t responses[]);

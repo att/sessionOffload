@@ -33,7 +33,7 @@
   #include "opof_clientlib.h"
   #include "opof_test_util.h"
 
-
+  char * getAddResponseError(ADD_SESSION_STATUS_T errorCode);
   //int get_key(char *location, char *public_key);
   sessionRequest_t **read_config(char *filename, int *nsessions);
   int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert);
@@ -128,7 +128,9 @@ int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsi
   int sessionCount =1;
   int bufferSize;
   int sessionId=0;
+  int total_sessions = max_sessions;
 
+ 
   handle = opof_create_sessionTable(address, port, cert);
   args.handle = handle;
   args.pageSize = pageSize;
@@ -142,6 +144,7 @@ int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsi
   printf("\n\nRunning Test 1: ");
   printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
   //
+  clock_t begin = clock();
   while(max_sessions > 0){
 
     sessionCount = max_sessions - pageSize;
@@ -154,11 +157,13 @@ int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsi
     status = opof_add_session(bufferSize,handle, request, &addResp);
     if (status == FAILURE){
       printf("ERROR: Adding sessions: \n");
-      //for (i=0; i < pageSize; i++){
-      //  if ((addResp.errorStatus & (error << i)) > 0) {
-      //    printf("Session index: %u failed code: %lu", i, (addResp.errorStatus & (error << i)));
-      //  }
       return FAILURE;
+    }
+    if (addResp.number_errors > 0){
+      printf("\n\nErrors in the following sessions\n");
+      for (int i=0; i < addResp.number_errors; i++){
+        printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
+      }
     }
      max_sessions = sessionCount;
      sessionId += bufferSize;
@@ -174,6 +179,9 @@ int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsi
       }
     }
   }
+  clock_t end = clock();
+  double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("\n\nSessions per second (add and close): %lf\n\n", ((double)total_sessions)/(time_spent));
   return SUCCESS;
 }
 

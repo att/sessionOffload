@@ -143,7 +143,7 @@ unsigned long SessionTableClient::getClosedSessions(statisticsRequestArgs_t *arg
   std::unique_ptr<ClientReader <sessionResponse> > reader(
         stub_->getClosedSessions(&context, request));
   while (reader->Read(&response)) {
-    if (response.requeststatus() == REQUEST_STATUS::_NO_CLOSED_SESSIONS){
+    if (response.requeststatus() == REQUEST_STATUS::_REJECTED_NO_CLOSED_SESSIONS){
       return 0;
     }
     convertSessionResponse2c(&response, &responses[sessionCount]);

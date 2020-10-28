@@ -54,6 +54,16 @@ typedef enum {
   _TIMEOUT    = 3,
 } SESSION_CLOSE_T;
 
+
+typedef enum {
+ _SESSION_ACCEPTED = 0,
+  _SESSION_REJECTED = 1,   //[deprecated = true];
+  _SESSION_TABLE_FULL = 2,
+  _SESSION_TABLE_UNAVAILABLE =3,
+  _SESSION_ERROR_OCCURED = 4,
+  _SESSION_UNKNOWN_ERROR = 5, 
+} ADD_SESSION_STATUS_T;
+
 typedef enum {
    _ACCEPTED = 0,
    _REJECTED = 1,
@@ -61,6 +71,9 @@ typedef enum {
    _REJECTED_SESSION_TABLE_FULL = 3,
    _REJECTED_SESSION_ALREADY_EXISTS = 4,
    _NO_CLOSED_SESSIONS = 5,
+   _ERROR_OCCURED = 6,
+   _REJECTED_INVALID_MESSAGE = 7,
+   _REJECTED_UNKNOWN = 8,
 } REQUEST_STATUS_T;
 
 
@@ -73,8 +86,15 @@ typedef struct {
 //  int64_t  sessionId;
 //} sessionRequest_t;
 
+typedef struct {
+  unsigned long sessionId;
+  ADD_SESSION_STATUS_T errorStatus;
+} addSessionErrors; 
+
 typedef struct addSessionResponseTuple {
   REQUEST_STATUS_T requestStatus;
+  addSessionErrors sessionErrors[BUFFER_MAX];
+  int number_errors;
   unsigned long errorStatus;
   //google.protobuf.Timestamp startTime = 3;
 } addSessionResponse_t;
@@ -116,6 +136,7 @@ typedef struct sessionRequestTuple {
     ACTION_VALUE_T actType;
     struct in_addr  nextHop;
     struct in6_addr nextHopV6;
+    unsigned int cacheTimeout;
 } sessionRequest_t;
 
 

@@ -138,6 +138,7 @@ sessionResponse_t **createSessionResponse(int size, int *sessionCount){
 **/
 sessionRequest_t **createSessionRequest(int size, unsigned long start_sessionId){
   int status;
+  unsigned int timeout = 15;
   sessionRequest_t *request;
   sessionRequest_t **requests = NULL;
   PROTOCOL_ID_T proto;
@@ -178,6 +179,7 @@ sessionRequest_t **createSessionRequest(int size, unsigned long start_sessionId)
     request->ipver = ipver;
     request->nextHop = nexthopip;
     request->actType = action;
+    request->cacheTimeout = timeout;
     requests[i] = request;
   }
 return requests;
@@ -287,6 +289,7 @@ void display_session_request(sessionRequest_t *request, const char * message){
     } else {
        printf( "Action Value (%d): UNKNOWN\n",request->actType);
     }
+    printf("Cache Session Timeout %u\n", request->cacheTimeout);
 }
 
 
@@ -340,4 +343,22 @@ void print_response(sessionResponse_t *response){
       printf( "ERROR %d",response->requestStatus );
     }
     printf("\n");
+}
+
+char * getAddResponseError(ADD_SESSION_STATUS_T errorCode){
+if (errorCode == 0){
+      return "_SESSION_ACCEPTED";
+    } else if (errorCode == 1) {
+      return "_SESSION_REJECTED";
+    } else if (errorCode == 2) {
+      return "_SESSION_TABLE_FULL";
+    } else if (errorCode == 3) {
+     return " _SESSION_TABLE_UNAVAILABLE ";
+    } else if (errorCode == 4) {
+     return "_SESSION_ERROR_OCCURED";
+    } else if (errorCode == 5) {
+     return "_SESSION_UNKNOWN_ERROR";
+    } else {
+     return "INVALID ERROR CODE";
+    }
 }

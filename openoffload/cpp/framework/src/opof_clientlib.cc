@@ -97,7 +97,6 @@ int opof_add_session(int size, sessionTable_t *sessionHandle,  sessionRequest_t 
 
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
 	status = client->addSessionClient(size,req,resp);
-	
 	if (status.ok() == true){
 		return addStatus;
 	} else {

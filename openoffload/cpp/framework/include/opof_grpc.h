@@ -56,6 +56,7 @@ using openoffload::v1alpha5::statisticsRequestArgs;
 using openoffload::v1alpha5::addSessionResponse;
 using openoffload::v1alpha5::sessionResponse;
 using openoffload::v1alpha5::sessionResponseArray;
+using openoffload::v1alpha5::sessionResponseError;
 using openoffload::v1alpha5::sessionId;
 using openoffload::v1alpha5::IP_VERSION;
 using openoffload::v1alpha5::PROTOCOL_ID;

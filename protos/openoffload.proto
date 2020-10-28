@@ -67,9 +67,12 @@ enum SESSION_CLOSE_CODE {
 //
 enum ADD_SESSION_STATUS{
   _SESSION_ACCEPTED = 0;
-  _SESSION_REJECTED = 1;
+  _SESSION_REJECTED = 1 [deprecated = true];
   _SESSION_TABLE_FULL = 2;
   _SESSION_TABLE_UNAVAILABLE =3;
+  _SESSION_ERROR_OCCURED = 4;
+  _SESSION_UNKNOWN_ERROR = 5;
+
 }
 enum REQUEST_STATUS{
    _ACCEPTED = 0;
@@ -77,7 +80,7 @@ enum REQUEST_STATUS{
    _REJECTED_SESSION_NONEXISTENT = 2;
    _REJECTED_SESSION_TABLE_FULL = 3;
    _REJECTED_SESSION_ALREADY_EXISTS = 4;
-   _NO_CLOSED_SESSIONS = 5;
+   _REJECTED_NO_CLOSED_SESSIONS = 5;
 }
 
 enum ACTION_TYPE{
@@ -148,7 +151,14 @@ message sessionRequest{
   uint32 destinationPort = 10;
   PROTOCOL_ID protocolId = 11;
   actionParameters action = 12;
+  uint32 cacheTimeout = 13;
 }
+
+message sessionResponseError {
+  uint64 sessionId = 1;
+  ADD_SESSION_STATUS errorStatus = 2;
+}
+
 
 message sessionResponseArray {
   repeated sessionResponse responseArray = 1;
@@ -160,8 +170,9 @@ message sessionResponseArray {
 //
 message addSessionResponse{
   ADD_SESSION_STATUS requestStatus = 1;
-  uint64 errorStatus = 2;
+  uint64 errorStatus = 2 [deprecated = true];
   google.protobuf.Timestamp startTime = 3;
+  repeated sessionResponseError responseError = 4;
 }
 
 message sessionResponse{
