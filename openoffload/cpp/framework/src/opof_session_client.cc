@@ -136,8 +136,8 @@ if (status.ok()) {
 * \param addSeesionResponse_t
 *
 */
-unsigned long SessionTableClient::getClosedSessions(statisticsRequestArgs_t *args, sessionResponse_t *responsec ){
-  unsigned long sessionCount = 0;
+int SessionTableClient::getClosedSessions(statisticsRequestArgs_t *args, sessionResponse_t responses[] ){
+  int sessionCount = 0;
   sessionResponse response;
   statisticsRequestArgs request;
   ClientContext context;
@@ -149,7 +149,7 @@ unsigned long SessionTableClient::getClosedSessions(statisticsRequestArgs_t *arg
     if (response.requeststatus() == REQUEST_STATUS::_NO_CLOSED_SESSIONS){
       return sessionCount;
     }
-    convertSessionResponse2c(&response, responsec);
+    convertSessionResponse2c(&response, &responses[sessionCount]);
     sessionCount++;
   }
   Status status = reader->Finish();
