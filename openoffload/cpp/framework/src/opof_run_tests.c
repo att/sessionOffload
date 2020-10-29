@@ -21,6 +21,7 @@
   *
   */
   #include <limits.h>
+  #include <stdbool.h>
   #include <arpa/inet.h>
   #include <sys/types.h>          
   #include <sys/socket.h>
@@ -36,11 +37,12 @@
   char * getAddResponseError(ADD_SESSION_STATUS_T errorCode);
   //int get_key(char *location, char *public_key);
   sessionRequest_t **read_config(char *filename, int *nsessions);
-  int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert);
+  int opof_fullTestSuite(const char *address, unsigned short port, const char *cert, bool verbose);
+  int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose);
   //int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, char *test_config);
-  int opof_test2(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert);
-  int opof_test3(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert);
-  int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert);
+  int opof_test2(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose);
+  int opof_test3(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose);
+  int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose);
   //int opof_test5(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, char *test_config);
   //int opof_test6(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, char *test_config);
 
@@ -54,23 +56,26 @@
     printf("\n");
   }
 
-  int opof_run_tests(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, char *test_config, int testid){
+  int opof_run_tests(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, char *test_config, int testid, bool verbose){
 
     int status;
 
     switch (testid){
 
+    case -1:
+      status = opof_fullTestSuite(address,port, cert, verbose);
+      break;
     case 1:
-      status = opof_test1(address,  max_sessions, pageSize,port, cert);
+      status = opof_test1(address,  max_sessions, pageSize,port, cert, verbose);
       break;
     case 2:
-      status = opof_test2(address,  max_sessions, pageSize,port, cert);
+      status = opof_test2(address,  max_sessions, pageSize,port, cert, verbose);
       break;
     case 3:
-      status = opof_test3(address,  max_sessions, pageSize,port, cert);
+      status = opof_test3(address,  max_sessions, pageSize,port, cert, verbose);
       break;
     case 4:
-      status = opof_test4(address,  max_sessions, pageSize,port, cert);
+      status = opof_test4(address,  max_sessions, pageSize,port, cert, verbose);
       break;
 #ifdef USED
     case 5:
@@ -86,7 +91,11 @@
       return status;
     }
       if (status == SUCCESS){
-        printf("\nINFO: Test: %d ran successfully\n\n", testid);
+        if (testid == -1){
+          printf("\nINFO: Full Test Suite ran successfully\n\n");
+        } else {
+          printf("\nINFO: Test: %d ran successfully\n\n", testid);
+        }
       } else {
         printf("ERROR: Test: %d Failed\n", testid);
       }
@@ -115,7 +124,141 @@
 
     return status;
   }
-int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert){
+
+int opof_fullTestSuite(const char *address, unsigned short port, const char *cert,bool verbose){
+
+      int status;
+      int pageSize = BUFFER_MAX;
+      int max_sessions;
+
+      max_sessions = 19;
+      printf("\n\n\nSmall Buffer Tests: %d\n", max_sessions);
+      status = opof_test1(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 1 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 1 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+      status = opof_test2(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 2 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 2 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+      status = opof_test3(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 3 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 3 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+      status = opof_test4(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 4 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 4 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+     
+      max_sessions = 72;
+      printf("\n\n\nMedium Buffer Tests: %d\n", max_sessions);
+      status = opof_test1(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 1 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 1 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+      status = opof_test2(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 2 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 2 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+      status = opof_test3(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 3 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 3 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+      status = opof_test4(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 4 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 4 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+
+      max_sessions = 384;
+      printf("\n\n\nLarge Buffer Tests: %d\n", max_sessions);
+      status = opof_test1(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 1 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 1 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+      status = opof_test2(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 2 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 2 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+      status = opof_test3(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 3 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 3 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+      status = opof_test4(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 4 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 4 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+
+      max_sessions = 1019;
+      printf("\n\n\nCache Overflow Tests: %d\n", max_sessions);
+      status = opof_test1(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 1 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 1 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+      status = opof_test2(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 2 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 2 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+      status = opof_test3(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 3 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 3 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+      status = opof_test4(address,  max_sessions, pageSize,port, cert, verbose);
+      if (status == SUCCESS){
+        printf("Passed Test 4 with max sessions: %d\n",max_sessions);
+      } else {
+        printf("Failed Test 4 with max sessions: %d\n",max_sessions);
+        return FAILURE;
+      }
+  return SUCCESS;
+
+}
+
+int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose){
 
   int status;
   streamArgs_t args;
@@ -168,14 +311,17 @@ int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsi
      max_sessions = sessionCount;
      sessionId += bufferSize;
   }
-
-  print_response_header();
+  if (verbose == true){
+    print_response_header();
+  }
   while(closed_sessions > 0){
     closed_sessions = opof_get_closed_sessions(&args,responses);
-    printf("Closed sessions: %lu\n", closed_sessions);
-    if (closed_sessions > 0){
-      for (int i=0; i < closed_sessions; i++){
-        print_response( &responses[i]);
+    //printf("Closed sessions: %lu\n", closed_sessions);
+    if (verbose == true){
+      if (closed_sessions > 0){
+        for (int i=0; i < closed_sessions; i++){
+          print_response( &responses[i]);
+        }
       }
     }
   }
@@ -185,7 +331,7 @@ int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsi
   return SUCCESS;
 }
 
-int opof_test2(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert){
+int opof_test2(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose){
 
   int nsessions = 1;
   int status;
@@ -243,24 +389,28 @@ int opof_test2(const char *address, int max_sessions, unsigned int pageSize,unsi
   while (nsessions > 0 ){
     nsessions = opof_get_all_sessions(handle, &sessionStart, pageSize, responses);
     if (nsessions > 0){
-      printf("\n\nDisplaying Page: %d\n",page_number);
-      print_response_header();
+      if (verbose){
+        printf("\n\nDisplaying Page: %d\n",page_number);
+        print_response_header();
+      }
       for (int i=0; i < nsessions; i++){
-        print_response(&responses[i]);
+        if (verbose){
+          print_response(&responses[i]);
+        }
         sessionStart = responses[i].sessionId;
       }
       //printf("sessionStart: %lu\n",sessionStart);
       page_number++;
-      if (page_number >5){
-        return SUCCESS;
-      }
+      //if (page_number >5){
+      //return SUCCESS;
+      //}
     }
   }
 
   return SUCCESS;
 }
 
-int opof_test3(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert){
+int opof_test3(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose){
 
   int status;
   
@@ -310,11 +460,14 @@ int opof_test3(const char *address, int max_sessions, unsigned int pageSize,unsi
      max_sessions = sessionCount;
      sessionId += bufferSize;
   }
-
-  print_response_header();
+  if (verbose){
+    print_response_header();
+  }
   for (int i = 0; i < total_sessions; i++){
     status = opof_get_session(handle, i, &resp);
-    print_response(&resp);
+    if (verbose){
+      print_response(&resp);
+    }
     if (status == FAILURE){
       printf("ERROR: getting session: %d\n", sessionId);
       exit(-1);
@@ -324,7 +477,7 @@ int opof_test3(const char *address, int max_sessions, unsigned int pageSize,unsi
 }
 
 
-int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert){
+int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose){
 
   int nsessions = 1;
   int status;
@@ -376,13 +529,17 @@ int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsi
      max_sessions = sessionCount;
      sessionId += bufferSize;
   }
-  printf("\n\nDeleting following sessions from cache\n");
-  print_response_header();
+  if (verbose){
+    printf("\n\nDeleting following sessions from cache\n");
+    print_response_header();
+  }
   for (int i = 0; i < total_sessions; i++){
     status = opof_del_session(handle, i, &resp);
-    print_response(&resp);
+    if (verbose){
+      print_response(&resp);
+    }
     if (status == FAILURE){
-      printf("ERROR: getting session: %d\n", sessionId);
+      printf("ERROR: deleting session: %d\n", sessionId);
       exit(-1);
     }
   }
@@ -391,21 +548,25 @@ int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsi
 
   //printf("\n\n Get all sessions test \n\n");
   //printf("\nNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
-  printf("\n\nDisplaying all Sessions\n");
-  print_response_header();
+  if (verbose){
+    printf("\n\nDisplaying all Sessions\n");
+    print_response_header();
+  }
   while (nsessions > 0 ){
     nsessions = opof_get_all_sessions(handle, &sessionStart, pageSize, responses);
     //printf("Number of sessions for get all: %d\n",nsessions);
-    if (nsessions > 0){
-      //printf("Page: %d\n",page_number);
-      
-      for (int i=0; i < nsessions; i++){
-        print_response(&responses[i]);
-      }
-      //printf("sessionStart: %lu\n",sessionStart);
-      page_number++;
-      if (page_number >5){
-        return SUCCESS;
+    if (verbose){
+      if (nsessions > 0){
+        //printf("Page: %d\n",page_number);
+        
+        for (int i=0; i < nsessions; i++){
+          print_response(&responses[i]);
+        }
+        //printf("sessionStart: %lu\n",sessionStart);
+        //page_number++;
+        //if (page_number >5){
+        //  return SUCCESS;
+       // }
       }
     }
   }

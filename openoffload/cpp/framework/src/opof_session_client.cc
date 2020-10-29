@@ -81,7 +81,7 @@ std::string SessionTableClient::getSessionClient(int sessionid,sessionResponse_t
   if (status.ok()) {
     return "Success";
   } else {
-    std::cout << "RPC getSession failed with error code: " << status.error_code() << ": " << status.error_message()
+    std::cout << "RPC getSession: " << sessionid << " failed with error code: " << status.error_code() << ": " << status.error_message()
               << std::endl;
     return "RPC failed";
   }
@@ -112,14 +112,9 @@ convertSessionResponse2c(&response, resp);
 #endif
 
 if (status.ok()) {
-  resp->sessionId = response.sessionid();
-  resp->requestStatus = (REQUEST_STATUS_T)response.requeststatus();
-  resp->sessionState = (SESSION_STATE_T)response.sessionstate();
-  resp->inPackets = response.inpackets();
-  resp->outPackets = response.outpackets();
   return "Success";
 } else {
-    std::cout << "RPC Delete Session Failed: " << status.error_code() << ": " << status.error_message()
+    std::cout << "RPC Delete Session: " << sessionid << " Failed: " << status.error_code() << ": " << status.error_message()
               << std::endl;
     return "RPC failed";
   }

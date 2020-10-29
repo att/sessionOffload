@@ -45,6 +45,7 @@ typedef enum {
   _CLOSING_1   = 1,
   _CLOSING_2   = 2,
   _CLOSED      = 3,
+  _UNKNOWN_STATE     = 4,
 } SESSION_STATE_T;
 
 typedef enum {
@@ -52,6 +53,7 @@ typedef enum {
   _FINACK     = 1,
   _RST        = 2,
   _TIMEOUT    = 3,
+  _UNKNOWN_CLOSE_CODE    = 4,
 } SESSION_CLOSE_T;
 
 

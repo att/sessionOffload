@@ -198,10 +198,17 @@ int opof_get_session_server(unsigned long sessionId, sessionResponse_t *response
     response->sessionState = r->sessionState;
     response->sessionCloseCode = r->sessionClose;
     response->requestStatus = _ACCEPTED;
-    return SUCCESS;
-    }
-    response = NULL;
-    return FAILURE;  
+  } else {
+    response->sessionId = sessionId;
+    response->inPackets = 0;
+    response->outPackets = 0;
+    response->inBytes = 0;
+    response->outBytes = 0;;
+    response->sessionState = _UNKNOWN_STATE;
+    response->sessionCloseCode = _UNKNOWN_CLOSE_CODE;
+    response->requestStatus = _REJECTED_SESSION_NONEXISTENT;
+  }
+  return SUCCESS;  
 }
 
 /** 
@@ -232,10 +239,17 @@ int opof_del_session_server(unsigned long sessionId, sessionResponse_t *response
     response->requestStatus = _ACCEPTED;
     HASH_DEL(sessions,r);
     free(r);
-    return SUCCESS;
+  }else {
+    response->sessionId = sessionId;
+    response->inPackets = 0;
+    response->outPackets = 0;
+    response->inBytes = 0;
+    response->outBytes = 0;;
+    response->sessionState = _UNKNOWN_STATE;
+    response->sessionCloseCode = _UNKNOWN_CLOSE_CODE;
+    response->requestStatus = _REJECTED_SESSION_NONEXISTENT;
   }
-  response = NULL;
-  return FAILURE;
+  return SUCCESS;
 }
 
 /** 

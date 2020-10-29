@@ -211,9 +211,12 @@ void display_session_response(sessionResponse_t *response, const char *message){
       printf("Session State (%d) _CLOSING_2 \n",response->sessionState);
     } else if (response->sessionState == 3){
       printf("Session State (%d) _CLOSED \n",response->sessionState);
+    } else if (response->sessionCloseCode == 4){
+       printf("Session State (%d) _UNKNOWN_STATE \n",response->sessionState);
     } else {
       printf("Session State Invalid value(%d) \n",response->sessionState);
     }
+
     if (response->sessionCloseCode == 0){
        printf("Session Close Code (%d) _NOT_CLOSED \n",response->sessionCloseCode);
     } else if (response->sessionCloseCode == 1){
@@ -222,9 +225,12 @@ void display_session_response(sessionResponse_t *response, const char *message){
        printf("Session Close Code (%d) _RST \n",response->sessionCloseCode);
     } else if (response->sessionCloseCode == 3){
        printf("Session Close Code (%d) _TIMEOUT \n",response->sessionCloseCode);
+    } else if (response->sessionCloseCode == 4){
+       printf("Session Close Code (%d) _UNKNOWN_CLOSE_CODE \n",response->sessionCloseCode);
     } else {
       printf("Session Close Code Invalid value (%d) \n",response->sessionCloseCode);
     }
+
     if (response->requestStatus == 0){
       printf("Request Status (%d) _ACCEPTED\n",response->requestStatus);
     } else if (response->requestStatus == 1){
@@ -311,6 +317,8 @@ void print_response(sessionResponse_t *response){
      printf( "_CLOSING_2");
     } else if (response->sessionState == 3) {
      printf( "_CLOSED");
+    } else if (response->sessionState == 4) {
+     printf( "_UNKNOWN_STATE");
     } else {
       printf( "ERROR %d",response->sessionState);
     }
@@ -323,6 +331,8 @@ void print_response(sessionResponse_t *response){
      printf( "_RST");
     } else if (response->sessionCloseCode == 3) {
      printf( "_TIMEOUT");
+    } else if (response->sessionCloseCode == 4) {
+     printf( "_UNKNOWN_CLOSE_CODE");
     } else {
       printf( "ERROR %d",response->sessionCloseCode);
     }

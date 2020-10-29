@@ -43,6 +43,7 @@ enum SESSION_STATE {
   _CLOSING_1   = 1;
   _CLOSING_2   = 2;
   _CLOSED      = 3;
+  _UNKNOWN_STATE     = 4;
 }
  
 enum SESSION_CLOSE_CODE {
@@ -50,6 +51,7 @@ enum SESSION_CLOSE_CODE {
   _FINACK     = 1;
   _RST        = 2;
   _TIMEOUT    = 3;
+  _UNKNOWN_CLOSE_CODE    = 4;
 }
 //
 // Errors for adding a session
