@@ -38,7 +38,7 @@ public:
     std::string getSessionClient(int session, sessionResponse_t *resp);
     std::string deleteSessionClient(int session, sessionResponse_t *resp);
     void getAllSessions();
-    unsigned long getClosedSessions(statisticsRequestArgs_t *args, sessionResponse_t *response);
+    int getClosedSessions(statisticsRequestArgs_t *args, sessionResponse_t responses[]);
 private:
     std::unique_ptr<SessionTable::Stub> stub_;
 };

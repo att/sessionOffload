@@ -240,17 +240,31 @@ int opof_del_session_server(unsigned long sessionId, sessionResponse_t *response
 * \return sessionResponse_t
 *
 */
-sessionResponse_t **opof_get_closed_sessions_server(statisticsRequestArgs_t *request, int *sessionCount){
+int opof_get_closed_sessions_server(statisticsRequestArgs_t *request, sessionResponse_t responses[]){
   
-  int count = 0;
-  int nresponses = request->pageSize;
-  sessionResponse_t **responses;
-  *sessionCount = 0;
-
-  responses = getClosedSessions(nresponses, &count);
-  *sessionCount = count;
+  record_t *r, *tmp;
+  int i = 0;
+  int size = request->pageSize;
  
-  return responses;
+  HASH_ITER(hh, sessions, r, tmp) {
+     if (r->sessionState == _CLOSED){
+        responses[i].sessionId = r->key.sessionId;
+        responses[i].inPackets = range(100,1000);
+        responses[i].outPackets = range(110,1500);
+        responses[i].inBytes = range(1000,5000);
+        responses[i].outBytes = range(1000,5000);
+        responses[i].sessionState = r->sessionState;
+        responses[i].sessionCloseCode = _TIMEOUT;
+        responses[i].requestStatus = _ACCEPTED;
+        HASH_DEL(sessions, r);  /* delete it (users advances to next) */
+        free(r);             /* free it */
+        i++;
+        if (i == size){
+          return i;
+        }
+      }
+   }
+  return i;
 }
 
 /** 

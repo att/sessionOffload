@@ -288,3 +288,55 @@ void display_session_request(sessionRequest_t *request, const char * message){
        printf( "Action Value (%d): UNKNOWN\n",request->actType);
     }
 }
+
+void print_response_header(){
+  printf("\n\n  Session ID\t In Packets\t In Bytes\t Out Packets\t  Out Bytes \t\t Session State \t  Close Code\t Request Status\n");
+}
+
+void print_response(sessionResponse_t *response){
+ 
+  printf("%12lu\t %12ld\t %12ld\t %12ld\t %12ld\t", 
+          response->sessionId,response->inPackets, response->inBytes, response->outPackets, 
+          response->outBytes);
+ printf("\t");
+ if (response->sessionState == 0){
+      printf( "_ESTABLISHED");
+    } else if (response->sessionState == 1) {
+     printf( "__CLOSING_1");
+    } else if (response->sessionState == 2) {
+     printf( "_CLOSING_2");
+    } else if (response->sessionState == 3) {
+     printf( "_CLOSED");
+    } else {
+      printf( "ERROR %d",response->sessionState);
+    }
+  printf("\t\t");
+  if (response->sessionCloseCode == 0){
+      printf( "_NOT_CLOSED");
+    } else if (response->sessionCloseCode == 1) {
+     printf( "_FINACK");
+    } else if (response->sessionCloseCode == 2) {
+     printf( "_RST");
+    } else if (response->sessionCloseCode == 3) {
+     printf( "_TIMEOUT");
+    } else {
+      printf( "ERROR %d",response->sessionCloseCode);
+    }
+  printf("\t");
+  if (response->requestStatus == 0){
+      printf( "_ACCEPTED");
+    } else if (response->requestStatus == 1) {
+     printf( "_REJECTED");
+    } else if (response->requestStatus == 2) {
+     printf( "_REJECTED_SESSION_NONEXISTANT");
+    } else if (response->requestStatus == 3) {
+     printf( "_REJECTED_SESSION_TABLE_FULL");
+    } else if (response->requestStatus == 4) {
+     printf( "_REJECTED_SESSION_AREADY_EXISTS");
+    } else if (response->requestStatus == 5) {
+     printf( "_NO_CLOSED_SESSIONS");
+    } else {
+      printf( "ERROR %d",response->requestStatus );
+    }
+    printf("\n");
+}
