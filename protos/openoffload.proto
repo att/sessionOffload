@@ -67,22 +67,44 @@ enum SESSION_CLOSE_CODE {
 // All other errors will return _REJECTED with a buit mask of the failed sessions and it is the responsibility
 // of the client to address the issues
 //
+// ADD_SESSION_STATUS Codes Description
+//
+// _SESSION_ACCEPTED: Session is accepted by the server and the client performs normal operation
+// _SESSION_REJECTED: Session is rejected by the server as the message 
+//    is invalid, the client needs to correct the error.
+// _SESSION_TABLE_FULL: Session is rejected by the server as its session table is full, 
+//    the client needs to backoff until more space is available
+// _SESSION_TABLE_UNAVAILABLE: Session is rejected by the server due to an internal error 
+//    in the server, the client needs to back off until error is corrected.
+// _SESSION_ALREADY_EXISTS: Session is rejected by the the server as it already exists 
+//    in the server session table, the client will take corrective action to ensure state is consistent.
+//
 enum ADD_SESSION_STATUS{
   _SESSION_ACCEPTED = 0;
-  _SESSION_REJECTED = 1 [deprecated = true];
+  _SESSION_REJECTED = 1;
   _SESSION_TABLE_FULL = 2;
   _SESSION_TABLE_UNAVAILABLE =3;
-  _SESSION_ERROR_OCCURED = 4;
-  _SESSION_UNKNOWN_ERROR = 5;
-
+  _SESSION_ALREADY_EXISTS=4;
 }
+//
+// REQUEST_STATUS Codes Description
+//
+// _ACCEPTED: Normal operation
+// _REJECTED: Unknown error in the format of the REQUEST message
+// _REJECTED_SESSION_NONEXISTENT: In getSession or deleteSession the server does not have the session
+//    in its session table. The client needs to reconcile the system state.
+// _REJECTED_SESSION_TABLE_FULL: This should never happen as getClosedSessions, getSession, deleteSession never add sessions.
+// _REJECTED_SESSION_ALREADY_EXISTS: This should never happen as getClosedSessions, getSession, deleteSession never add sessions.
+// _NO_CLOSED_SESSIONS: When getClosedSessions returns with no closed sessions it will return 0 sessions. There should be no
+//    message attached so not sure if this is valid.
+//
 enum REQUEST_STATUS{
    _ACCEPTED = 0;
    _REJECTED = 1;
    _REJECTED_SESSION_NONEXISTENT = 2;
    _REJECTED_SESSION_TABLE_FULL = 3;
    _REJECTED_SESSION_ALREADY_EXISTS = 4;
-   _REJECTED_NO_CLOSED_SESSIONS = 5;
+   _NO_CLOSED_SESSIONS = 5;
 }
 
 enum ACTION_TYPE{
