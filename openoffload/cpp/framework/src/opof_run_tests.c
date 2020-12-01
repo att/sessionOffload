@@ -106,7 +106,7 @@
   int opof_delete_all_sessions(void * handle, int pageSize){
 
     sessionResponse_t responses[BUFFER_MAX], resp;
-    int nsessions = 1;
+    unsigned long nsessions = 1;
     int sessionId;
     int status = SUCCESS;
     uint64_t sessionStart = UINT_MAX;
@@ -334,7 +334,7 @@ int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsi
 
 int opof_test2(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose){
 
-  int nsessions = 1;
+  unsigned long nsessions = 1;
   int status;
  
   sessionTable_t *handle;
@@ -480,7 +480,7 @@ int opof_test3(const char *address, int max_sessions, unsigned int pageSize,unsi
 
 int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose){
 
-  int nsessions = 1;
+  unsigned long nsessions = 1;
   int status;
   
   sessionTable_t *handle;
@@ -490,7 +490,6 @@ int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsi
   addSessionResponse_t addResp;
  
   sessionResponse_t responses[BUFFER_MAX];
-  int page_number =0;
   int sessionCount =1;
   int bufferSize;
   handle = opof_create_sessionTable(address, port, cert);
