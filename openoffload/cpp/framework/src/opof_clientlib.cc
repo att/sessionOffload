@@ -91,18 +91,12 @@ sessionTable_t * opof_create_sessionTable(const char * host, unsigned int port, 
 *
 */
 int opof_add_session(int size, sessionTable_t *sessionHandle,  sessionRequest_t **req, addSessionResponse_t *resp){
-	int addStatus = SUCCESS;
 	SessionTableClient *client;
-	Status status;
+	int status;
 
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
 	status = client->addSessionClient(size,req,resp);
-	if (status.ok() == true){
-		return addStatus;
-	} else {
-		std::cout << "ERROR addSessionClient: " << status.error_code() << status.error_message() << std::endl;
-		return FAILURE;
-	}
+	return status;
 }
 /**  \ingroup clientcinterface
 * \brief Get a session from the offload device.
@@ -122,7 +116,6 @@ int opof_get_session(sessionTable_t *sessionHandle, unsigned long  session, sess
 
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
 	status = client->getSessionClient(session, resp);
- 	//std::cout << "Get Session received: " << reply << std::endl;
 	return status;
 }
 /**  \ingroup clientcinterface

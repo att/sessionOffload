@@ -34,32 +34,32 @@ extern "C" {
 * \param addSeesionResponse_t
 *
 */
-Status SessionTableClient::addSessionClient(int size, sessionRequest_t **s, addSessionResponse_t *resp){
+int SessionTableClient::addSessionClient(int size, sessionRequest_t **s, addSessionResponse_t *resp){
 
-sessionRequest_t *request_c;
-sessionRequest request;
-addSessionResponse response;
-ClientContext context;
-Status status;
-std::unique_ptr<ClientWriter <sessionRequest> > writer(
-        stub_->addSession(&context, &response));
+  sessionRequest_t *request_c;
+  sessionRequest request;
+  addSessionResponse response;
+  ClientContext context;
+  Status status;
+  std::unique_ptr<ClientWriter <sessionRequest> > writer(
+          stub_->addSession(&context, &response));
 
-for (int i=0; i< size; i++){
-  request_c = s[i];
-#ifdef DEBUG
-  display_session_request(request_c, "addSessionClient");
-#endif
-  convertSessionRequest2cpp(request_c, &request);
-  writer->Write(request);
-  //free(request_c);
-}
+  for (int i=0; i< size; i++){
+    request_c = s[i];
+  #ifdef DEBUG
+    display_session_request(request_c, "addSessionClient");
+  #endif
+    convertSessionRequest2cpp(request_c, &request);
+    writer->Write(request);
+    //free(request_c);
+  }
 
-//free(s);
-writer->WritesDone();
-status = writer->Finish();
-convertAddSessionResponse2c(resp,&response);
+  //free(s);
+  writer->WritesDone();
+  status = writer->Finish();
+  convertAddSessionResponse2c(resp,&response);
 
-return status;
+  return static_cast<int>(status.error_code());
 }
 /**  \ingroup clientlibrary
 * \brief getSessionClient
