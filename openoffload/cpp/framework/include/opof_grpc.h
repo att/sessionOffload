@@ -44,6 +44,7 @@ using grpc::ServerContext;
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
+using grpc::StatusCode;
 using grpc::ClientReader;
 using grpc::ServerReader;
 using grpc::ServerWriter;

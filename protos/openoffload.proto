@@ -97,14 +97,17 @@ enum ADD_SESSION_STATUS{
 // _REJECTED_SESSION_ALREADY_EXISTS: This should never happen as getClosedSessions, getSession, deleteSession never add sessions.
 // _NO_CLOSED_SESSIONS: When getClosedSessions returns with no closed sessions it will return 0 sessions. There should be no
 //    message attached so not sure if this is valid.
+// _REJECTED_INTERNAL_ERROR: The server has an internal error and cannot serivce the request.
+//    The client must log the error and optionally retry or skip the request.
 //
 enum REQUEST_STATUS{
    _ACCEPTED = 0;
    _REJECTED = 1;
    _REJECTED_SESSION_NONEXISTENT = 2;
-   _REJECTED_SESSION_TABLE_FULL = 3;
-   _REJECTED_SESSION_ALREADY_EXISTS = 4;
-   _NO_CLOSED_SESSIONS = 5;
+   _REJECTED_SESSION_TABLE_FULL = 3 [deprecated=true];
+   _REJECTED_SESSION_ALREADY_EXISTS = 4 [deprecated=true];
+   _NO_CLOSED_SESSIONS = 5 [deprecated=true];
+   _REJECTED_INTERNAL_ERROR =6;
 }
 
 enum ACTION_TYPE{

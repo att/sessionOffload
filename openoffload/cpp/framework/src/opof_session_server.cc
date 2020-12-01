@@ -189,12 +189,16 @@ Status SessionTableImpl::getClosedSessions(ServerContext* context, const statist
   sessionResponse_t closedResponse;
   statisticsRequestArgs_t request_c;
   int sessionCount = 0;
+  //Status status;
   int nresponses = request->pagesize();
   request_c.pageSize = nresponses;
   sessionResponse_t closedSessions[BUFFER_MAX];
 
   sessionCount = opof_get_closed_sessions_server(&request_c, closedSessions);
-
+  if (sessionCount == 0){
+    //status.error_code() = grpc::grpc::StatusCode::NOT_FOUND;;
+    return Status(grpc::StatusCode::NOT_FOUND,"No Closed Sessions");
+  }
   for (int i=0; i < sessionCount; i++){
     closedResponse = closedSessions[i];
     response.set_sessionid(closedResponse.sessionId);

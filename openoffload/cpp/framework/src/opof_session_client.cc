@@ -69,7 +69,7 @@ return status;
 * \param addSeesionResponse_t
 *
 */
-std::string SessionTableClient::getSessionClient(int sessionid,sessionResponse_t *resp){
+int SessionTableClient::getSessionClient(int sessionid,sessionResponse_t *resp){
 
   sessionId sid;
   sessionResponse response;
@@ -78,16 +78,7 @@ std::string SessionTableClient::getSessionClient(int sessionid,sessionResponse_t
 
   Status status = stub_->getSession(&context, sid, &response);
   convertSessionResponse2c(&response, resp);
-  if (status.ok()) {
-    return "Success";
-  } else {
-    std::cout << "RPC getSession: " << sessionid << " failed with error code: " << status.error_code() << ": " << status.error_message()
-              << std::endl;
-    return "RPC failed";
-  }
-  //TODO: print timestamps
-  //std::cout << "session starttime is: " << response.starttime() << std::endl;
-  //std::cout << "session endtime is: " << response.endtime() << std::endl;
+  return static_cast<int>(status.error_code());
 }
 
 /**  \ingroup clientlibrary
@@ -98,27 +89,20 @@ std::string SessionTableClient::getSessionClient(int sessionid,sessionResponse_t
 * \param addSeesionResponse_t
 *
 */
-std::string SessionTableClient::deleteSessionClient(int sessionid,sessionResponse_t *resp){
+int SessionTableClient::deleteSessionClient(int sessionid,sessionResponse_t *resp){
 
-sessionId sid;
-sessionResponse response;
-sid.set_sessionid(sessionid);
-ClientContext context;
-Status status = stub_->deleteSession(&context, sid, &response);
+  sessionId sid;
+  sessionResponse response;
+  sid.set_sessionid(sessionid);
+  ClientContext context;
+  Status status = stub_->deleteSession(&context, sid, &response);
 
-convertSessionResponse2c(&response, resp);
-#ifdef DEBUG
-  display_session_response(resp, "delSessionClient");
-#endif
+  convertSessionResponse2c(&response, resp);
+  #ifdef DEBUG
+    display_session_response(resp, "delSessionClient");
+  #endif
 
-if (status.ok()) {
-  return "Success";
-} else {
-    std::cout << "RPC Delete Session: " << sessionid << " Failed: " << status.error_code() << ": " << status.error_message()
-              << std::endl;
-    return "RPC failed";
-  }
-
+  return static_cast<int>(status.error_code());
 }
 /**  \ingroup clientlibrary
 * \brief getClosedSessions
@@ -128,32 +112,21 @@ if (status.ok()) {
 * \param addSeesionResponse_t
 *
 */
-unsigned long SessionTableClient::getClosedSessions(statisticsRequestArgs_t *args, sessionResponse_t responses[] ){
-  unsigned long sessionCount = 0;
+int SessionTableClient::getClosedSessions(statisticsRequestArgs_t *args, sessionResponse_t responses[], unsigned long *sessionCount){
   sessionResponse response;
   statisticsRequestArgs request;
   ClientContext context;
   request.set_pagesize(args->pageSize);
   
+  *sessionCount = 0;
   std::unique_ptr<ClientReader <sessionResponse> > reader(
         stub_->getClosedSessions(&context, request));
   while (reader->Read(&response)) {
-    if (response.requeststatus() == REQUEST_STATUS::_REJECTED_NO_CLOSED_SESSIONS){
-      return 0;
-    }
-    convertSessionResponse2c(&response, &responses[sessionCount]);
-    sessionCount++;
+    convertSessionResponse2c(&response, &responses[*sessionCount]);
+    (*sessionCount)++;
   }
   Status status = reader->Finish();
-  if (status.ok()) {
-    return sessionCount;
-  }
-    //std::cout << "getClosedSessions rpc succeeded sesssion count " << sessionCount << std::endl;
-  if (status.error_code() == grpc::StatusCode::NOT_FOUND ){
-    std::cout << "Get all sessions complete" << std::endl;
-    return 0;
-  }
-  return 0;
+  return static_cast<int>(status.error_code());
 }
 /**  \ingroup clientlibrary
 * \brief getAllSessions
@@ -163,8 +136,8 @@ unsigned long SessionTableClient::getClosedSessions(statisticsRequestArgs_t *arg
 * \param addSeesionResponse_t
 *
 */
-Status SessionTableClient::getAllSessions(int pageSize, uint64_t *session_start_id, uint64_t *session_count, sessionResponse_t responses[]){
-  unsigned long sessionCount=0;
+int  SessionTableClient::getAllSessions(int pageSize, uint64_t *session_start_id, uint64_t *session_count, sessionResponse_t responses[], unsigned long *sessionCount){
+  
   Status status;
   sessionResponseArray response;
   statisticsRequestArgs request;
@@ -172,7 +145,6 @@ Status SessionTableClient::getAllSessions(int pageSize, uint64_t *session_start_
   sessionResponse_t responsec;
   int array_size;
 
-  
   request.set_pagesize(pageSize);
   request.set_startsession(*session_start_id);
   
@@ -187,5 +159,5 @@ Status SessionTableClient::getAllSessions(int pageSize, uint64_t *session_start_
 
   *session_count = array_size;
   
-  return status;
+  return static_cast<int>(status.error_code());
 }
