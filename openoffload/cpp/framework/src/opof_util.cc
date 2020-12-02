@@ -114,7 +114,7 @@ void convertAddSessionResponse2c(addSessionResponse_t *response_c, addSessionRes
     for (int i=0; i< response_c->number_errors; i++){
       responseError = response->responseerror(i);
       response_c->sessionErrors[i].sessionId = responseError.sessionid();
-      response_c->sessionErrors[i].errorStatus = (ADD_SESSION_STATUS_T)responseError.errorstatus();
+      response_c->sessionErrors[i].errorStatus = responseError.errorstatus();
     }
   } else {
     response_c->number_errors = 0;

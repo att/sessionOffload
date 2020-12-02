@@ -355,19 +355,55 @@ void print_response(sessionResponse_t *response){
     printf("\n");
 }
 
-char * getAddResponseError(ADD_SESSION_STATUS_T errorCode){
+char * getAddResponseError(int errorCode){
 if (errorCode == 0){
-      return "_SESSION_ACCEPTED";
-    } else if (errorCode == 1) {
-      return "_SESSION_REJECTED";
+      return "_OK";
     } else if (errorCode == 2) {
-      return "_SESSION_TABLE_FULL";
+      return "_UNKNOWN";
+    } else if (errorCode == 6) {
+      return " _ALREADY_EXISTS";
+    } else if (errorCode == 8) {
+      return "_RESOURCE_EXHAUSTED";
+    } else {
+     return "INVALID ERROR CODE";
+    }
+}
+
+char * getStatusCode(int errorCode){
+  if (errorCode == 0){
+      return "_OK";
+    } else if (errorCode == 1) {
+      return "_CANCELLED";
+    } else if (errorCode == 2) {
+      return "_UNKNOWN";
     } else if (errorCode == 3) {
-     return " _SESSION_TABLE_UNAVAILABLE ";
+      return "_INVALID_ARGUMENT";
     } else if (errorCode == 4) {
-     return "_SESSION_ERROR_OCCURED";
+      return "_DEADLINE_EXCEEDED";
     } else if (errorCode == 5) {
-     return "_SESSION_UNKNOWN_ERROR";
+      return "_NOT_FOUND"; 
+    } else if (errorCode == 6) {
+      return "_ALREADY_EXISTS";
+    } else if (errorCode == 7) {
+      return "_PERMISSION_DENIED";
+    } else if (errorCode == 8) {
+      return "_RESOURCE_EXHAUSTED";
+    } else if (errorCode == 9) {
+      return "_FAILED_PRECONDITION";
+    } else if (errorCode == 10) {
+      return "_ABORTED"; 
+    } else if (errorCode == 11) {
+      return "_OUT_OF_RANGE";
+    } else if (errorCode == 12) {
+      return "_UNIMPLEMENTED";
+    } else if (errorCode == 13) {
+      return "_INTERNAL";
+    } else if (errorCode == 14) {
+      return "_UNAVAILABLE";
+    } else if (errorCode == 15) {
+      return "_DATA_LOSS";
+    } else if (errorCode == 16) {
+      return "_UNAUTHENTICATED";
     } else {
      return "INVALID ERROR CODE";
     }

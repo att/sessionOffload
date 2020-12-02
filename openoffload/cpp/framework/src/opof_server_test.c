@@ -131,13 +131,13 @@ sessionResponse_t **getAllSessions(int size, int *sessionCount){
 * \return  SUCCESS or FAILURE
 *
 */
-ADD_SESSION_STATUS_T opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *response ){
+SESSION_STATUS_T opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *response ){
  
   int num_sessions;
 #ifdef DEBUG
   display_session_request(parameters, "Server addSession");
 #endif
-    record_t *r;
+    record_t *r, *f,l;
     //record_t *records = NULL;
     r =  (record_t *)malloc(sizeof (record_t));
     memset(r,0,sizeof(*r));
@@ -146,10 +146,22 @@ ADD_SESSION_STATUS_T opof_add_session_server(sessionRequest_t *parameters, addSe
 #ifdef DEBUG
     printf("MAX Sessions: %d\n", num_sessions);
 #endif
+    /*
+    * Check capacity of session table
+    */
     if (num_sessions > HASHTABLE_SIZE){
-      response->requestStatus = _REJECTED_SESSION_TABLE_FULL;
-      return _SESSION_TABLE_FULL;
+      //response->requestStatus = _REJECTED_SESSION_TABLE_FULL;
+      return _RESOURCE_EXHAUSTED;
     }
+    /*
+    * Check if sessionId already exists
+    */
+    l.key.sessionId = parameters->sessId;
+    HASH_FIND(hh,sessions, &l.key, sizeof(record_key_t),f);
+    if (f != NULL){
+      return _ALREADY_EXISTS;
+    }
+
     r->key.sessionId = parameters->sessId;
     HASH_ADD(hh, sessions, key, sizeof(record_key_t),r);
     r->inLif = parameters->inlif;
@@ -168,9 +180,9 @@ ADD_SESSION_STATUS_T opof_add_session_server(sessionRequest_t *parameters, addSe
     r->sessionClose = _NOT_CLOSED;
     r->actionValue = _FORWARD;
     //
-    response->requestStatus = _ACCEPTED;
+    //response->requestStatus = _ACCEPTED;
     //
-  return _SESSION_ACCEPTED;
+  return _OK;
 }
 
 /** 

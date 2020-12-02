@@ -53,10 +53,10 @@ Status SessionTableImpl::addSession(ServerContext* context, ServerReader<session
     while(reader->Read(&request)){
       convertSessionRequest2c(request, &request_c);
       status = opof_add_session_server(&request_c, &addResponse_c);
-      if (status != _SESSION_ACCEPTED){
+      if (status != _OK){
           errorMessage = response->add_responseerror();
           errorMessage->set_sessionid(request.sessionid());
-          errorMessage->set_errorstatus((ADD_SESSION_STATUS)status);
+          errorMessage->set_errorstatus(status);
       }
       index++;
     }

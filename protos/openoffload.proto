@@ -183,7 +183,7 @@ message sessionRequest{
 
 message sessionResponseError {
   uint64 sessionId = 1;
-  ADD_SESSION_STATUS errorStatus = 2;
+  int32 errorStatus = 2;
 }
 
 
@@ -196,7 +196,7 @@ message sessionResponseArray {
 // of errors for each of the sesssions sent in a stream (max 64).
 //
 message addSessionResponse{
-  ADD_SESSION_STATUS requestStatus = 1;
+  ADD_SESSION_STATUS requestStatus = 1 [deprecated = true];
   uint64 errorStatus = 2 [deprecated = true];
   google.protobuf.Timestamp startTime = 3;
   repeated sessionResponseError responseError = 4;
@@ -210,7 +210,7 @@ message sessionResponse{
   uint64  outBytes = 5;
   SESSION_STATE sessionState = 6 ;
   SESSION_CLOSE_CODE sessionCloseCode = 7 ;
-  REQUEST_STATUS requestStatus = 8;
+  REQUEST_STATUS requestStatus = 8 [deprecated = true];
   google.protobuf.Timestamp startTime = 9;
   google.protobuf.Timestamp endTime = 10;
 }

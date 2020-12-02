@@ -51,14 +51,11 @@ int SessionTableClient::addSessionClient(int size, sessionRequest_t **s, addSess
   #endif
     convertSessionRequest2cpp(request_c, &request);
     writer->Write(request);
-    //free(request_c);
   }
-
-  //free(s);
   writer->WritesDone();
   status = writer->Finish();
   convertAddSessionResponse2c(resp,&response);
-
+  //std::cout << "Status code: " <<  static_cast<int>(status.error_code()) << endl;
   return static_cast<int>(status.error_code());
 }
 /**  \ingroup clientlibrary
