@@ -149,7 +149,6 @@ int opof_del_session(sessionTable_t *sessionHandle,  unsigned long  sessionId, s
 *
 */
 int opof_get_closed_sessions(streamArgs_t *args, sessionResponse_t responses[], unsigned long *sessionCount){
-	//void opof_get_closed_sessions(sessionTable_t *sessionHandle, unsigned int size){
 	int status;
 	SessionTableClient *client;
 	std::string reply;
@@ -174,7 +173,6 @@ int opof_get_closed_sessions(streamArgs_t *args, sessionResponse_t responses[], 
 *
 */
 int opof_get_all_sessions(sessionTable_t *sessionHandle, uint64_t *startSession,int pageSize, sessionResponse_t responses[], unsigned long *sessionCount){
-	//void opof_get_closed_sessions(sessionTable_t *sessionHandle, unsigned int size){
 	int status;
 	SessionTableClient *client;
 	std::string reply;

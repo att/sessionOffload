@@ -41,28 +41,28 @@ extern "C" {
 * \param response
 */
 Status SessionTableImpl::addSession(ServerContext* context, ServerReader<sessionRequest>* reader, addSessionResponse* response) {
-    int status;
-    unsigned long errorCode;
-    unsigned long error = 1;
-    int index=0;
-    ADD_SESSION_STATUS reqStatus;
-    addSessionResponse_t addResponse_c;
-    sessionResponseError *errorMessage;
-    sessionRequest_t request_c;
-    sessionRequest request;
-    while(reader->Read(&request)){
-      convertSessionRequest2c(request, &request_c);
-      status = opof_add_session_server(&request_c, &addResponse_c);
-      if (status != _OK){
-          errorMessage = response->add_responseerror();
-          errorMessage->set_sessionid(request.sessionid());
-          errorMessage->set_errorstatus(status);
-      }
-      index++;
+  int status;
+  unsigned long errorCode;
+  unsigned long error = 1;
+  int index=0;
+  ADD_SESSION_STATUS reqStatus;
+  addSessionResponse_t addResponse_c;
+  sessionResponseError *errorMessage;
+  sessionRequest_t request_c;
+  sessionRequest request;
+  while(reader->Read(&request)){
+    convertSessionRequest2c(request, &request_c);
+    status = opof_add_session_server(&request_c, &addResponse_c);
+    if (status != _OK){
+      errorMessage = response->add_responseerror();
+      errorMessage->set_sessionid(request.sessionid());
+      errorMessage->set_errorstatus(status);
     }
-    response->set_requeststatus(reqStatus);
-    return Status::OK;
+    index++;
   }
+  response->set_requeststatus(reqStatus);
+  return Status::OK;
+}
 
 /** \ingroup serverlibrary
 * \brief getSession
@@ -72,19 +72,19 @@ Status SessionTableImpl::addSession(ServerContext* context, ServerReader<session
 * \param response
 */
 Status SessionTableImpl::getSession(ServerContext* context, const sessionId* sid,
-                  sessionResponse* response) {
-        sessionResponse_t response_c;
-        int status;
-        uint64_t session;
-        session = sid->sessionid();
-        status = opof_get_session_server(session, &response_c);
-        if (status == SUCCESS){
-          convertSessionResponse2cpp(response, &response_c);
-          return Status::OK;
-        } else {
-          return Status(grpc::StatusCode::NOT_FOUND, "Get Session Not Found");
-        }
+  sessionResponse* response) {
+  sessionResponse_t response_c;
+  int status;
+  uint64_t session;
+  session = sid->sessionid();
+  status = opof_get_session_server(session, &response_c);
+  if (status == SUCCESS){
+    convertSessionResponse2cpp(response, &response_c);
+    return Status::OK;
+  } else {
+    return Status(grpc::StatusCode::NOT_FOUND, "Get Session Not Found");
   }
+}
 
 /** \ingroup serverlibrary
 * \brief deleteSession
@@ -94,18 +94,17 @@ Status SessionTableImpl::getSession(ServerContext* context, const sessionId* sid
 * \param response
 */
 Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* sid,
-                  sessionResponse* response) {
-      int status;
-      sessionResponse_t response_c;
-        //std::cout << "sessionID to delete is: " << sid->sessionid() << std::endl;
-        status = opof_del_session_server(sid->sessionid(), &response_c);
-        if (status ==SUCCESS){
-          convertSessionResponse2cpp(response, &response_c);
-          return Status::OK;
-        } else {
-          return Status(grpc::StatusCode::NOT_FOUND, "Delete Session Not Found");
-        }
+  sessionResponse* response) {
+  int status;
+  sessionResponse_t response_c;
+  status = opof_del_session_server(sid->sessionid(), &response_c);
+  if (status ==SUCCESS){
+    convertSessionResponse2cpp(response, &response_c);
+    return Status::OK;
+  } else {
+    return Status(grpc::StatusCode::NOT_FOUND, "Delete Session Not Found");
   }
+}
 
 /** \ingroup serverlibrary
 * \brief getAllSessions
@@ -114,22 +113,19 @@ Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* 
 * \param reader
 * \param response
 */
-  Status SessionTableImpl::getAllSessions(ServerContext* context, const statisticsRequestArgs* request, sessionResponseArray *responses) {
+Status SessionTableImpl::getAllSessions(ServerContext* context, const statisticsRequestArgs* request, sessionResponseArray *responses) {
   
   Status status;
   sessionResponse_t **allSessions= NULL;
   sessionResponse_t *closedResponse;
   sessionResponse *response;
-  //statisticsRequestArgs_t request_c;
   int sessionCount;
   int pageCount = 0;
-  //int nresponses = request->pagesize();
+  
   int nresponses = BUFFER_MAX;
   uint64_t start_session;
   start_session = request->startsession();
-  //printf("Start session from request: %lu\n", start_session);
-
-  //request_c.pageSize = nresponses;
+  
   allSessions = (sessionResponse_t **)malloc(nresponses * sizeof(sessionResponse_t *));
   for (int i = 0; i < nresponses; i++){
     allSessions[i] = (sessionResponse_t *)malloc(sizeof(sessionResponse_t));
@@ -138,43 +134,28 @@ Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* 
   sessionCount = opof_get_all_sessions_server(nresponses, &start_session, pageCount, allSessions);
 
   responses->set_nextkey(start_session);
-  //printf("Start Session from response: %lu\n", start_session);
-  //printf("session count: %d\n", sessionCount);
+  
   if (sessionCount > 0){
-      pageCount++;
-      for (int i=0; i < sessionCount; i++){
-        closedResponse = allSessions[i];
-        //std::cout << "session count i: " << i << std::endl;
-        responses->add_responsearray();
-        response = responses->mutable_responsearray(i);
-        response->set_sessionid(closedResponse->sessionId);
-        response->set_sessionstate((SESSION_STATE)closedResponse->sessionState);
-        response->set_inpackets(closedResponse->inPackets);
-        response->set_outpackets(closedResponse->outPackets);
-        response->set_inbytes(closedResponse->inBytes);
-        response->set_outbytes(closedResponse->outBytes);
-        response->set_sessionclosecode((SESSION_CLOSE_CODE)closedResponse->sessionCloseCode);
-        response->set_requeststatus((REQUEST_STATUS)closedResponse->requestStatus);
-      }
+    pageCount++;
+    for (int i=0; i < sessionCount; i++){
+      closedResponse = allSessions[i];
+      response = responses->mutable_responsearray(i);
+      response->set_sessionid(closedResponse->sessionId);
+      response->set_sessionstate((SESSION_STATE)closedResponse->sessionState);
+      response->set_inpackets(closedResponse->inPackets);
+      response->set_outpackets(closedResponse->outPackets);
+      response->set_inbytes(closedResponse->inBytes);
+      response->set_outbytes(closedResponse->outBytes);
+      response->set_sessionclosecode((SESSION_CLOSE_CODE)closedResponse->sessionCloseCode);
+      response->set_requeststatus((REQUEST_STATUS)closedResponse->requestStatus);
     }
+  }
   for (int i=0; i <nresponses; i++){
     free(allSessions[i]);
   }
   free(allSessions);
-  //if (sessionCount == 0){
-   // printf("Sending cancel message\n");
-  ////  //Status(StatusCode::INVALID_ARGUMENT, "Ouch!");
-   // return Status::CANCELLED;
- // } else {
-  //if (sessionCount == 0){
-   // printf("finished get all sessions\n");
-   // return Status::CANCELLED;
-  //}
-  //printf("Sending success message\n");
   return Status::OK;
-    
- // }
- }
+}
 
 /** \ingroup serverlibrary
 * \brief getClosedSessions
@@ -196,7 +177,6 @@ Status SessionTableImpl::getClosedSessions(ServerContext* context, const statist
 
   sessionCount = opof_get_closed_sessions_server(&request_c, closedSessions);
   if (sessionCount == 0){
-    //status.error_code() = grpc::grpc::StatusCode::NOT_FOUND;;
     return Status(grpc::StatusCode::NOT_FOUND,"No Closed Sessions");
   }
   for (int i=0; i < sessionCount; i++){
@@ -214,4 +194,4 @@ Status SessionTableImpl::getClosedSessions(ServerContext* context, const statist
   }
   
   return Status::OK;
- }
+}

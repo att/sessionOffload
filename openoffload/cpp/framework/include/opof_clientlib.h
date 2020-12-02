@@ -51,7 +51,6 @@ int opof_del_session(sessionTable_t *sessionHandle,  unsigned long  sessionId, s
 int opof_get_session(sessionTable_t *sessionHandle,  unsigned long  sessionId , sessionResponse_t *resp);
 int opof_get_all_sessions(sessionTable_t *sessionHandle, uint64_t *sessionStart,int pageSize, sessionResponse_t responses[], unsigned long *sessionCount);
 int opof_get_closed_sessions(streamArgs_t *args,sessionResponse_t responses[], unsigned long *sessionCount);
-//void opof_get_closed_sessions(sessionTable_t *sessionHandle, unsigned int size);
 #ifdef __cplusplus
 }
 #endif

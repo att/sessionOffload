@@ -131,7 +131,7 @@ sessionResponse_t **getAllSessions(int size, int *sessionCount){
 * \return  SUCCESS or FAILURE
 *
 */
-SESSION_STATUS_T opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *response ){
+int opof_add_session_server(sessionRequest_t *parameters, addSessionResponse_t *response ){
  
   int num_sessions;
 #ifdef DEBUG
