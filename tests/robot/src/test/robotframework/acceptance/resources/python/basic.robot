@@ -35,10 +35,17 @@ Run Add Session Ipv4
      [Documentation]    Add IPv4 Session
      Run Process	python3   	-c   import sessions_client; sessions_client.run_add_session_ipv4(); 	cwd=${projectRoot}/../buildBasic   alias=client
      ${result} =	Get Process Result	client
-     Log       ${result.stderr}	
-     Log       ${result.stdout}	
+     Log       ${result.stderr}
+     Log       ${result.stdout}
      Should Contain   ${result.stdout}    Request Status=   0
 
+Run Add Session Ipv4 Error Session
+     [Documentation]    Add IPv4 Session
+     Run Process	python3   	-c   import sessions_client; sessions_client.run_add_session_ipv4_error(); 	cwd=${projectRoot}/../buildBasic   alias=client
+     ${result} =	Get Process Result	client
+     Log       ${result.stderr}
+     Log       ${result.stdout}
+     Should Contain   ${result.stdout}    addSessionErrorResponse.errorStatus: 2
 
 Run Add Session Ipv6
      [Documentation]    Add IPv6 Session
