@@ -42,25 +42,25 @@
 * \return SUCCESS or FAILURE
 **/
 int get_key(const char *filename, char *key){
-    FILE *fp;
-    int status  = SUCCESS;
+  FILE *fp;
+  int status  = SUCCESS;
   printf("Reading: %s\n", filename);
-    fp = fopen(filename, "r");
-    if(fp == NULL) {
-      perror("Error opening file ");
-      return(-1);
-    }
-    status = fread(key, sizeof(char), 2047,(FILE*)fp);
-    if (status == -1){
-        perror("Error reading file ");
-        return(-1);
-    } else {
-        printf("Read %d characters\n",status);
+  fp = fopen(filename, "r");
+  if(fp == NULL) {
+    perror("Error opening file ");
+    return(-1);
+  }
+  status = fread(key, sizeof(char), 2047,(FILE*)fp);
+  if (status == -1){
+    perror("Error reading file ");
+    return(-1);
+  } else {
+    printf("Read %d characters\n",status);
         key[status++] = '\0'; /* Just to be safe. */
-    }
-   fclose(fp);
-   printf("Returning: %d from reading %s\n", status, filename);
-   return status;
+  }
+  fclose(fp);
+  printf("Returning: %d from reading %s\n", status, filename);
+  return status;
 };
 /** \ingroup testlibrary
 * \brief Utility function to create random dummy value in between a range of numbers
@@ -97,31 +97,31 @@ sessionResponse_t **createSessionResponse(int size, int *sessionCount){
   *sessionCount = 0;
 
   HASH_ITER(hh, sessions, r, tmp) {
-     if (r->sessionState == _CLOSED){
-        count++;
-        response = (sessionResponse_t *)malloc(sizeof(sessionResponse_t));
-        response->sessionId = r->key.sessionId;
-        response->inPackets = range(100,1000);
-        response->outPackets = range(110,1500);
-        response->inBytes = range(1000,5000);
-        response->outBytes = range(1000,5000);
-        response->sessionState = r->sessionState;
-        response->sessionCloseCode = _TIMEOUT;
-        response->requestStatus = _ACCEPTED;
+   if (r->sessionState == _CLOSED){
+    count++;
+    response = (sessionResponse_t *)malloc(sizeof(sessionResponse_t));
+    response->sessionId = r->key.sessionId;
+    response->inPackets = range(100,1000);
+    response->outPackets = range(110,1500);
+    response->inBytes = range(1000,5000);
+    response->outBytes = range(1000,5000);
+    response->sessionState = r->sessionState;
+    response->sessionCloseCode = _TIMEOUT;
+    response->requestStatus = _ACCEPTED;
         HASH_DEL(sessions, r);  /* delete it (users advances to next) */
         free(r);             /* free it */
-        responses[i] = response;
-        i++;
-        if (i == size){
-          *sessionCount = count;
-          return responses;
-        }
-      }
-   }
-  if (i == 0) {
-    return NULL;
+    responses[i] = response;
+    i++;
+    if (i == size){
+      *sessionCount = count;
+      return responses;
+    }
   }
+}
+if (i == 0) {
   return NULL;
+}
+return NULL;
 }
 
 /** \ingroup testlibrary
@@ -182,7 +182,7 @@ sessionRequest_t **createSessionRequest(int size, unsigned long start_sessionId)
     request->cacheTimeout = timeout;
     requests[i] = request;
   }
-return requests;
+  return requests;
 }
 /** \ingroup testlibrary
 * \brief Utility function to print out the sessionResponse_t structure to stdout
@@ -197,55 +197,55 @@ return requests;
 * \return void
 **/
 void display_session_response(sessionResponse_t *response, const char *message){
-    printf("\n\nSession Response: %s\n",message);
-    printf("Session ID: %ld\n",response->sessionId);
-    printf("In Packets %ld\n",response->inPackets);
-    printf("Out Packets: %ld\n",response->outPackets);
-    printf("In Bytes: %ld\n",response->inBytes);
-    printf("Out Bytes: %ld\n",response->outBytes);
-    if (response->sessionState == 0){
-      printf("Session State (%d) _ESTABLSIHED \n",response->sessionState);
-    } else if (response->sessionState == 1){
-      printf("Session State (%d) _CLOSING_1 \n",response->sessionState);
-    } else if (response->sessionState == 2){
-      printf("Session State (%d) _CLOSING_2 \n",response->sessionState);
-    } else if (response->sessionState == 3){
-      printf("Session State (%d) _CLOSED \n",response->sessionState);
-    } else if (response->sessionCloseCode == 4){
-       printf("Session State (%d) _UNKNOWN_STATE \n",response->sessionState);
-    } else {
-      printf("Session State Invalid value(%d) \n",response->sessionState);
-    }
+  printf("\n\nSession Response: %s\n",message);
+  printf("Session ID: %ld\n",response->sessionId);
+  printf("In Packets %ld\n",response->inPackets);
+  printf("Out Packets: %ld\n",response->outPackets);
+  printf("In Bytes: %ld\n",response->inBytes);
+  printf("Out Bytes: %ld\n",response->outBytes);
+  if (response->sessionState == 0){
+    printf("Session State (%d) _ESTABLSIHED \n",response->sessionState);
+  } else if (response->sessionState == 1){
+    printf("Session State (%d) _CLOSING_1 \n",response->sessionState);
+  } else if (response->sessionState == 2){
+    printf("Session State (%d) _CLOSING_2 \n",response->sessionState);
+  } else if (response->sessionState == 3){
+    printf("Session State (%d) _CLOSED \n",response->sessionState);
+  } else if (response->sessionCloseCode == 4){
+   printf("Session State (%d) _UNKNOWN_STATE \n",response->sessionState);
+ } else {
+  printf("Session State Invalid value(%d) \n",response->sessionState);
+}
 
-    if (response->sessionCloseCode == 0){
-       printf("Session Close Code (%d) _NOT_CLOSED \n",response->sessionCloseCode);
-    } else if (response->sessionCloseCode == 1){
-       printf("Session Close Code (%d) _FINACK \n",response->sessionCloseCode);
-    } else if (response->sessionCloseCode == 2){
-       printf("Session Close Code (%d) _RST \n",response->sessionCloseCode);
-    } else if (response->sessionCloseCode == 3){
-       printf("Session Close Code (%d) _TIMEOUT \n",response->sessionCloseCode);
-    } else if (response->sessionCloseCode == 4){
-       printf("Session Close Code (%d) _UNKNOWN_CLOSE_CODE \n",response->sessionCloseCode);
-    } else {
-      printf("Session Close Code Invalid value (%d) \n",response->sessionCloseCode);
-    }
+if (response->sessionCloseCode == 0){
+ printf("Session Close Code (%d) _NOT_CLOSED \n",response->sessionCloseCode);
+} else if (response->sessionCloseCode == 1){
+ printf("Session Close Code (%d) _FINACK \n",response->sessionCloseCode);
+} else if (response->sessionCloseCode == 2){
+ printf("Session Close Code (%d) _RST \n",response->sessionCloseCode);
+} else if (response->sessionCloseCode == 3){
+ printf("Session Close Code (%d) _TIMEOUT \n",response->sessionCloseCode);
+} else if (response->sessionCloseCode == 4){
+ printf("Session Close Code (%d) _UNKNOWN_CLOSE_CODE \n",response->sessionCloseCode);
+} else {
+  printf("Session Close Code Invalid value (%d) \n",response->sessionCloseCode);
+}
 
-    if (response->requestStatus == 0){
-      printf("Request Status (%d) _ACCEPTED\n",response->requestStatus);
-    } else if (response->requestStatus == 1){
-      printf("Request Status (%d) _REJECTED\n",response->requestStatus);
-    } else if (response->requestStatus == 2){
-      printf("Request Status (%d) _REJECTED_SESSION_NOTEXISTANT\n",response->requestStatus);
-    } else if (response->requestStatus == 3){
-      printf("Request Status (%d) _REJECTED_SESSION_TABLE_FULL\n",response->requestStatus);
-    } else if (response->requestStatus == 4){
-      printf("Request Status (%d) _REJECTED_SESSION_ALREADY_EXISTS\n",response->requestStatus);
-    } else if (response->requestStatus == 5){
-      printf("Request Status (%d) _NO_CLOSED_SESSIONS\n",response->requestStatus);
-    } else {
-      printf("Request Status Invalid Value: %d\n",response->requestStatus);
-    }
+if (response->requestStatus == 0){
+  printf("Request Status (%d) _ACCEPTED\n",response->requestStatus);
+} else if (response->requestStatus == 1){
+  printf("Request Status (%d) _REJECTED\n",response->requestStatus);
+} else if (response->requestStatus == 2){
+  printf("Request Status (%d) _REJECTED_SESSION_NOTEXISTANT\n",response->requestStatus);
+} else if (response->requestStatus == 3){
+  printf("Request Status (%d) _REJECTED_SESSION_TABLE_FULL\n",response->requestStatus);
+} else if (response->requestStatus == 4){
+  printf("Request Status (%d) _REJECTED_SESSION_ALREADY_EXISTS\n",response->requestStatus);
+} else if (response->requestStatus == 5){
+  printf("Request Status (%d) _NO_CLOSED_SESSIONS\n",response->requestStatus);
+} else {
+  printf("Request Status Invalid Value: %d\n",response->requestStatus);
+}
 }
 /** \ingroup testlibrary
 * \brief Utility function to print out the sessionRequest_t structure to stdout
@@ -259,43 +259,43 @@ void display_session_response(sessionResponse_t *response, const char *message){
 * \return void
 **/
 void display_session_request(sessionRequest_t *request, const char * message){
-    char str[INET6_ADDRSTRLEN];
-    printf("\n\nSession Request: %s\n",message);
-    printf("Session ID: %ld\n",request->sessId);
-    printf( "Inlif: %d\n",request->inlif);
-    printf( "Outlif: %d\n",request->outlif);
-    if ((request->ipver) == _IPV6){
-      printf( "IP Version: V6\n");
-      printf( "Source IP: %s\n", inet_ntop(AF_INET6, &request->srcIPV6, str, INET6_ADDRSTRLEN));
-      printf( "Destination IP: %s\n",inet_ntop(AF_INET6, &request->dstIPV6, str, INET6_ADDRSTRLEN));
-      printf( "NextHop IP: %s\n",inet_ntop(AF_INET6, &request->nextHopV6, str, INET6_ADDRSTRLEN));
-    } else {
-      printf( "IP Version: V4\n");
-      printf( "Source IP: %s\n", inet_ntop(AF_INET, &request->srcIP, str, INET6_ADDRSTRLEN));
-      printf( "Destination IP: %s\n",inet_ntop(AF_INET, &request->dstIP, str, INET6_ADDRSTRLEN));
-      printf( "NextHop IP: %s\n",inet_ntop(AF_INET, &request->nextHop, str, INET6_ADDRSTRLEN));
-    }
-    printf( "Source Port: (Host Format) %d\n",ntohs(request->srcPort));
-    printf( "Destination Port (Host Format): %d\n",ntohs(request->dstPort));
-    if (request->proto == 6){
-      printf( "Protocol Type (%d): TCP\n", request->proto);
-    } else if (request->proto ==17 ){
-      printf( "Protocol Type (%d): UDP\n",request->proto);
-    } else {
-      printf( "request->proto is: unknown\n");
-    }
-    if (request->actType == 0){
-      printf( "Action Value (%d): DROP\n",request->actType);
-    } else if (request->actType == 1) {
+  char str[INET6_ADDRSTRLEN];
+  printf("\n\nSession Request: %s\n",message);
+  printf("Session ID: %ld\n",request->sessId);
+  printf( "Inlif: %d\n",request->inlif);
+  printf( "Outlif: %d\n",request->outlif);
+  if ((request->ipver) == _IPV6){
+    printf( "IP Version: V6\n");
+    printf( "Source IP: %s\n", inet_ntop(AF_INET6, &request->srcIPV6, str, INET6_ADDRSTRLEN));
+    printf( "Destination IP: %s\n",inet_ntop(AF_INET6, &request->dstIPV6, str, INET6_ADDRSTRLEN));
+    printf( "NextHop IP: %s\n",inet_ntop(AF_INET6, &request->nextHopV6, str, INET6_ADDRSTRLEN));
+  } else {
+    printf( "IP Version: V4\n");
+    printf( "Source IP: %s\n", inet_ntop(AF_INET, &request->srcIP, str, INET6_ADDRSTRLEN));
+    printf( "Destination IP: %s\n",inet_ntop(AF_INET, &request->dstIP, str, INET6_ADDRSTRLEN));
+    printf( "NextHop IP: %s\n",inet_ntop(AF_INET, &request->nextHop, str, INET6_ADDRSTRLEN));
+  }
+  printf( "Source Port: (Host Format) %d\n",ntohs(request->srcPort));
+  printf( "Destination Port (Host Format): %d\n",ntohs(request->dstPort));
+  if (request->proto == 6){
+    printf( "Protocol Type (%d): TCP\n", request->proto);
+  } else if (request->proto ==17 ){
+    printf( "Protocol Type (%d): UDP\n",request->proto);
+  } else {
+    printf( "request->proto is: unknown\n");
+  }
+  if (request->actType == 0){
+    printf( "Action Value (%d): DROP\n",request->actType);
+  } else if (request->actType == 1) {
     printf( "Action Value (%d):  FORWARD\n",request->actType);
-    } else if (request->actType == 2) {
+  } else if (request->actType == 2) {
     printf( "Action Value (%d):  MIRROR\n",request->actType);
-    } else if (request->actType == 3) {
+  } else if (request->actType == 3) {
     printf( "Action Value (%d):  SNOOP\n",request->actType);
-    } else {
-       printf( "Action Value (%d): UNKNOWN\n",request->actType);
-    }
-    printf("Cache Session Timeout %u\n", request->cacheTimeout);
+  } else {
+   printf( "Action Value (%d): UNKNOWN\n",request->actType);
+ }
+ printf("Cache Session Timeout %u\n", request->cacheTimeout);
 }
 
 
@@ -306,105 +306,105 @@ void print_response_header(){
 void print_response(sessionResponse_t *response){
  
   printf("%12lu\t %12ld\t %12ld\t %12ld\t %12ld\t", 
-          response->sessionId,response->inPackets, response->inBytes, response->outPackets, 
-          response->outBytes);
- printf("\t");
- if (response->sessionState == 0){
-      printf( "_ESTABLISHED");
-    } else if (response->sessionState == 1) {
-     printf( "__CLOSING_1");
-    } else if (response->sessionState == 2) {
-     printf( "_CLOSING_2");
-    } else if (response->sessionState == 3) {
-     printf( "_CLOSED");
-    } else if (response->sessionState == 4) {
-     printf( "_UNKNOWN_STATE");
-    } else {
-      printf( "ERROR %d",response->sessionState);
-    }
-  printf("\t\t");
-  if (response->sessionCloseCode == 0){
-      printf( "_NOT_CLOSED");
-    } else if (response->sessionCloseCode == 1) {
-     printf( "_FINACK");
-    } else if (response->sessionCloseCode == 2) {
-     printf( "_RST");
-    } else if (response->sessionCloseCode == 3) {
-     printf( "_TIMEOUT");
-    } else if (response->sessionCloseCode == 4) {
-     printf( "_UNKNOWN_CLOSE_CODE");
-    } else {
-      printf( "ERROR %d",response->sessionCloseCode);
-    }
+    response->sessionId,response->inPackets, response->inBytes, response->outPackets, 
+    response->outBytes);
   printf("\t");
-  if (response->requestStatus == 0){
-      printf( "_ACCEPTED");
-    } else if (response->requestStatus == 1) {
-     printf( "_REJECTED");
-    } else if (response->requestStatus == 2) {
-     printf( "_REJECTED_SESSION_NONEXISTANT");
-    } else if (response->requestStatus == 3) {
-     printf( "_REJECTED_SESSION_TABLE_FULL");
-    } else if (response->requestStatus == 4) {
-     printf( "_REJECTED_SESSION_AREADY_EXISTS");
-    } else if (response->requestStatus == 5) {
-     printf( "_NO_CLOSED_SESSIONS");
-    } else {
-      printf( "ERROR %d",response->requestStatus );
-    }
-    printf("\n");
+  if (response->sessionState == 0){
+    printf( "_ESTABLISHED");
+  } else if (response->sessionState == 1) {
+   printf( "__CLOSING_1");
+ } else if (response->sessionState == 2) {
+   printf( "_CLOSING_2");
+ } else if (response->sessionState == 3) {
+   printf( "_CLOSED");
+ } else if (response->sessionState == 4) {
+   printf( "_UNKNOWN_STATE");
+ } else {
+  printf( "ERROR %d",response->sessionState);
+}
+printf("\t\t");
+if (response->sessionCloseCode == 0){
+  printf( "_NOT_CLOSED");
+} else if (response->sessionCloseCode == 1) {
+ printf( "_FINACK");
+} else if (response->sessionCloseCode == 2) {
+ printf( "_RST");
+} else if (response->sessionCloseCode == 3) {
+ printf( "_TIMEOUT");
+} else if (response->sessionCloseCode == 4) {
+ printf( "_UNKNOWN_CLOSE_CODE");
+} else {
+  printf( "ERROR %d",response->sessionCloseCode);
+}
+printf("\t");
+if (response->requestStatus == 0){
+  printf( "_ACCEPTED");
+} else if (response->requestStatus == 1) {
+ printf( "_REJECTED");
+} else if (response->requestStatus == 2) {
+ printf( "_REJECTED_SESSION_NONEXISTANT");
+} else if (response->requestStatus == 3) {
+ printf( "_REJECTED_SESSION_TABLE_FULL");
+} else if (response->requestStatus == 4) {
+ printf( "_REJECTED_SESSION_AREADY_EXISTS");
+} else if (response->requestStatus == 5) {
+ printf( "_NO_CLOSED_SESSIONS");
+} else {
+  printf( "ERROR %d",response->requestStatus );
+}
+printf("\n");
 }
 
 char * getAddResponseError(int errorCode){
-if (errorCode == 0){
-      return "_OK";
-    } else if (errorCode == 2) {
-      return "_UNKNOWN";
-    } else if (errorCode == 6) {
-      return " _ALREADY_EXISTS";
-    } else if (errorCode == 8) {
-      return "_RESOURCE_EXHAUSTED";
-    } else {
-     return "INVALID ERROR CODE";
-    }
+  if (errorCode == 0){
+    return "_OK";
+  } else if (errorCode == 2) {
+    return "_UNKNOWN";
+  } else if (errorCode == 6) {
+    return " _ALREADY_EXISTS";
+  } else if (errorCode == 8) {
+    return "_RESOURCE_EXHAUSTED";
+  } else {
+   return "INVALID ERROR CODE";
+ }
 }
 
 char * getStatusCode(int errorCode){
   if (errorCode == 0){
-      return "_OK";
-    } else if (errorCode == 1) {
-      return "_CANCELLED";
-    } else if (errorCode == 2) {
-      return "_UNKNOWN";
-    } else if (errorCode == 3) {
-      return "_INVALID_ARGUMENT";
-    } else if (errorCode == 4) {
-      return "_DEADLINE_EXCEEDED";
-    } else if (errorCode == 5) {
-      return "_NOT_FOUND"; 
-    } else if (errorCode == 6) {
-      return "_ALREADY_EXISTS";
-    } else if (errorCode == 7) {
-      return "_PERMISSION_DENIED";
-    } else if (errorCode == 8) {
-      return "_RESOURCE_EXHAUSTED";
-    } else if (errorCode == 9) {
-      return "_FAILED_PRECONDITION";
-    } else if (errorCode == 10) {
-      return "_ABORTED"; 
-    } else if (errorCode == 11) {
-      return "_OUT_OF_RANGE";
-    } else if (errorCode == 12) {
-      return "_UNIMPLEMENTED";
-    } else if (errorCode == 13) {
-      return "_INTERNAL";
-    } else if (errorCode == 14) {
-      return "_UNAVAILABLE";
-    } else if (errorCode == 15) {
-      return "_DATA_LOSS";
-    } else if (errorCode == 16) {
-      return "_UNAUTHENTICATED";
-    } else {
-     return "INVALID ERROR CODE";
-    }
+    return "_OK";
+  } else if (errorCode == 1) {
+    return "_CANCELLED";
+  } else if (errorCode == 2) {
+    return "_UNKNOWN";
+  } else if (errorCode == 3) {
+    return "_INVALID_ARGUMENT";
+  } else if (errorCode == 4) {
+    return "_DEADLINE_EXCEEDED";
+  } else if (errorCode == 5) {
+    return "_NOT_FOUND"; 
+  } else if (errorCode == 6) {
+    return "_ALREADY_EXISTS";
+  } else if (errorCode == 7) {
+    return "_PERMISSION_DENIED";
+  } else if (errorCode == 8) {
+    return "_RESOURCE_EXHAUSTED";
+  } else if (errorCode == 9) {
+    return "_FAILED_PRECONDITION";
+  } else if (errorCode == 10) {
+    return "_ABORTED"; 
+  } else if (errorCode == 11) {
+    return "_OUT_OF_RANGE";
+  } else if (errorCode == 12) {
+    return "_UNIMPLEMENTED";
+  } else if (errorCode == 13) {
+    return "_INTERNAL";
+  } else if (errorCode == 14) {
+    return "_UNAVAILABLE";
+  } else if (errorCode == 15) {
+    return "_DATA_LOSS";
+  } else if (errorCode == 16) {
+    return "_UNAUTHENTICATED";
+  } else {
+   return "INVALID ERROR CODE";
+ }
 }

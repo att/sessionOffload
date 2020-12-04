@@ -36,18 +36,16 @@
 
   char * getAddResponseError(ADD_SESSION_STATUS_T errorCode);
   char * getStatusCode(int statusCode);
-  //int get_key(char *location, char *public_key);
+  
   sessionRequest_t **read_config(char *filename, int *nsessions);
   int opof_fullTestSuite(const char *address, unsigned short port, const char *cert, bool verbose);
   int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose);
-  //int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, char *test_config);
   int opof_test2(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose);
   int opof_test3(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose);
   int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose);
   int opof_test5(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose);
   int opof_test6(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose);
-  //int opof_test6(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, char *test_config);
-
+  int opof_test7(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose);
 
   void opof_list_tests(){
     printf("\n\nAvaialble Tests\n");
@@ -57,6 +55,7 @@
     printf("\tTest 4: Use addSession to create a session using config file and then delete the sessions\n");
     printf("\tTest 5: Test that getClosedSessions works when there are no sessions in session table\n");
     printf("\tTest 6: Test duplicate session errors\n");
+    printf("\tTest 7: Test get and delete session not found errors\n");
     printf("\n");
   }
 
@@ -86,6 +85,9 @@
       break;
     case 6:
       status = opof_test6(address,  max_sessions, pageSize,port, cert,verbose);
+      break;
+    case 7:
+      status = opof_test7(address,  max_sessions, pageSize,port, cert,verbose);
       break;
     default:
       printf("ERROR: Unknown Test ID: %d\n", testid);
@@ -747,6 +749,73 @@ int opof_test6(const char *address, int max_sessions, unsigned int pageSize,unsi
   return SUCCESS;
 }
 
+
+int opof_test7(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose){
+
+  int status;
+  
+  sessionTable_t *handle;
+  
+  
+  sessionRequest_t **request;
+  sessionResponse_t resp;
+  addSessionResponse_t addResp;
+  
+  int sessionCount =1;
+  int bufferSize;
+  handle = opof_create_sessionTable(address, port, cert);
+  int sessionId=0;
+  int total_sessions;
+  
+
+  /*
+  *  Clean up any exisitng data in cache
+  */
+  if (opof_delete_all_sessions(handle,pageSize) == FAILURE){
+    return FAILURE;
+  }
+  printf("\n\nRunning Test 7: ");
+  printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
+ 
+  //
+  total_sessions = max_sessions;
+  while(max_sessions > 0){
+
+    sessionCount = max_sessions - pageSize;
+    if (sessionCount < 0){
+      bufferSize = max_sessions;
+    } else {
+      bufferSize = pageSize;
+    }
+    request = createSessionRequest(bufferSize, sessionId);
+    status = opof_add_session(bufferSize,handle, request, &addResp);
+    if (status == FAILURE){
+      printf("ERROR: Adding sessions: \n");
+      //for (i=0; i < pageSize; i++){
+      //  if ((addResp.errorStatus & (error << i)) > 0) {
+      //    printf("Session index: %u failed code: %lu", i, (addResp.errorStatus & (error << i)));
+      //  }
+      return FAILURE;
+    }
+     max_sessions = sessionCount;
+     sessionId += bufferSize;
+  }
+  if (verbose){
+    print_response_header();
+  }
+  status = opof_get_session(handle, total_sessions+1, &resp);
+  printf("Test 7 Get: %s\n", getStatusCode(status));
+  status = opof_del_session(handle, total_sessions+1, &resp);
+  printf("Test 7 Delete: %s\n", getStatusCode(status));
+  if (verbose){
+    print_response(&resp);
+  }
+  if (status == FAILURE){
+    printf("ERROR: getting session: %d\n", sessionId);
+    exit(-1);
+  }
+  return SUCCESS;
+}
 #ifdef USED
 int opof_test0(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, char *test_config){
   

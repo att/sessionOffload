@@ -201,7 +201,12 @@ int opof_get_session_server(unsigned long sessionId, sessionResponse_t *response
   record_t *r,l;
   l.key.sessionId = sessionId;
   HASH_FIND(hh,sessions, &l.key, sizeof(record_key_t),r);
-  if (r != NULL) {
+  if (r == NULL){
+     /*
+    * Session does not exist in Session Table
+    */
+    return _NOT_FOUND;
+  }   
     response->sessionId = sessionId;
     response->inPackets = r->inPackets;
     response->outPackets = r->outPackets;
@@ -210,17 +215,7 @@ int opof_get_session_server(unsigned long sessionId, sessionResponse_t *response
     response->sessionState = r->sessionState;
     response->sessionCloseCode = r->sessionClose;
     response->requestStatus = _ACCEPTED;
-  } else {
-    response->sessionId = sessionId;
-    response->inPackets = 0;
-    response->outPackets = 0;
-    response->inBytes = 0;
-    response->outBytes = 0;;
-    response->sessionState = _UNKNOWN_STATE;
-    response->sessionCloseCode = _UNKNOWN_CLOSE_CODE;
-    response->requestStatus = _REJECTED_SESSION_NONEXISTENT;
-  }
-  return SUCCESS;  
+    return _OK;  
 }
 
 /** 
@@ -240,28 +235,23 @@ int opof_del_session_server(unsigned long sessionId, sessionResponse_t *response
  
   l.key.sessionId = sessionId;
   HASH_FIND(hh,sessions, &l.key, sizeof(record_key_t),r);
-  if (r !=NULL){
-    response->sessionId = sessionId;
-    response->inPackets = r->inPackets;
-    response->outPackets = r->outPackets;
-    response->inBytes = r->inBytes;
-    response->outBytes = r->outBytes;
-    response->sessionState = _CLOSED;
-    response->sessionCloseCode = r->sessionClose;
-    response->requestStatus = _ACCEPTED;
-    HASH_DEL(sessions,r);
-    free(r);
-  }else {
-    response->sessionId = sessionId;
-    response->inPackets = 0;
-    response->outPackets = 0;
-    response->inBytes = 0;
-    response->outBytes = 0;;
-    response->sessionState = _UNKNOWN_STATE;
-    response->sessionCloseCode = _UNKNOWN_CLOSE_CODE;
-    response->requestStatus = _REJECTED_SESSION_NONEXISTENT;
+  if (r == NULL){
+     /*
+    * Session does not exist in Session Table
+    */
+    return _NOT_FOUND;
   }
-  return SUCCESS;
+  response->sessionId = sessionId;
+  response->inPackets = r->inPackets;
+  response->outPackets = r->outPackets;
+  response->inBytes = r->inBytes;
+  response->outBytes = r->outBytes;
+  response->sessionState = _CLOSED;
+  response->sessionCloseCode = r->sessionClose;
+  response->requestStatus = _ACCEPTED;
+  HASH_DEL(sessions,r);
+  free(r);
+  return _OK;
 }
 
 /** 

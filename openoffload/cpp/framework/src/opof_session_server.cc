@@ -78,11 +78,13 @@ Status SessionTableImpl::getSession(ServerContext* context, const sessionId* sid
   uint64_t session;
   session = sid->sessionid();
   status = opof_get_session_server(session, &response_c);
-  if (status == SUCCESS){
+  if (status == _OK){
     convertSessionResponse2cpp(response, &response_c);
     return Status::OK;
-  } else {
+  } else if (status == _NOT_FOUND){
     return Status(grpc::StatusCode::NOT_FOUND, "Get Session Not Found");
+  } else {
+    return Status(grpc::StatusCode::UNKNOWN, "Internal Open Offload Server Error");
   }
 }
 
@@ -98,11 +100,13 @@ Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* 
   int status;
   sessionResponse_t response_c;
   status = opof_del_session_server(sid->sessionid(), &response_c);
-  if (status ==SUCCESS){
+  if (status == _OK){
     convertSessionResponse2cpp(response, &response_c);
     return Status::OK;
-  } else {
+  } else if (status == _NOT_FOUND){
     return Status(grpc::StatusCode::NOT_FOUND, "Delete Session Not Found");
+  } else {
+    return Status(grpc::StatusCode::UNKNOWN, "Internal Open Offload Server Error");
   }
 }
 
