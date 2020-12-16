@@ -26,8 +26,42 @@ import sys
 import grpc
 import google.protobuf.timestamp_pb2
 
+#from grpc_status import rpc_status
+
+from google.protobuf import any_pb2
+from google.rpc import code_pb2, status_pb2, error_details_pb2
+
 import openoffload_pb2
 import openoffload_pb2_grpc
+
+
+
+class AddSessionErrors:
+   '''
+   '''
+   def __init__(self):
+       self._addSessionErrors= list()
+   def addSessionErrorMembers(self, sessionResponseError):
+       self._addSessionErrors.append(sessionResponseError)
+   def __iter__(self):
+       ''' Returns the Iterator object '''
+       return AddSessionErrorsIterator(self)
+
+class AddSessionErrorsIterator:
+   ''' Iterator class '''
+   def __init__(self, addSessionErrors_list):
+       # AddSessionErrors object reference
+       self._addSessionErrors_list = addSessionErrors_list
+       # member variable to keep track of current index
+       self._index = 0
+   def __next__(self):
+       ''''Returns the next value from team object's lists '''
+       if self._index < (len(self._addSessionErrors_list._addSessionErrors) ) :
+           result = (self._addSessionErrors_list._addSessionErrors[self._index])
+           self._index +=1
+           return result
+       # End of Iteration
+       raise StopIteration
 
 
 class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
@@ -43,11 +77,13 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
         """do some init stuff"""
 
     def addSession(self, request_iterator, context):
+        sessionErrors_value=AddSessionErrors()
         for request in request_iterator:
             print("############ ADD SESSION ##################");
             #print("Application SessionID:", request.sessionId);
             print("protocolID 6=TCP,17=UDP:",request.protocolId);
             print("IP Version:", openoffload_pb2._IP_VERSION.values_by_number[request.ipVersion].name)
+            
 
             if request.ipVersion == openoffload_pb2._IPV4:
               print ("sourceIp:", socket.inet_ntop(socket.AF_INET, request.sourceIp.to_bytes(4,byteorder=sys.byteorder)))
@@ -61,7 +97,15 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
             print("destinationPort:", int(request.destinationPort));
             print("ActionType 0=DROP,1=FORWARD,2=MIRROR,3=SNOOP:" , request.action.actionType)
             print("ActionNextHop:" , request.action.actionNextHop)
-        return openoffload_pb2.addSessionResponse(requestStatus=openoffload_pb2._ACCEPTED);
+            if  request.sessionId == 99999999999:
+                print("Error test case")
+                #sessionError=openoffload_pb2.addSessionResponse.responseError()
+                sessionError=openoffload_pb2.sessionResponseError()
+                sessionError.sessionId=request.sessionId
+                sessionError.errorStatus=openoffload_pb2._SESSION_TABLE_FULL
+                sessionErrors_value.addSessionErrorMembers( sessionError)
+
+        return openoffload_pb2.addSessionResponse(requestStatus=openoffload_pb2._ACCEPTED, responseError=sessionErrors_value);
 
     def getSession(self, request, context):
             print("############ GET SESSION ##################");

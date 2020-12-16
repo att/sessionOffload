@@ -57,6 +57,33 @@ class SessionsIterator:
        raise StopIteration
 
 
+class AddSessionErrors:
+   '''
+   '''
+   def __init__(self):
+       self._addSessionErrors= list()
+   def addSessionErrorMembers(self, addSessionError):
+       self._addSessionErrors.append(addSessionError)
+   def __iter__(self):
+       ''' Returns the Iterator object '''
+       return AddSessionErrorsIterator(self)
+
+class AddSessionErrorsIterator:
+   ''' Iterator class '''
+   def __init__(self, addSessionErrors_list):
+       # AddSessionErrors object reference
+       self._addSessionErrors_list = addSessionErrors_list
+       # member variable to keep track of current index
+       self._index = 0
+   def __next__(self):
+       ''''Returns the next value from team object's lists '''
+       if self._index < (len(self._addSessionErrors_list._addSessionErrors) ) :
+           result = (self._addSessionErrrors_list._addSessionErrors[self._index])
+           self._index +=1
+           return result
+       # End of Iteration
+       raise StopIteration
+
 def session_addSession(stub):
     session=openoffload_pb2.sessionRequest()
     session.sessionId= 12345678910
@@ -75,7 +102,41 @@ def session_addSession(stub):
     session_iterator=iter(sessions_value)
     addSessionResponse =  stub.addSession( session_iterator)
     print("addSessionResponse:",addSessionResponse.requestStatus)
+
+    sessionErrors_value=addSessionResponse.responseError
+    sessionErrors_iterator=iter(sessionErrors_value)
+
+    for sessionError in sessionErrors_iterator:
+         print("addSessionErrorResponse:",sessionError.requestStatus)
+
     return addSessionResponse.requestStatus
+
+def session_addSession_error(stub):
+    # use specific sessionId to test error response
+    session=openoffload_pb2.sessionRequest()
+    session.sessionId= 99999999999
+    session.inLif= 1
+    session.outLif= 2
+    session.sourceIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.9.0.1"), byteorder=sys.byteorder)
+    session.sourcePort=12345
+    session.destinationIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.99.0.3"), byteorder=sys.byteorder)
+    session.destinationPort=80
+    session.protocolId=openoffload_pb2._TCP
+    session.ipVersion=openoffload_pb2._IPV4
+    session.action.actionType=openoffload_pb2._FORWARD
+    session.action.actionNextHop = int.from_bytes(socket.inet_pton(socket.AF_INET,"12.2.3.4"),byteorder=sys.byteorder)
+    sessions_value=Sessions()
+    sessions_value.addSessionMembers(session)
+    session_iterator=iter(sessions_value)
+    addSessionResponse =  stub.addSession( session_iterator)
+    print("addSessionResponse:",addSessionResponse.requestStatus)
+
+    sessionErrors_value=addSessionResponse.responseError
+    sessionErrors_iterator=iter(sessionErrors_value)
+
+    for sessionError in sessionErrors_iterator:
+         print("addSessionErrorResponse.sessionId:",sessionError.sessionId)
+         print("addSessionErrorResponse.errorStatus:",sessionError.errorStatus)
 
 def session_addSession_ipv6(stub):
     session=openoffload_pb2.sessionRequest()
@@ -227,6 +288,14 @@ def run_add_session_ipv4():
         stub = openoffload_pb2_grpc.SessionTableStub(channel)
         print("-------------- Add IPv4 Session --------------")
         result = session_addSession(stub)
+        print("Request Status=",result)
+def run_add_session_ipv4_error():
+    with open('ssl/server.crt', 'rb') as f:
+        creds = grpc.ssl_channel_credentials(f.read())
+        channel = grpc.secure_channel('localhost:3443', creds)
+        stub = openoffload_pb2_grpc.SessionTableStub(channel)
+        print("-------------- Add IPv4 Session --------------")
+        result = session_addSession_error(stub)
         print("Request Status=",result)
 def run_add_session_ipv6():
     with open('ssl/server.crt', 'rb') as f:
