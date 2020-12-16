@@ -94,6 +94,7 @@ void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *requ
       action.set_actionnexthop(request_c->nextHop.s_addr);
     }
     request->mutable_action()->CopyFrom(action);
+    request->set_cachetimeout(request_c->cacheTimeout);
 
 }
 /** \ingroup utilities
@@ -176,7 +177,7 @@ void convertSessionRequest2c(sessionRequest request, sessionRequest_t *request_c
     request_c->proto = (PROTOCOL_ID_T)request.protocolid();
     action = request.action();
     request_c->actType= (ACTION_VALUE_T)action.actiontype();
-
+    request_c->cacheTimeout = request.cachetimeout();
      if (request_c->ipver == _IPV6){
       char_array.assign(action.actionnexthopv6().begin(), action.actionnexthopv6().end());
       memcpy(request_c->nextHopV6.s6_addr,&char_array[0],16);

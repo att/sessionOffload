@@ -26,7 +26,6 @@
 
 extern "C" {
 #include "opof.h"
-#include "opof_error.h"
 }
 #include "opof_grpc.h"
 
