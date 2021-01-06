@@ -42,14 +42,14 @@ extern "C" {
 */
 Status SessionTableImpl::addSession(ServerContext* context, ServerReader<sessionRequest>* reader, addSessionResponse* response) {
   int status;
-  unsigned long errorCode;
-  unsigned long error = 1;
-  int index=0;
-  ADD_SESSION_STATUS reqStatus;
+  //int index=0;
+  //ADD_SESSION_STATUS reqStatus = ADD_SESSION_STATUS::_SESSION_ACCEPTED;
   addSessionResponse_t addResponse_c;
   sessionResponseError *errorMessage;
   sessionRequest_t request_c;
   sessionRequest request;
+  response->clear_responseerror();
+  //std::cout << "response size: " << response->responseerror_size() << std::endl;
   while(reader->Read(&request)){
     convertSessionRequest2c(request, &request_c);
     status = opof_add_session_server(&request_c, &addResponse_c);
@@ -58,9 +58,9 @@ Status SessionTableImpl::addSession(ServerContext* context, ServerReader<session
       errorMessage->set_sessionid(request.sessionid());
       errorMessage->set_errorstatus(status);
     }
-    index++;
+    //index++;
   }
-  response->set_requeststatus(reqStatus);
+  //response->set_requeststatus(reqStatus);
   return Status::OK;
 }
 

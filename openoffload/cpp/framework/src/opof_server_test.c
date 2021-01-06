@@ -24,6 +24,7 @@
 #include "opof_hash.h"
 #include "opof_test_util.h"
 
+static record_t *sessions = NULL;
 /** 
 * \ingroup servercinterface
 * \brief Utility fumction to get all sessions from test hashtable

@@ -46,6 +46,7 @@
   int opof_test5(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose);
   int opof_test6(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose);
   int opof_test7(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose);
+  int opof_test8(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose);
 
   void opof_list_tests(){
     printf("\n\nAvaialble Tests\n");
@@ -56,6 +57,7 @@
     printf("\tTest 5: Test that getClosedSessions works when there are no sessions in session table\n");
     printf("\tTest 6: Test duplicate session errors\n");
     printf("\tTest 7: Test get and delete session not found errors\n");
+    printf("\tTest 8: Test delete session and reconnect\n");
     printf("\n");
   }
 
@@ -88,6 +90,9 @@
       break;
     case 7:
       status = opof_test7(address,  max_sessions, pageSize,port, cert,verbose);
+      break;
+    case 8:
+      status = opof_test8(address,  max_sessions, pageSize,port, cert,verbose);
       break;
     default:
       printf("ERROR: Unknown Test ID: %d\n", testid);
@@ -816,6 +821,92 @@ int opof_test7(const char *address, int max_sessions, unsigned int pageSize,unsi
   }
   return SUCCESS;
 }
+
+int opof_test8(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose){
+
+  int status;
+  streamArgs_t args;
+  sessionTable_t *handle;
+  unsigned long closed_sessions=1;
+  sessionRequest_t **request;
+  addSessionResponse_t addResp;
+ 
+  sessionResponse_t responses[BUFFER_MAX];
+  int sessionCount =1;
+  int bufferSize;
+  int sessionId=0;
+  int total_sessions = max_sessions;
+
+ 
+  handle = opof_create_sessionTable(address, port, cert);
+  args.handle = handle;
+  args.pageSize = pageSize;
+
+  /*
+  *  Clean up any exisitng data in cache
+  */
+  if (opof_delete_all_sessions(handle,pageSize) == FAILURE){
+    return FAILURE;
+  }
+  printf("\n\nRunning Test 8: ");
+  printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
+  //
+  clock_t begin = clock();
+  while(max_sessions > 0){
+
+    sessionCount = max_sessions - pageSize;
+    if (sessionCount < 0){
+      bufferSize = max_sessions;
+    } else {
+      bufferSize = pageSize;
+    }
+    request = createSessionRequest(bufferSize, sessionId);
+    status = opof_add_session(bufferSize,handle, request, &addResp);
+    if (status != _OK){
+      printf("ERROR: Adding sessions: %d\n",status);
+      return FAILURE;
+    }
+    if (addResp.number_errors > 0){
+      printf("\n\nErrors in the following sessions\n");
+      for (int i=0; i < addResp.number_errors; i++){
+        printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
+      }
+    }
+     max_sessions = sessionCount;
+     sessionId += bufferSize;
+  }
+  if (verbose == true){
+    print_response_header();
+  }
+
+  opof_delete_sessionTable(handle);
+  handle = opof_create_sessionTable(address, port, cert);
+  args.handle = handle;
+  args.pageSize = pageSize;
+
+  while(closed_sessions > 0){
+    status = opof_get_closed_sessions(&args,responses,&closed_sessions);
+    printf("Closed sessions: %lu\n", closed_sessions);
+    if (verbose == true){
+      if (closed_sessions > 0){
+        for (int i=0; i < closed_sessions; i++){
+          print_response( &responses[i]);
+        }
+      }
+    }
+  }
+  clock_t end = clock();
+  double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+  printf("\n\nSessions per second (add and close): %lf\n\n", ((double)total_sessions)/(time_spent));
+  return SUCCESS;
+}
+
+
+
+
+
+
+
 #ifdef USED
 int opof_test0(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, char *test_config){
   

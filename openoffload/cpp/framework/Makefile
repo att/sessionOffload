@@ -76,10 +76,10 @@ CC := gcc -g
 CPP := g++ -g
 
 #CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DDEBUG -DVISIBLE
-CFLAGS := -c -O2 -I include -Wno-undef -I $(ROOT_DIR)/local/include -std=gnu99 -Wall
+CFLAGS := -c -O0 -I include -Wno-undef -I $(ROOT_DIR)/local/include -std=gnu99 -Werror -Wall  
 #CPPFLAGS := -c -O2 -std=c++11 -I ./ -I include  -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations  -DDEBUG -DVISIBLE
 #CPPFLAGS := -c -O2 -std=c++11 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations -DSSL -DDEBUG
-CPPFLAGS := -c -O2 -std=c++11 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations
+CPPFLAGS := -c -O0 -std=c++11 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Werror -Wall -Wno-deprecated-declarations
 #
 #
 # Link Flags
@@ -270,3 +270,4 @@ clean:
 	rm -f src/openoffload.pb.cc \
 	rm -f include/openoffload.grpc.pb.h \
 	rm -f include/openoffload.pb.h
+#

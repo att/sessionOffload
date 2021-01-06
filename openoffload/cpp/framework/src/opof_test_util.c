@@ -86,6 +86,8 @@ int range(int lower, int upper){
 * 
 * \return **sessionRequest_t
 **/
+
+#ifdef OLD
 sessionResponse_t **createSessionResponse(int size, int *sessionCount){
   record_t *r, *tmp;
   int i=0;
@@ -123,7 +125,7 @@ if (i == 0) {
 }
 return NULL;
 }
-
+#endif
 /** \ingroup testlibrary
 * \brief Utility function to create an array of sessionRequest_t structs
 *
