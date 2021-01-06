@@ -85,6 +85,7 @@ void opof_delete_sessionTable(sessionTable_t *sessionHandle){
 	SessionTableClient *client;
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
 	delete client;
+	free(sessionHandle);
 }
 /**  \ingroup clientcinterface
 * \brief Add sessions to the offload device in batches of up to 64.
