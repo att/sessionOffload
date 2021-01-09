@@ -139,7 +139,7 @@ int  SessionTableClient::getAllSessions(int pageSize, uint64_t *session_start_id
   sessionResponseArray response;
   statisticsRequestArgs request;
   ClientContext context;
-  sessionResponse_t responsec;
+ 
   int array_size;
 
   request.set_pagesize(pageSize);

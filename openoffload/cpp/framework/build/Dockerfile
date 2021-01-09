@@ -1,4 +1,4 @@
-FROM centos:7.6.1810
+FROM centos:8.3.2011
 USER root
 RUN mkdir -p /home/grpc/local
 WORKDIR /home/grpc/local
@@ -8,13 +8,13 @@ RUN yum -y update
 RUN yum -y install wget
 RUN yum -y install which
 RUN yum -y groupinstall "Development tools"
-RUN wget --no-check-certificate -q -O cmake-linux.sh https://github.com/Kitware/CMake/releases/download/v3.17.0/cmake-3.17.0-Linux-x86_64.sh
+RUN wget --no-check-certificate -q -O cmake-linux.sh https://github.com/Kitware/CMake/releases/download/v3.17.5/cmake-3.17.5-Linux-x86_64.sh
 RUN ["sh", "cmake-linux.sh",  "--", "--skip-license", "--prefix=/home/grpc/local"]
 RUN rm cmake-linux.sh
 ENV PATH="$GRPC_INSTALL/bin:${PATH}"
 RUN echo $PATH
 RUN git config --global  http.sslVerify false
-RUN git clone --recurse-submodules -b v1.30.0 https://github.com/grpc/grpc
+RUN git clone --recurse-submodules -b v1.32.0 https://github.com/grpc/grpc
 RUN cd grpc
 RUN mkdir -p /home/grpc/local/grpc/cmake/build
 WORKDIR /home/grpc/local/grpc/cmake/build

@@ -72,9 +72,25 @@ sessionTable_t * opof_create_sessionTable(const char * host, unsigned int port, 
   	
 }
 /**  \ingroup clientcinterface
+* \brief Destroy client connection to server
+*
+* The opof_delete_sessionTable deletes the handle to the client. This cleans up the internal gRPC connections.
+* This enables a new connection to be made cleanly to the server.  
+** \param  *sessionHandle    Handle pointing to the C++ instance 
+*
+* \return  void
+*
+*/
+void opof_delete_sessionTable(sessionTable_t *sessionHandle){
+	SessionTableClient *client;
+	client = static_cast<SessionTableClient *>(sessionHandle->obj);
+	delete client;
+	free(sessionHandle);
+}
+/**  \ingroup clientcinterface
 * \brief Add sessions to the offload device in batches of up to 64.
 *
-* THe opof_add_session interface is a C wrapper on the underlying gRPC C++ code. This function
+* The opof_add_session interface is a C wrapper on the underlying gRPC C++ code. This function
 * streams up to 64 sessionRequest_t structs to the server. The server either returns success or failure.
 * On failure the server returns a bitmask in the addSessionResponse_t, sessions that were failed to be added
 * to the hardware have a bit set. Any sessions that failed are set to 1 
@@ -152,7 +168,7 @@ int opof_get_closed_sessions(streamArgs_t *args, sessionResponse_t responses[], 
 	int status;
 	SessionTableClient *client;
 	std::string reply;
-	unsigned long closed_sessions =1;
+	
 	sessionTable_t *sessionHandle;
 	statisticsRequestArgs_t sessionArgs;
 	sessionArgs.pageSize = args->pageSize;
@@ -176,7 +192,7 @@ int opof_get_all_sessions(sessionTable_t *sessionHandle, uint64_t *startSession,
 	int status;
 	SessionTableClient *client;
 	std::string reply;
-	unsigned long  number_sessions;
+	
 
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
 
