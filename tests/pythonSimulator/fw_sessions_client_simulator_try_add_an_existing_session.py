@@ -32,40 +32,9 @@ import grpc
 import openoffload_pb2
 import openoffload_pb2_grpc
 
-##################################################################################
-#
-#  Sessions class is used for stream interface to create an iterator
-#
-##################################################################################
-class Sessions:
-   '''
-   '''
-   def __init__(self):
-       self._sessions= list()
-   def addSessionMembers(self, session):
-       self._sessions.append(session)
-   def __iter__(self):
-       ''' Returns the Iterator object '''
-       return SessionsIterator(self)
-
-class SessionsIterator:
-   ''' Iterator class '''
-   def __init__(self, session_list):
-       # Sessions object reference
-       self._session_list = session_list
-       # member variable to keep track of current index
-       self._index = 0
-   def __next__(self):
-       ''''Returns the next value from team object's lists '''
-       if self._index < (len(self._session_list._sessions) ) :
-           result = (self._session_list._sessions[self._index])
-           self._index +=1
-           return result
-       # End of Iteration
-       raise StopIteration
-
 
 def session_addSession(stub):
+    newSessions = []
     session=openoffload_pb2.sessionRequest()
     session.sessionId = 1001
     session.inLif= 1
@@ -82,31 +51,24 @@ def session_addSession(stub):
     #session.action.actionNextHop = "12.2.3.4"
     session.action.actionNextHop=int.from_bytes(socket.inet_pton(socket.AF_INET, "12.2.3.4"), byteorder=sys.byteorder)
 
+    newSessions.append(session)
+
     print("Adding Session to Offload Engine...")
     try:
-      #sessionResponse =  stub.addSession(session)
-      sessions_value=Sessions()
-      sessions_value.addSessionMembers(session)
-      session_iterator=iter(sessions_value)
-      sessionResponse =  stub.addSession( session_iterator)
-
+      print(f"calling GRPC rpc addSession")
+      addSessionResponse = stub.addSession(iter(newSessions))
 
     except grpc.RpcError as e:
       print(f"ERROR Exception Caught: {e}")
       print(f"exception details: {e.details()}")
       status_code = e.code()
-      print(f"exception status code: #{status_code.name}")
-      print(f"exception status code value: #{status_code.value}")
+      print(f"exception status code: {status_code.name}")
+      print(f"exception status code value: {status_code.value}")
+      return False
 
-    else:
-      if sessionResponse.requestStatus == openoffload_pb2._REJECTED_SESSION_ALREADY_EXISTS:
-          print(f"ERROR session already exists")
-      elif sessionResponse.requestStatus == openoffload_pb2._REJECTED_SESSION_TABLE_FULL:
-          print(f"WARNING session table is full")
-      else:
-          #print(f"new offload session added id: {sessionResponse.sessionId}")
-          print(f"new offload session added id: {session.sessionId}")
-
+    if addSessionResponse.responseError:
+      for error in addSessionResponse.responseError:
+        print(f"INFO Failed Offloading session id:{error.sessionId}   errornumber:{error.errorStatus}  errorname:{openoffload_pb2._ADD_SESSION_STATUS.values_by_number[error.errorStatus].name}")
 
 
 
@@ -121,6 +83,7 @@ def run():
 
         print("adding session")
         session_addSession(stub)
+        print("\n\n")
 
         print("adding the same session")
         session_addSession(stub)
