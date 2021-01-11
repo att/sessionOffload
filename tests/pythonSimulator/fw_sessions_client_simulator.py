@@ -75,11 +75,11 @@ def nextSessionId():
 
 
 
-def session_addSession(stub, cnt = 1, type = 'IPv4'):
+def session_addSessions(stub, cnt = 1, type = 'IPv4'):
     global sessionTable
     newSessions=[]
 
-    print(f"session_addSession() add {cnt} {type} sessions ")
+    print(f"session_addSessions() add {cnt} {type} sessions ")
     for x in range(cnt):
 
       sessionId = nextSessionId()
@@ -139,85 +139,12 @@ def session_addSession(stub, cnt = 1, type = 'IPv4'):
       status_code = e.code()
       print(f"exception status code: {status_code.name}")
       print(f"exception status code value: {status_code.value}")
-      return False
+      # this exception handler should make getSession calls to determine if any of the passed sessions were successfully offloaded.
 
     if addSessionResponse.responseError:
       for error in addSessionResponse.responseError:
         print(f"INFO Failed Offloading session id:{error.sessionId}   errornumber:{error.errorStatus}  errorname:{openoffload_pb2._ADD_SESSION_STATUS.values_by_number[error.errorStatus].name}")
-        sessionTable[sessionId]["offloaded"] = False
-
-
-
-  
-
-def session_addSessionIpv6(stub):
-    global sessionTable
-
-    print("NO NO")
-    return
-
-    sessionId = nextSessionId()
-    session=openoffload_pb2.sessionRequest()
-    session.sessionId = sessionId
-    session.inLif= 1
-    session.outLif= 2
-    session.ipVersion=openoffload_pb2._IPV6
-    session.sourceIpV6=socket.inet_pton(socket.AF_INET6, randomIpv6())
-    session.sourcePort=int(random.randint(8192,65535))
-    session.destinationIpV6=socket.inet_pton(socket.AF_INET6, randomIpv6())
-    session.destinationPort=randomServerPort()
-    session.protocolId=openoffload_pb2._UDP
-    session.action.actionType=openoffload_pb2._FORWARD
-    session.action.actionNextHop=int.from_bytes(socket.inet_pton(socket.AF_INET, "12.2.3.4"), byteorder=sys.byteorder)
-
-    print(f"\nAdding Session to local table new id {sessionId}")
-    timestamp = Timestamp()
-    sessionTable[sessionId] = {
-                                "inLif": session.inLif,
-                                "outLif": session.outLif,
-                                "ipVersion": session.ipVersion,
-                                "sourceIpV6": session.sourceIpV6,
-                                "sourcePort": session.sourcePort,
-                                "destinationIpV6": session.destinationIpV6,
-                                "destinationPort": session.destinationPort,
-                                "protocolId": session.protocolId,
-                                "startTime": time.time(),
-                                "inPackets": 4,
-                                "inBytes": random.randint(10,9999),
-                                "outPackets": 3,
-                                "outBytes": random.randint(10,9999),
-                                "timeout": 3600,
-                                "offloaded": False
-                              }
-
-    #print(f" dump table: {sessionTable}")
-    print("Requesting Offload of IPv6 Session...")
-    try:
-      sessions_value=Sessions()
-      sessions_value.addSessionMembers(session)
-      session_iterator=iter(sessions_value)
-      sessionResponse =  stub.addSession( session_iterator)
-
-    except grpc.RpcError as e:
-      print(f"ERROR Exception Caught: {e}")
-      print(f"exception details: {e.details()}")
-      status_code = e.code()
-      print(f"exception status code: {status_code.name}")
-      print(f"exception status code value: {status_code.value}")
-      return False
-    else:
-      if sessionResponse.requestStatus == openoffload_pb2._ACCEPTED:
-        print(f"new session added Offload device")
-        sessionTable[sessionId]["offloaded"] = True
-      elif sessionResponse.requestStatus == openoffload_pb2._REJECTED_SESSION_TABLE_FULL:
-        print(f"Offload Engine has no room for this session, Offload failed since offload session table is full")
-      else:
-        print("ERROR Offload Engine returned unknown response.")
-
-    return sessionId
-
-
-
+        sessionTable[error.sessionId]["offloaded"] = False
 
 
 def session_getSession(stub, sessionId):
@@ -337,8 +264,8 @@ def run():
 
         print("\n\n\n")
         print("-------------- Adding 10 IPv4 & 10 IPv6 Sessions --------------")
-        session_addSession(stub, 10, 'IPv4')
-        session_addSession(stub, 10, 'IPv6')
+        session_addSessions(stub, 10, 'IPv4')
+        session_addSessions(stub, 10, 'IPv6')
 
         time.sleep(3)
         print("\n\n\n")
@@ -350,7 +277,7 @@ def run():
           sessionClosedSessions(stub)
 
           print("\n\n------------ Adding new IPv4 Sessions ------------")
-          session_addSession(stub, 3, 'IPv4')
+          session_addSessions(stub, 3, 'IPv4')
           print("\n\n\n")
 
           # test grpc rpc call to get a single session
@@ -362,7 +289,7 @@ def run():
           print("\n\n\n")
 
           print("\n\n------------ Adding new IPv6 Sessions ------------")
-          session_addSession(stub, 3, 'IPv6')
+          session_addSessions(stub, 3, 'IPv6')
           print("\n\n\n")
 
           # test grpc rpc call to get a single session
