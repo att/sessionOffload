@@ -31,29 +31,6 @@ extern "C" {
 #include "opof_util.h"
 #include "opof_grpc.h"
 
-
-
-/** \ingroup utilities
-*
-* \brief Append the port to the address string and return as string.
-*
-* \param *address   A string containing the address of the server. The string must
-*                   be long enough to append the port too.
-* \param prot       The listening port as an int, it will be converted to a string
-*                   and appended to the address string.
-*
-* \return SUCCESS or FAILURE
-*/
-int create_address(char *address, unsigned short port){
-  int status = SUCCESS;
-  char port_str[12];
-  sprintf(port_str, "%u", port);
-  strcat(address,":");
-  strcat(address,port_str);
-  printf("Address: %s\n",address);
-
-  return status;
-}
 /** \ingroup utilities
 *
 * \brief Covert a C SessionRequest_t to a C++ sessionRequest Class instance
