@@ -218,7 +218,8 @@ def session_getClosedSessions(stub):
 
 
 def session_getAllSessions(stub):
-    for sessionResponse in stub.getClosedSessions(openoffload_pb2.statisticsRequestArgs(pageSize=0)):
+    sessionResponseArray = stub.getAllSessions(openoffload_pb2.statisticsRequestArgs(pageSize=0))
+    for sessionResponse in sessionResponseArray.responseArray: 
         print("### RECEIVED SESSION #####")
         print("SessionId:", sessionResponse.sessionId)
         print("Session State:", openoffload_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name)

@@ -33,12 +33,15 @@ import openoffload_pb2_grpc
 
 def session_getOffloadedSessions(stub, paramPageSize, paramPage):
     sessionCnt=0
-    for sessionResponse in stub.getAllSessions(openoffload_pb2.statisticsRequestArgs(pageSize=paramPageSize, page=paramPage)):
+    sessionResponseArray = stub.getAllSessions(openoffload_pb2.statisticsRequestArgs(pageSize=paramPageSize, page=paramPage))
+
+    for sessionResponse in sessionResponseArray.responseArray:
       sessionCnt=sessionCnt+1
       print(f"SessionId: {sessionResponse.sessionId}")
       print(f"\tSession State: {openoffload_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name}")
       print(f"\tSession InPackets: {sessionResponse.inPackets} InBytes: {sessionResponse.inBytes} OutPackets: {sessionResponse.outPackets} OutBytes: {sessionResponse.outBytes}")
-      print(f"\tSession End Reason: {openoffload_pb2._SESSION_CLOSE_CODE.values_by_number[sessionResponse.sessionCloseCode].name}")
+      print(f"\tSession End Reason: {openoffload_pb2._SESSION_CLOSE_CODE.values_by_number[sessionResponse.sessionCloseCode].name}\n")
+
     print(f"***Found {sessionCnt} sessions")
 
 

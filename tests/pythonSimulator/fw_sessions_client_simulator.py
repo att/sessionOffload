@@ -42,38 +42,24 @@ sessionTable = {}
 startSessionId = 1000
 lastSessionId = startSessionId
 maxSessionId = 999999
+offloadedIPv4count = 0
+offloadedIPv6count = 0
+attemptsToOffload = 0
 
-##################################################################################
-#
-#  Sessions class is used for stream interface to create an iterator
-#
-##################################################################################
-class Sessions:
-   '''
-   '''
-   def __init__(self):
-       self._sessions= list()
-   def addSessionMembers(self, session):
-       self._sessions.append(session)
-   def __iter__(self):
-       ''' Returns the Iterator object '''
-       return SessionsIterator(self)
 
-class SessionsIterator:
-   ''' Iterator class '''
-   def __init__(self, session_list):
-       # Sessions object reference
-       self._session_list = session_list
-       # member variable to keep track of current index
-       self._index = 0
-   def __next__(self):
-       ''''Returns the next value from team object's lists '''
-       if self._index < (len(self._session_list._sessions) ) :
-           result = (self._session_list._sessions[self._index])
-           self._index +=1
-           return result
-       # End of Iteration
-       raise StopIteration
+def printSessionResponse(sessionResponse):
+        global sessionTable
+
+        session = sessionTable[sessionResponse.sessionId]
+        print(f"\tFW sessionID: {sessionResponse.sessionId}  Session State: {openoffload_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name}")
+        print(f"\tSession Start Time our table:",datetime.datetime.fromtimestamp(session["startTime"]), "Start Time Offload table:", sessionResponse.startTime.seconds, "End Time Offfload table:", sessionResponse.endTime.seconds)
+        if session["ipVersion"] == openoffload_pb2._IPV4:
+          #print("\tsrcIP: %s srcPort: %d destIP: %s destPort: %d" % (socket.inet_ntop(socket.AF_INET, session["sourceIp"]), session["sourcePort"], socket.inet_ntop(socket.AF_INET, session["destinationIp"]), session["destinationPort"]));
+          print("\tsrcIP: %s srcPort: %d destIP: %s destPort: %d" % (socket.inet_ntop(socket.AF_INET, session["sourceIp"].to_bytes(4,byteorder=sys.byteorder)), session["sourcePort"], socket.inet_ntop(socket.AF_INET, session["destinationIp"].to_bytes(4,byteorder=sys.byteorder)), session["destinationPort"]));
+        else:
+          print("\tsrcIP: %s srcPort: %d destIP: %s destPort: %d" % (socket.inet_ntop(socket.AF_INET6, session["sourceIpV6"]), session["sourcePort"], socket.inet_ntop(socket.AF_INET6, session["destinationIpV6"]), session["destinationPort"]));
+        print("\tSession InPackets: %d InBytes: %d OutPackets: %d OutBytes: %d" % (sessionResponse.inPackets + session["inPackets"], sessionResponse.inBytes + session["inBytes"], sessionResponse.outPackets + session["outPackets"], sessionResponse.outBytes + session["outBytes"]))
+        print(f"\tSession End Reason: {openoffload_pb2._SESSION_CLOSE_CODE.values_by_number[sessionResponse.sessionCloseCode].name}")
 
 
 def nextSessionId():
@@ -89,26 +75,37 @@ def nextSessionId():
 
 
 
-def session_addSession(stub):
+def session_addSessions(stub, cnt = 1, type = 'IPv4'):
     global sessionTable
+    newSessions=[]
 
-    sessionId = nextSessionId()
+    print(f"session_addSessions() add {cnt} {type} sessions ")
+    for x in range(cnt):
 
-    session=openoffload_pb2.sessionRequest()
-    session.sessionId = sessionId
-    session.inLif= 1
-    session.outLif= 2
-    session.ipVersion=openoffload_pb2._IPV4
-    session.sourceIp=int.from_bytes(socket.inet_pton(socket.AF_INET, randomIp()), byteorder=sys.byteorder)
-    session.sourcePort=int(random.randint(8192,65535))
-    session.destinationIp=int.from_bytes(socket.inet_pton(socket.AF_INET, randomIp()), byteorder=sys.byteorder)
-    session.destinationPort=randomServerPort()
-    session.protocolId=openoffload_pb2._TCP
-    session.action.actionType=openoffload_pb2._FORWARD
-    session.action.actionNextHop=int.from_bytes(socket.inet_pton(socket.AF_INET, "12.2.3.4"), byteorder=sys.byteorder)
+      sessionId = nextSessionId()
 
-    print(f"\nAdding Session to local table new id {sessionId}")
-    sessionTable[sessionId] = {
+      session=openoffload_pb2.sessionRequest()
+      session.sessionId = sessionId
+      session.inLif= 1
+      session.outLif= 2
+      session.sourcePort=int(random.randint(8192,65535))
+      session.destinationPort=randomServerPort()
+      session.protocolId=openoffload_pb2._TCP
+      session.action.actionType=openoffload_pb2._FORWARD
+      session.action.actionNextHop=int.from_bytes(socket.inet_pton(socket.AF_INET, "12.2.3.4"), byteorder=sys.byteorder)
+      if type == 'IPv4':
+        session.ipVersion=openoffload_pb2._IPV4
+        session.sourceIp=int.from_bytes(socket.inet_pton(socket.AF_INET, randomIp()), byteorder=sys.byteorder)
+        session.destinationIp=int.from_bytes(socket.inet_pton(socket.AF_INET, randomIp()), byteorder=sys.byteorder)
+      else:
+        session.ipVersion=openoffload_pb2._IPV6
+        session.sourceIpV6=socket.inet_pton(socket.AF_INET6, randomIpv6())
+        session.destinationIpV6=socket.inet_pton(socket.AF_INET6, randomIpv6())
+
+      newSessions.append(session)
+
+      print(f"\nAdding Session to local table new id {sessionId}")
+      sessionTable[sessionId] = {
                                 "inLif": session.inLif,
                                 "outLif": session.outLif,
                                 "ipVersion": session.ipVersion,
@@ -123,133 +120,41 @@ def session_addSession(stub):
                                 "outPackets": 3,
                                 "outBytes": random.randint(10,9999),
                                 "timeout": 3600,
-                                "offloaded": False,
-                                "offloadSessionId": None
+                                "offloaded": True
                               }
+      if type == 'IPv4':
+        sessionTable[sessionId]["sourceIp"] = session.sourceIp
+        sessionTable[sessionId]["destinationIp"] = session.destinationIp
+      else:
+        sessionTable[sessionId]["sourceIpV6"] = session.sourceIpV6
+        sessionTable[sessionId]["destinationIpV6"] = session.destinationIpV6
 
-    print("Requesting Offload of IPv4 Session...")
     try:
-      sessions_value=Sessions()
-      sessions_value.addSessionMembers(session)
-      session_iterator=iter(sessions_value)
-      sessionResponse =  stub.addSession( session_iterator)
+      print(f"calling GRPC rpc addSession to attempt to offload {len(newSessions)} sessions")
+      addSessionResponse = stub.addSession(iter(newSessions))
 
     except grpc.RpcError as e:
       print(f"ERROR Exception Caught: {e}")
       print(f"exception details: {e.details()}")
       status_code = e.code()
-      print(f"exception status code: #{status_code.name}")
-      print(f"exception status code value: #{status_code.value}")
-      return False
-    else:
-      if sessionResponse.requestStatus == openoffload_pb2._ACCEPTED:
-        #:print(f"new session added Offload SessionId: {sessionResponse.sessionId}")
-        print(f"new session added to Offload device")
-        sessionTable[sessionId]["offloaded"] = True
-        # TODO: fw should use same sessionId as request since its not tracked separately
-        #sessionTable[sessionId]["offloadSessionId"] = sessionResponse.sessionId
-      elif sessionResponse.requestStatus == openoffload_pb2._REJECTED_SESSION_TABLE_FULL:
-        print(f"Offload Engine has no room for this session, Offload failed since offload session table is full")
-      else:
-        print("ERROR Offload Engine returned unknown response.")
+      print(f"exception status code: {status_code.name}")
+      print(f"exception status code value: {status_code.value}")
+      # this exception handler should make getSession calls to determine if any of the passed sessions were successfully offloaded.
 
-    return sessionId
-
-
-def session_addSessionIpv6(stub):
-    global sessionTable
-
-    sessionId = nextSessionId()
-    session=openoffload_pb2.sessionRequest()
-    session.sessionId = sessionId
-    session.inLif= 1
-    session.outLif= 2
-    session.ipVersion=openoffload_pb2._IPV6
-    session.sourceIpV6=socket.inet_pton(socket.AF_INET6, randomIpv6())
-    session.sourcePort=int(random.randint(8192,65535))
-    session.destinationIpV6=socket.inet_pton(socket.AF_INET6, randomIpv6())
-    session.destinationPort=randomServerPort()
-    session.protocolId=openoffload_pb2._UDP
-    session.action.actionType=openoffload_pb2._FORWARD
-    session.action.actionNextHop=int.from_bytes(socket.inet_pton(socket.AF_INET, "12.2.3.4"), byteorder=sys.byteorder)
-
-    print(f"\nAdding Session to local table new id {sessionId}")
-    timestamp = Timestamp()
-    sessionTable[sessionId] = {
-                                "inLif": session.inLif,
-                                "outLif": session.outLif,
-                                "ipVersion": session.ipVersion,
-                                "sourceIpV6": session.sourceIpV6,
-                                "sourcePort": session.sourcePort,
-                                "destinationIpV6": session.destinationIpV6,
-                                "destinationPort": session.destinationPort,
-                                "protocolId": session.protocolId,
-                                "startTime": time.time(),
-                                "inPackets": 4,
-                                "inBytes": random.randint(10,9999),
-                                "outPackets": 3,
-                                "outBytes": random.randint(10,9999),
-                                "timeout": 3600,
-                                "offloaded": False,
-                                "offloadSessionId": None
-                              }
-
-    #print(f" dump table: {sessionTable}")
-    print("Requesting Offload of IPv6 Session...")
-    try:
-      sessions_value=Sessions()
-      sessions_value.addSessionMembers(session)
-      session_iterator=iter(sessions_value)
-      sessionResponse =  stub.addSession( session_iterator)
-
-    except grpc.RpcError as e:
-      print(f"ERROR Exception Caught: {e}")
-      print(f"exception details: {e.details()}")
-      status_code = e.code()
-      print(f"exception status code: #{status_code.name}")
-      print(f"exception status code value: #{status_code.value}")
-      return False
-    else:
-      if sessionResponse.requestStatus == openoffload_pb2._ACCEPTED:
-        print(f"new session added Offload device")
-        sessionTable[sessionId]["offloaded"] = True
-      elif sessionResponse.requestStatus == openoffload_pb2._REJECTED_SESSION_TABLE_FULL:
-        print(f"Offload Engine has no room for this session, Offload failed since offload session table is full")
-      else:
-        print("ERROR Offload Engine returned unknown response.")
-
-    return sessionId
-
-
-
+    if addSessionResponse.responseError:
+      for error in addSessionResponse.responseError:
+        print(f"INFO Failed Offloading session id:{error.sessionId}   errornumber:{error.errorStatus}  errorname:{openoffload_pb2._ADD_SESSION_STATUS.values_by_number[error.errorStatus].name}")
+        sessionTable[error.sessionId]["offloaded"] = False
 
 
 def session_getSession(stub, sessionId):
     print(f"Getting Session id: {sessionId}")
-    sessionResponse =  stub.getSession( openoffload_pb2.sessionId(sessionId=sessionId))
-    print("SessionId:", sessionResponse.sessionId)
-    print("Session State 0=ESTABLISHED :",sessionResponse.sessionState)
-    print("Session RequestStatus:",sessionResponse.requestStatus)
-    print("Session SessionEndCode:",sessionResponse.sessionCloseCode)
-    print("Session InPackets",sessionResponse.inPackets)
-    print("Session InBytes",sessionResponse.inBytes)
-    print("Session OutPackets",sessionResponse.outPackets)
-    print("Session OutBytes",sessionResponse.outBytes)
-    print("Session startTime",sessionResponse.startTime)
-    print("Session endTime",sessionResponse.endTime)
-
+    sessionResponse = stub.getSession( openoffload_pb2.sessionId(sessionId=sessionId))
+    printSessionResponse(sessionResponse)
 
 def session_deleteSession(stub, sessionId):
+    print(f"Deleting Session Id:{sessionId}")
     sessionResponse =  stub.deleteSession( openoffload_pb2.sessionId(sessionId=sessionId))
-    print("Getting Session")
-    print("SessionId:", sessionResponse.sessionId)
-    print("Session State 0=ESTABLISHED 1=CLOSING_1 :",sessionResponse.sessionState)
-    print("Session RequestStatus:",sessionResponse.requestStatus)
-    print("Session SessionEndCode:",sessionResponse.sessionCloseCode)
-    print("Session InPackets",sessionResponse.inPackets)
-    print("Session InBytes",sessionResponse.inBytes)
-    print("Session startTime",sessionResponse.startTime)
-    print("Session endTime",sessionResponse.endTime)
 
 def session_addMirrorSession(stub):
     # not yet implemented within the local session table
@@ -275,7 +180,6 @@ def sessionClosedSessions(stub):
     #print(f"getClosed() dump table: {sessionTable}")
     for sessionResponse in stub.getClosedSessions(openoffload_pb2.sessionId(sessionId=0)):
       print(f"\n\nOFFLOAD SESSION END - Closed Session Offload SessionId: {sessionResponse.sessionId}")
-      print(f"current sessionTable size: {len(sessionTable)}")
 
       if not sessionResponse.sessionId in sessionTable.keys():
         print(f"\tERROR session id: {sessionResponse.sessionId} not found in local session table")
@@ -284,7 +188,6 @@ def sessionClosedSessions(stub):
         print(f"\tFW sessionID: {sessionResponse.sessionId}  Session State: {openoffload_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name}")
         print(f"\tSession Start Time our table:",datetime.datetime.fromtimestamp(session["startTime"]), "Start Time Offload table:", sessionResponse.startTime.seconds, "End Time Offfload table:", sessionResponse.endTime.seconds)
         if session["ipVersion"] == openoffload_pb2._IPV4:
-          #print("\tsrcIP: %s srcPort: %d destIP: %s destPort: %d" % (socket.inet_ntop(socket.AF_INET, session["sourceIp"]), session["sourcePort"], socket.inet_ntop(socket.AF_INET, session["destinationIp"]), session["destinationPort"]));
           print("\tsrcIP: %s srcPort: %d destIP: %s destPort: %d" % (socket.inet_ntop(socket.AF_INET, session["sourceIp"].to_bytes(4,byteorder=sys.byteorder)), session["sourcePort"], socket.inet_ntop(socket.AF_INET, session["destinationIp"].to_bytes(4,byteorder=sys.byteorder)), session["destinationPort"]));
         else:
           print("\tsrcIP: %s srcPort: %d destIP: %s destPort: %d" % (socket.inet_ntop(socket.AF_INET6, session["sourceIpV6"]), session["sourcePort"], socket.inet_ntop(socket.AF_INET6, session["destinationIpV6"]), session["destinationPort"]));
@@ -329,13 +232,17 @@ def randomIpv6():
 
 def session_getOffloadedSessions(stub, paramPageSize, paramPage):
     sessionCnt=0
-    for sessionResponse in stub.getAllSessions(openoffload_pb2.statisticsRequestArgs(pageSize=paramPageSize, page=paramPage)):
+    sessionResponseArray = stub.getAllSessions(openoffload_pb2.statisticsRequestArgs(pageSize=paramPageSize, page=paramPage))
+
+    for sessionResponse in sessionResponseArray.responseArray:
       sessionCnt=sessionCnt+1
+      #print(f"\n\n\n******************\ndump session = {sessionResponse}")
       print(f"SessionId: {sessionResponse.sessionId}")
       print(f"\tSession State: {openoffload_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name}")
       print(f"\tSession InPackets: {sessionResponse.inPackets} InBytes: {sessionResponse.inBytes} OutPackets: {sessionResponse.outPackets} OutBytes: {sessionResponse.outBytes}")
-      print(f"\tSession End Reason: {openoffload_pb2._SESSION_CLOSE_CODE.values_by_number[sessionResponse.sessionCloseCode].name}")
-    print(f"\n\tFound {sessionCnt} offloaded sessions")
+      print(f"\tSession End Reason: {openoffload_pb2._SESSION_CLOSE_CODE.values_by_number[sessionResponse.sessionCloseCode].name}\n")
+    print(f"\n\n\n\tFound {sessionCnt} offloaded sessions")
+
 
 def run():
     # NOTE(gRPC Python Team): openoffload_pb2.close() is possible on a channel and should be
@@ -353,19 +260,15 @@ def run():
         # we currently just print these on the screen, but an actual production 
         # implementation would want to consider loading them into the firwall's 
         # session table.
+        time.sleep(3)
 
-
+        print("\n\n\n")
         print("-------------- Adding 10 IPv4 & 10 IPv6 Sessions --------------")
-        newSessionId=None
-        for x in range(10):
-          newSessionId=session_addSession(stub)
-          print(f"Added new session id: {newSessionId}")
+        session_addSessions(stub, 10, 'IPv4')
+        session_addSessions(stub, 10, 'IPv6')
 
-        print("Fetch the session from Offload device for testing purposes.")
-        session_getSession(stub, newSessionId)
-
-        for x in range(10):
-          newSessionId=session_addSessionIpv6(stub)
+        time.sleep(3)
+        print("\n\n\n")
 
         # We did not thread this code, but would expect parrallism be used to add new offload
         # sessions and to receive the offloaded sessions that have closed.
@@ -373,14 +276,37 @@ def run():
           print("\n-------------- Get All the Closed Sessions and update our session table  --------------")
           sessionClosedSessions(stub)
 
-          for x in range(2):
-            print("\nAdding new IPv4 Session")
-            newSessionId=session_addSession(stub)
-          for x in range(2):
-            print("\nAdding new IPv6 Session")
-            newSessionId=session_addSessionIpv6(stub)
+          print("\n\n------------ Adding new IPv4 Sessions ------------")
+          session_addSessions(stub, 3, 'IPv4')
+          print("\n\n\n")
+
+          # test grpc rpc call to get a single session
+          for sessionId  in sessionTable:
+            if sessionTable[sessionId]["offloaded"] == True:
+              print(f"------------ Fetch the session from Offload device for testing purposes using sessionId: #{sessionId}. ------------")
+              session_getSession(stub, sessionId)
+              break
+          print("\n\n\n")
+
+          print("\n\n------------ Adding new IPv6 Sessions ------------")
+          session_addSessions(stub, 3, 'IPv6')
+          print("\n\n\n")
+
+          # test grpc rpc call to get a single session
+          for sessionId  in sessionTable:
+            if sessionTable[sessionId]["offloaded"] == True:
+              print(f"------------ Fetch the session from Offload device for testing purposes using sessionId: #{sessionId}. ------------")
+              session_getSession(stub, sessionId)
+              break
+          print("\n\n\n")
 
           time.sleep(2)
+
+          print("\n\n------------ List All OffloadedSessions ------------") 
+          session_getOffloadedSessions(stub, 0, 0)
+          print("\n\n\n")
+
+          time.sleep(5)
 
 if __name__ == '__main__':
     logging.basicConfig()

@@ -78,7 +78,10 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
 
 
     def addSession(self, request_iterator, context):
+        addSessionResponse = openoffload_pb2.addSessionResponse()
+
         for request in request_iterator:
+            addNewSession = True
             print("############ ADD SESSION ##################");
             print("Client Session ID:", request.sessionId)
             print("IP Version:", openoffload_pb2._IP_VERSION.values_by_number[request.ipVersion].name)
@@ -96,6 +99,8 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
             print("ActionType 0=DROP,1=FORWARD,2=MIRROR,3=SNOOP:" , request.action.actionType)
             print("ActionNextHop:" , request.action.actionNextHop)
 
+
+
             # check that all the required fields were included in the request
             if request.sessionId is None or request.inLif is None or request.outLif is None or request.ipVersion is None or request.action is None or request.protocolId is None or request.sourceIp is None or request.sourcePort is None or request.destinationIp is None or request.destinationPort is None:
                 msg = (f"ERROR: Invalid Request")
@@ -103,7 +108,12 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
                 # Raise Exception on GRPC client
                 context.set_details(msg)
                 context.set_code(grpc.StatusCode.UNKNOWN)
-                return openoffload_pb2.addSessionResponse(requestStatus=openoffload_pb2._REJECTED)
+
+
+                sessionResponseError = openoffload_pb2.sessionResponseError(sessionId=request.sessionId, errorStatus=openoffload_pb2._SESSION_REJECTED)
+                addSessionResponse.responseError.append(sessionResponseError)
+                addNewSession = False
+                #return openoffload_pb2.addSessionResponse(requestStatus=openoffload_pb2._REJECTED)
 
 
             # check that the same 7 tuple doesn't already exist
@@ -115,21 +125,27 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
                 # Raise Exception on GRPC client
                 #context.set_details(msg)
                 #context.set_code(grpc.StatusCode.UNKNOWN)
-                return openoffload_pb2.addSessionResponse(requestStatus=openoffload_pb2._REJECTED_SESSION_ALREADY_EXISTS)
+                sessionResponseError = openoffload_pb2.sessionResponseError(sessionId=request.sessionId, errorStatus=openoffload_pb2._SESSION_ALREADY_EXISTS)
+                addSessionResponse.responseError.append(sessionResponseError)
+                addNewSession = False
+                #return openoffload_pb2.addSessionResponse(requestStatus=openoffload_pb2._REJECTED_SESSION_ALREADY_EXISTS)
 
             newSessionId = self.nextSessionId()
             # check if offloadSessionTable is already full
             if newSessionId < 0:
                 msg = (f"INFO: The session table is full and cannot support any new offload sessions at this time.")
                 print(msg)
-                return openoffload_pb2.addSessionResponse(requestStatus=openoffload_pb2._REJECTED_SESSION_TABLE_FULL)
+                sessionResponseError = openoffload_pb2.sessionResponseError(sessionId=request.sessionId, errorStatus=openoffload_pb2._SESSION_TABLE_FULL)
+                addSessionResponse.responseError.append(sessionResponseError)
+                addNewSession = False
+                #return openoffload_pb2.addSessionResponse(requestStatus=openoffload_pb2._REJECTED_SESSION_TABLE_FULL)
 
 
-
-            print(f"Found slot for new offload session @ id = {newSessionId}")
-            timestamp = google.protobuf.timestamp_pb2.Timestamp()
-            timestamp.GetCurrentTime()
-            offloadSessionTable[newSessionId] = {
+            if addNewSession: 
+                print(f"Excepting new session for Offload. Found slot for new offload session @ id = {newSessionId}")
+                timestamp = google.protobuf.timestamp_pb2.Timestamp()
+                timestamp.GetCurrentTime()
+                offloadSessionTable[newSessionId] = {
                                                 "clientSessionId": request.sessionId,
                                                 "inLif": request.inLif,
                                                 "outLif": request.outLif,
@@ -152,7 +168,10 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
                                                 "timeOut": 3600,
                                                 "sessionCloseCode": openoffload_pb2._NOT_CLOSED
                                               }
-            return openoffload_pb2.addSessionResponse(requestStatus=openoffload_pb2._ACCEPTED);
+
+
+        return addSessionResponse 
+            #return openoffload_pb2.addSessionResponse(requestStatus=openoffload_pb2._ACCEPTED);
 
 
     # find and return a single session by the passed in sessionId
@@ -166,7 +185,7 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
               for sessionId, session in offloadSessionTable.items():
                 #print(f"checking our session id:{sessionId} client session id:", session["clientSessionId"], " matches the request sessionId:", request.sessionId )
                 if session["clientSessionId"] == request.sessionId:
-                  return openoffload_pb2.sessionResponse(sessionId=sessionId, sessionState=session["state"], requestStatus=openoffload_pb2._ACCEPTED, inPackets=session["inPackets"], inBytes=session["inBytes"], outPackets=session["outPackets"], outBytes=session["outBytes"], startTime=session["startTime"], endTime=session["endTime"], sessionCloseCode=session["sessionCloseCode"]);
+                  return openoffload_pb2.sessionResponse(sessionId=request.sessionId, sessionState=session["state"], requestStatus=openoffload_pb2._ACCEPTED, inPackets=session["inPackets"], inBytes=session["inBytes"], outPackets=session["outPackets"], outBytes=session["outBytes"], startTime=session["startTime"], endTime=session["endTime"], sessionCloseCode=session["sessionCloseCode"]);
 
 
               msg = (f"ERROR: The session was not found.")
@@ -327,11 +346,18 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
               endIndex = sessionCount - 1
 
             #print(f"start index = {startIndex} end index = {endIndex}")
+
+            sessionResponseArray = openoffload_pb2.sessionResponseArray()
             for x in range(startIndex, endIndex + 1):
               sessionId = list(offloadSessionTable)[x]
               session = offloadSessionTable[sessionId]
               #print(f"index = {x} returning session {sessionId}")
-              yield openoffload_pb2.sessionResponse(sessionId=session["clientSessionId"], sessionState=session["state"], requestStatus=openoffload_pb2._ACCEPTED, inPackets=session["inPackets"], inBytes=session["inBytes"], outPackets=session["outPackets"], outBytes=session["outBytes"], startTime=session["startTime"], endTime=session["endTime"], sessionCloseCode=session["sessionCloseCode"]);
+              sessionResponse = openoffload_pb2.sessionResponse(sessionId=session["clientSessionId"], sessionState=session["state"], requestStatus=openoffload_pb2._ACCEPTED, inPackets=session["inPackets"], inBytes=session["inBytes"], outPackets=session["outPackets"], outBytes=session["outBytes"], startTime=session["startTime"], endTime=session["endTime"], sessionCloseCode=session["sessionCloseCode"])
+
+              sessionResponseArray.responseArray.append(sessionResponse)
+
+            sessionResponseArray.nextkey=23333
+            return sessionResponseArray
                 
 
 def serve():
