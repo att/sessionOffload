@@ -65,6 +65,7 @@ int getAllSessionsPage(int size, uint64_t *sessionStart, sessionResponse_t **res
     responses[i]->sessionState = r->sessionState;
     responses[i]->sessionCloseCode = _TIMEOUT;
     responses[i]->requestStatus = _ACCEPTED;
+    *sessionStart = r->key.sessionId;
     i++;
     if (i == size){
       start = r->hh.next;
@@ -74,6 +75,7 @@ int getAllSessionsPage(int size, uint64_t *sessionStart, sessionResponse_t **res
   }
   start = NULL;
   //*sessionStart = ;
+ 
   return i;
 }
 #if 0
