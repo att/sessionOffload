@@ -300,7 +300,6 @@ void display_session_request(sessionRequest_t *request, const char * message){
  printf("Cache Session Timeout %u\n", request->cacheTimeout);
 }
 
-
 void print_response_header(){
   printf("\n\n  Session ID\t In Packets\t In Bytes\t Out Packets\t  Out Bytes \t\t Session State \t  Close Code\t Request Status\n");
 }

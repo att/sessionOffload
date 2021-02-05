@@ -168,7 +168,6 @@ int opof_get_closed_sessions(streamArgs_t *args, sessionResponse_t responses[], 
 	int status;
 	SessionTableClient *client;
 	std::string reply;
-	
 	sessionTable_t *sessionHandle;
 	statisticsRequestArgs_t sessionArgs;
 	sessionArgs.pageSize = args->pageSize;
