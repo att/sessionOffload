@@ -30,7 +30,7 @@ import datetime
 from random import getrandbits
 from ipaddress import IPv4Network, IPv4Address, IPv6Address
 import socket
-import sys
+import sys, getopt
 
 import grpc
 
@@ -244,7 +244,7 @@ def session_getOffloadedSessions(stub, paramPageSize, paramPage):
     print(f"\n\n\n\tFound {sessionCnt} offloaded sessions")
 
 
-def run():
+def run(loopmax):
     # NOTE(gRPC Python Team): openoffload_pb2.close() is possible on a channel and should be
     # used in circumstances in which the with statement does not fit the needs
     # of the code.
@@ -272,7 +272,11 @@ def run():
 
         # We did not thread this code, but would expect parrallism be used to add new offload
         # sessions and to receive the offloaded sessions that have closed.
-        while True:
+        #while True:
+        loop=0
+        while loop <= loopmax:
+          if (loopmax > 0):
+              loop=loop+1
           print("\n-------------- Get All the Closed Sessions and update our session table  --------------")
           sessionClosedSessions(stub)
 
@@ -308,7 +312,24 @@ def run():
 
           time.sleep(5)
 
+
+
+
 if __name__ == '__main__':
-    logging.basicConfig()
-    run()
+   loopmax= 0
+   try:
+       opts, args = getopt.getopt(sys.argv[1:],"h",["loopmax="])
+   except getopt.GetoptError:
+      print('fw_sessions_client_simulator.py --loopmax <max_add_sessions>')
+      sys.exit(2)
+   for opt, arg in opts:
+      if opt == '-h':
+         print('fw_sessions_client_simulator.py --loopmax <max_add_sessions>')
+         print('loopmax blank or 0 is infinite loop')
+         sys.exit()
+      elif opt in ("--loopmax"):
+         loopmax= int(arg)
+   print ('loopmax is ', loopmax)
+   logging.basicConfig()
+   run(loopmax)
 
