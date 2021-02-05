@@ -114,7 +114,7 @@ ABSL_TIME_ZONE_LIB := $(LIBDIR)/libabsl_time_zone.a
 LD = g++ -g
 #LDFLAGS = -lc  -lc++ -lgrpc++ -lprotobuf -L/usr/local/lib -L /opt/local/lib
 LIBCONFIG := /usr/local/lib/libconfig.a
-LDFLAGS = -lc  -lstdc++ -pthread  
+LDFLAGS = -lc  -lstdc++ -pthread 
 SERVERFLAGS =  -L $(LIB_DIR) -lopof_server
 CLIENTFLAGS =  -L $(LIB_DIR) -lopof_client
 
