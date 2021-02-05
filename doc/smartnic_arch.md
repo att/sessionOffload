@@ -1,17 +1,17 @@
 # Generic SmartNIC Architecture for OpenOffload
 
-##Overview
+## Overview
 The following presents a high level architecture of a generic SmartNIC architecture for OpenOffload. The steps in the packet flow are presented to help implementers design their implementations.
 
 ## Setup with virtual functions (VF)
 The firewall is connected to the SmartNIC through three virtual functions. The first two are for the data path interfaces. The third is used as a control channel to the SmartNIC. 
 
-##Steps in the packet flow
+## Steps in the packet flow
 The diagram below shows the diagram for the packet path of though the SmartNIC and the firewall.
 
-[](images/smartnic_arch.png)
+![](images/smartnic_arch.png)
 
-###Description of Steps
+### Description of Steps
 1. A packet arrives at ens0
 2. The emdedded switch does a lookup in the session table for the session. If the session is present and the action is offload the packet is sent out ens1. The inverse is also true for packets arriving at en1.
 3. If the packet does not exist it is sent to the firewall. Note: All TCP control packets are always sent to the firewall. The firewall is responsible for managing session state.
