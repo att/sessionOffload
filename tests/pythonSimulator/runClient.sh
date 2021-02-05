@@ -13,4 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #============LICENSE_END===============================================================================================================
+
+# run client in infinit loop
+# use --loopmax <loopcount> to iterate for a limited number of loops
+#     --loopmax 3   is used by robot
 python3 fw_sessions_client_simulator.py
