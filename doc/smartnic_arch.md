@@ -22,6 +22,10 @@ The diagram below shows the diagram for the packet path of though the SmartNIC a
 8. The firewall receives the closed session message and updates the session statistics and goes about the session close process.
 
 
-[]: Copyright (C) 2021 Palo Alto Networks Intellectual Property. All rights reserved.
+
+
+
+
+Copyright (C) 2021 Palo Alto Networks Intellectual Property. All rights reserved.
 
 
