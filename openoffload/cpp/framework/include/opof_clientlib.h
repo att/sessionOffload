@@ -49,9 +49,8 @@ void opof_delete_sessionTable( sessionTable_t *session);
 int opof_add_session(int size, sessionTable_t *sessionHandle,  sessionRequest_t **parameters, addSessionResponse_t *resp);
 int opof_del_session(sessionTable_t *sessionHandle,  unsigned long  sessionId, sessionResponse_t *resp);
 int opof_get_session(sessionTable_t *sessionHandle,  unsigned long  sessionId , sessionResponse_t *resp);
-void opof_get_all_sessions(sessionTable_t *sessionHandle);
-int opof_get_closed_sessions(streamArgs_t *args,sessionResponse_t responses[]);
-//void opof_get_closed_sessions(sessionTable_t *sessionHandle, unsigned int size);
+int opof_get_all_sessions(sessionTable_t *sessionHandle, uint64_t *sessionStart,int pageSize, sessionResponse_t responses[], unsigned long *sessionCount);
+int opof_get_closed_sessions(streamArgs_t *args,sessionResponse_t responses[], unsigned long *sessionCount);
 #ifdef __cplusplus
 }
 #endif

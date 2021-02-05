@@ -35,6 +35,10 @@ sessionRequest_t **read_config(char *filename,int *nsessions){
 	const char *srcaddr, *dstaddr, *nexthopaddr;
   	config_init(&cfg);
 
+  	if (filename[0] != '\0'){
+  		printf("ERROR: No config file defined\n");
+  		exit(-1);
+  	}
   	/* Read the file. If there is an error, report it and exit. */
   	if (! config_read_file(&cfg, filename))
   	{

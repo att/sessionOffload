@@ -72,9 +72,25 @@ sessionTable_t * opof_create_sessionTable(const char * host, unsigned int port, 
   	
 }
 /**  \ingroup clientcinterface
+* \brief Destroy client connection to server
+*
+* The opof_delete_sessionTable deletes the handle to the client. This cleans up the internal gRPC connections.
+* This enables a new connection to be made cleanly to the server.  
+** \param  *sessionHandle    Handle pointing to the C++ instance 
+*
+* \return  void
+*
+*/
+void opof_delete_sessionTable(sessionTable_t *sessionHandle){
+	SessionTableClient *client;
+	client = static_cast<SessionTableClient *>(sessionHandle->obj);
+	delete client;
+	free(sessionHandle);
+}
+/**  \ingroup clientcinterface
 * \brief Add sessions to the offload device in batches of up to 64.
 *
-* THe opof_add_session interface is a C wrapper on the underlying gRPC C++ code. This function
+* The opof_add_session interface is a C wrapper on the underlying gRPC C++ code. This function
 * streams up to 64 sessionRequest_t structs to the server. The server either returns success or failure.
 * On failure the server returns a bitmask in the addSessionResponse_t, sessions that were failed to be added
 * to the hardware have a bit set. Any sessions that failed are set to 1 
@@ -91,19 +107,12 @@ sessionTable_t * opof_create_sessionTable(const char * host, unsigned int port, 
 *
 */
 int opof_add_session(int size, sessionTable_t *sessionHandle,  sessionRequest_t **req, addSessionResponse_t *resp){
-	int addStatus = SUCCESS;
 	SessionTableClient *client;
-	Status status;
+	int status;
 
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
 	status = client->addSessionClient(size,req,resp);
-	
-	if (status.ok() == true){
-		return addStatus;
-	} else {
-		std::cout << "ERROR addSessionClient: " << status.error_code() << status.error_message() << std::endl;
-		return FAILURE;
-	}
+	return status;
 }
 /**  \ingroup clientcinterface
 * \brief Get a session from the offload device.
@@ -120,11 +129,9 @@ int opof_add_session(int size, sessionTable_t *sessionHandle,  sessionRequest_t 
 int opof_get_session(sessionTable_t *sessionHandle, unsigned long  session, sessionResponse_t *resp){
 	int status = SUCCESS;
 	SessionTableClient *client;
-	std::string reply;
 
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
-	reply = client->getSessionClient(session, resp);
- 	std::cout << "Get Session received: " << reply << std::endl;
+	status = client->getSessionClient(session, resp);
 	return status;
 }
 /**  \ingroup clientcinterface
@@ -142,11 +149,9 @@ int opof_get_session(sessionTable_t *sessionHandle, unsigned long  session, sess
 int opof_del_session(sessionTable_t *sessionHandle,  unsigned long  sessionId, sessionResponse_t *resp){
 	int status= SUCCESS;
 	SessionTableClient *client;
-	std::string reply;
 
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
-	reply = client->deleteSessionClient(sessionId, resp);
-	std::cout << "Delete Session received: " << reply << std::endl;
+	status = client->deleteSessionClient(sessionId, resp);
 	return status;
 }
 /**  \ingroup clientcinterface
@@ -159,20 +164,18 @@ int opof_del_session(sessionTable_t *sessionHandle,  unsigned long  sessionId, s
 * \return void
 *
 */
-int opof_get_closed_sessions(streamArgs_t *args, sessionResponse_t responses[]){
-	//void opof_get_closed_sessions(sessionTable_t *sessionHandle, unsigned int size){
-	int status= SUCCESS;
+int opof_get_closed_sessions(streamArgs_t *args, sessionResponse_t responses[], unsigned long *sessionCount){
+	int status;
 	SessionTableClient *client;
 	std::string reply;
-	int closed_sessions =1;
 	sessionTable_t *sessionHandle;
 	statisticsRequestArgs_t sessionArgs;
 	sessionArgs.pageSize = args->pageSize;
 	sessionHandle = (sessionTable_t *)args->handle;
 	
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
-	closed_sessions = client->getClosedSessions(&sessionArgs, responses);
-	return closed_sessions;
+	status = client->getClosedSessions(&sessionArgs, responses, sessionCount);
+	return status;
 }
 /**  \ingroup clientcinterface
 * \brief Get a stream of all sessions from the offload device
@@ -184,14 +187,14 @@ int opof_get_closed_sessions(streamArgs_t *args, sessionResponse_t responses[]){
 * \return void
 *
 */
-void opof_get_all_sessions(sessionTable_t *sessionHandle){
-	int status= SUCCESS;
+int opof_get_all_sessions(sessionTable_t *sessionHandle, uint64_t *startSession,int pageSize, sessionResponse_t responses[], unsigned long *sessionCount){
+	int status;
 	SessionTableClient *client;
 	std::string reply;
+	
 
 	client = static_cast<SessionTableClient *>(sessionHandle->obj);
 
-	client->getAllSessions();
-
-	//return status;
+	status = client->getAllSessions(pageSize, startSession, sessionCount,responses, sessionCount);
+	return status;
 }

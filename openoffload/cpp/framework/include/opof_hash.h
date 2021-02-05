@@ -45,6 +45,6 @@ typedef struct {
 	UT_hash_handle hh;
 } record_t;
 
-static record_t *sessions = NULL;
+//static record_t *sessions = NULL;
 
 #endif  //OPOF_HASH_H

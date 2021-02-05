@@ -31,7 +31,6 @@ extern "C" {
 #include "opof_grpc.h"
 
 int get_key(const char *filename, char *key);
-//int create_address(char *address, unsigned short port);
 
 void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *request);
 void convertAddSessionResponse2c(addSessionResponse_t *response_c, addSessionResponse *response);

@@ -20,9 +20,9 @@ syntax = "proto3";
 // will move to v1 at release 
 // increment beta1 to beta2 , etc for changes during development
 
-package openoffload.v1alpha4;
+package openoffload.v1alpha5;
 
-option go_package = ".;openoffload_v1alpha4";
+option go_package = ".;openoffload_v1alpha5";
 
 import "google/protobuf/timestamp.proto";
 
@@ -43,6 +43,7 @@ enum SESSION_STATE {
   _CLOSING_1   = 1;
   _CLOSING_2   = 2;
   _CLOSED      = 3;
+  _UNKNOWN_STATE     = 4;
 }
  
 enum SESSION_CLOSE_CODE {
@@ -50,6 +51,7 @@ enum SESSION_CLOSE_CODE {
   _FINACK     = 1;
   _RST        = 2;
   _TIMEOUT    = 3;
+  _UNKNOWN_CLOSE_CODE    = 4;
 }
 //
 // Errors for adding a session
@@ -65,19 +67,47 @@ enum SESSION_CLOSE_CODE {
 // All other errors will return _REJECTED with a buit mask of the failed sessions and it is the responsibility
 // of the client to address the issues
 //
+// ADD_SESSION_STATUS Codes Description
+//
+// _SESSION_ACCEPTED: Session is accepted by the server and the client performs normal operation
+// _SESSION_REJECTED: Session is rejected by the server as the message 
+//    is invalid, the client needs to correct the error.
+// _SESSION_TABLE_FULL: Session is rejected by the server as its session table is full, 
+//    the client needs to backoff until more space is available
+// _SESSION_TABLE_UNAVAILABLE: Session is rejected by the server due to an internal error 
+//    in the server, the client needs to back off until error is corrected.
+// _SESSION_ALREADY_EXISTS: Session is rejected by the the server as it already exists 
+//    in the server session table, the client will take corrective action to ensure state is consistent.
+//
 enum ADD_SESSION_STATUS{
   _SESSION_ACCEPTED = 0;
   _SESSION_REJECTED = 1;
   _SESSION_TABLE_FULL = 2;
   _SESSION_TABLE_UNAVAILABLE =3;
+  _SESSION_ALREADY_EXISTS=4;
 }
+//
+// REQUEST_STATUS Codes Description
+//
+// _ACCEPTED: Normal operation
+// _REJECTED: Unknown error in the format of the REQUEST message
+// _REJECTED_SESSION_NONEXISTENT: In getSession or deleteSession the server does not have the session
+//    in its session table. The client needs to reconcile the system state.
+// _REJECTED_SESSION_TABLE_FULL: This should never happen as getClosedSessions, getSession, deleteSession never add sessions.
+// _REJECTED_SESSION_ALREADY_EXISTS: This should never happen as getClosedSessions, getSession, deleteSession never add sessions.
+// _NO_CLOSED_SESSIONS: When getClosedSessions returns with no closed sessions it will return 0 sessions. There should be no
+//    message attached so not sure if this is valid.
+// _REJECTED_INTERNAL_ERROR: The server has an internal error and cannot serivce the request.
+//    The client must log the error and optionally retry or skip the request.
+//
 enum REQUEST_STATUS{
    _ACCEPTED = 0;
    _REJECTED = 1;
    _REJECTED_SESSION_NONEXISTENT = 2;
-   _REJECTED_SESSION_TABLE_FULL = 3;
-   _REJECTED_SESSION_ALREADY_EXISTS = 4;
-   _NO_CLOSED_SESSIONS = 5;
+   _REJECTED_SESSION_TABLE_FULL = 3 [deprecated=true];
+   _REJECTED_SESSION_ALREADY_EXISTS = 4 [deprecated=true];
+   _NO_CLOSED_SESSIONS = 5 [deprecated=true];
+   _REJECTED_INTERNAL_ERROR =6;
 }
 
 enum ACTION_TYPE{
@@ -106,8 +136,8 @@ rpc getSession(sessionId) returns (sessionResponse) {}
 rpc deleteSession(sessionId) returns (sessionResponse) {}
 
 // Stream back all current sessions
-rpc getAllSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
-
+//rpc getAllSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
+rpc getAllSessions(statisticsRequestArgs) returns (sessionResponseArray) {}
 // statistics as a outgoing session from the WB to Applications ?
 // grpc seems to need a request input streamId is a placeholder
 rpc getClosedSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
@@ -148,15 +178,28 @@ message sessionRequest{
   uint32 destinationPort = 10;
   PROTOCOL_ID protocolId = 11;
   actionParameters action = 12;
+  uint32 cacheTimeout = 13;
+}
+
+message sessionResponseError {
+  uint64 sessionId = 1;
+  int32 errorStatus = 2;
+}
+
+
+message sessionResponseArray {
+  repeated sessionResponse responseArray = 1;
+  uint64 nextkey =2;
 }
 //
 // In v1apha4 the errorstatus was added to act as a bitmask
 // of errors for each of the sesssions sent in a stream (max 64).
 //
 message addSessionResponse{
-  ADD_SESSION_STATUS requestStatus = 1;
-  uint64 errorStatus = 2;
+  ADD_SESSION_STATUS requestStatus = 1 [deprecated = true];
+  uint64 errorStatus = 2 [deprecated = true];
   google.protobuf.Timestamp startTime = 3;
+  repeated sessionResponseError responseError = 4;
 }
 
 message sessionResponse{
@@ -167,7 +210,7 @@ message sessionResponse{
   uint64  outBytes = 5;
   SESSION_STATE sessionState = 6 ;
   SESSION_CLOSE_CODE sessionCloseCode = 7 ;
-  REQUEST_STATUS requestStatus = 8;
+  REQUEST_STATUS requestStatus = 8 [deprecated = true];
   google.protobuf.Timestamp startTime = 9;
   google.protobuf.Timestamp endTime = 10;
 }
@@ -178,6 +221,7 @@ message statisticsRequestArgs{
   //  the client should read/process each event on the stream anyway.
   uint32  pageSize=1;
   uint32  page=2;
+  uint64  startSession=3;
   //  what other arguments make sense for retrieving or filtering streams 
 }
 //////////////////////////////////////////////////////////////////////////////////

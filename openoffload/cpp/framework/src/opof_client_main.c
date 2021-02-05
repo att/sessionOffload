@@ -42,8 +42,9 @@
  * Declare functions
  */
 void signal_handler(int sig);
-void opof_client_speed_test(const char *address, int number, unsigned int pageSize, unsigned short port, const char *cert);
-void opof_run_tests(const char *address, int number, unsigned int pageSize, unsigned short port, const char *cert, char *filename, int test_id);
+void opof_list_tests();
+
+void opof_run_tests(const char *address, int number, unsigned int pageSize, unsigned short port, const char *cert, char *filename, int test_id, bool verbose);
 /*
  * Main routine
  */
@@ -58,17 +59,17 @@ int main(int argc, char ** argv){
 #endif
     char test_config[FILENAME_MAX];
     int c;
-    int test_number=1;
-    bool speed_test = false;
-    bool config_test = false;
     int status = SUCCESS;
+    int test_number=1;
     struct sigaction newSigAction;
     unsigned short port = 3443;
     char address[64];
     int number = 1;
-    unsigned int pageSize = 1;
+    unsigned int pageSize = BUFFER_MAX;
     char *str_part;
     char *default_address ="localhost";
+    bool fullTestSuite = false;
+    bool verbose = false;
     
     strncpy(address,default_address,strlen(default_address)+1);
     
@@ -78,21 +79,22 @@ int main(int argc, char ** argv){
         {"version", no_argument,0,'v'},
         {"address", no_argument, 0, 'a'},
         {"port", no_argument, 0 ,'p'},
+        {"verbose",no_argument, 0,'v'},
         {"number", no_argument,0,'n'},
         {"buffersize", no_argument,0,'b'},
         {"config", no_argument,0,'c'},
         {"test", no_argument, 0, 't'},
-        {"speed", no_argument, 0, 's'},
+        {"full", no_argument, 0,'f'},
+        {"list", no_argument, 0, 'l'},
         {"help",no_argument,0,'h'},
     };
     /*
      * Loop over input
      */
-    while (( c = getopt_long(argc,argv, "a:p:n:b:t:c:svh",longopts,NULL))!=    -1){
+    while (( c = getopt_long(argc,argv, "a:p:n:b:t:c:flvh",longopts,NULL))!=    -1){
         switch(c) {
             case 'v':
-                printf("\nVersion of OPOF Program: %s\n\n", OPOF_VERSION);
-                exit(0);
+                verbose = true;
                 break;    
              case 'p':
                 port = strtoul(optarg, &str_part,10);
@@ -103,22 +105,22 @@ int main(int argc, char ** argv){
             case 'n':
                 number = strtoul(optarg, &str_part,10);
                 break;
-             case 'b':
+            case 'b':
                 pageSize = (unsigned int)strtoul(optarg, &str_part,10);
+                break;
+            case 'f':
+                fullTestSuite = true;
                 break;
             case 'c':
                 strncpy(test_config, optarg, FILENAME_MAX-1);
                 break;
             case 't':
                 test_number = strtoul(optarg, &str_part,10);
-                speed_test=false;
-                config_test=true;
-                printf("Enabling config tests and disabling performance tests\n");
+                //printf("Enabling config tests and disabling performance tests\n");
                 break;
-            case 's':
-                speed_test=true;
-                config_test=false;
-                printf("Enabling performance test and disabling configuration tests\n");
+            case 'l':
+                opof_list_tests();
+                exit(1);
                 break;
             case 'h':
                 printf("\nCommand line arguments for OpenOffload tests version: %s \n", OPOF_VERSION);
@@ -126,10 +128,11 @@ int main(int argc, char ** argv){
                 printf("\t-a, --address         Address of gRPC Server\n");
                 printf("\t-n, --number          Number of sessions\n");
                 printf("\t-b, --buffersize      Streaming buffer size\n");
-                printf("\t-v, --version         Version of Open Offload Program\n");
+                printf("\t-v, --verbose         Verbose output\n");
                 printf("\t-c, --config          Configuration file\n");
                 printf("\t-t, --test            Test to run\n");
-                printf("\t-s, --speed           speed test\n");
+                printf("\t-f, --full            Run full test suite\n");
+                printf("\t-l, --list            List all tests\n");
                 printf("\t-h, --help:           Command line help \n\n");
                 exit(1);
             default:
@@ -142,7 +145,7 @@ int main(int argc, char ** argv){
     */
     setlogmask(LOG_UPTO(LOG_INFO));
     openlog("OPOF", LOG_CONS | LOG_PERROR, LOG_USER);
-    syslog(LOG_INFO,"Starting OPOF Version  %s", OPOF_VERSION);
+    syslog(LOG_INFO,"INFO: Starting OPOF Test Client Version  %s", OPOF_VERSION);
     /*
      * Set up a signal handler 
      */
@@ -224,17 +227,15 @@ int main(int argc, char ** argv){
         status = get_key(CERT_FILE, cert);
 #endif
         if (status != FAILURE){
-            if (speed_test == true){
-                opof_client_speed_test(address, number, pageSize, port, cert);
-            }
-           if ((test_config[0] != '\0') && (config_test == true)){
-                opof_run_tests(address, number, pageSize, port, cert,test_config, test_number);
-            } 
+            if (fullTestSuite){
+                opof_run_tests(address, number, pageSize, port, cert,test_config, -1, verbose); 
+            } else {
+                opof_run_tests(address, number, pageSize, port, cert,test_config, test_number, verbose); 
+            }   
         } else {
             printf("Error: could not read client credentials\n");
             exit (-1);
         } 
-    printf("Exiting client test normally\n");
     return 1;
 }
 

@@ -11,6 +11,8 @@ Full Client Tests
     Run Client
 Add IPv4 Session Test
     Run Add Session IPV4
+Add IPv4 Session Error Test
+    Run Add Session Ipv4 Error Session
 Add IPV6 Session Test
     Run Add Session IPv6
 Get Session Test

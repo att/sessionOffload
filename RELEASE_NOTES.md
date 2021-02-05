@@ -5,6 +5,26 @@
 * Centos 8
 * Ubuntu 18.04
 
+## Release v1alpha5
+
+### Bug Fixes
+
+- Fixed bugs in C/C++ code in opof_get_closed_sessions
+
+### Feature Changes
+
+- Add more test cases in C/C++ code
+
+### Major Protocol Changes
+
+- Added field in addSession to define the session cache timeout.
+- Added message for to improve addSession error handling and depreciated prevous code.
+- Changed model for getAllSessions from streaming to buffers.
+
+### Minor Protocol Changes
+
+- None 
+
 ## Release v1alpha4
 
 ### Bug Fixes

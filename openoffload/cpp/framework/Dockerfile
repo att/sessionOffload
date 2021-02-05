@@ -1,4 +1,4 @@
-FROM grpcbuild:0.3
+FROM grpcbuild:v1alpha5
 #
 USER root
 ENV PATH="/home/grpc/local/bin:${PATH}"
@@ -18,5 +18,6 @@ RUN ls ../../../protos
 RUN mkdir -p bin
 RUN mkdir -p obj
 RUN mkdir -p log
+RUN make clean
 RUN make HOME=/home/grpc all
 CMD ["sh", "-c", "tail -f /dev/null"]
