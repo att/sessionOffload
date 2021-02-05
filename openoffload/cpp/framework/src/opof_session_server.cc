@@ -143,7 +143,7 @@ Status SessionTableImpl::getAllSessions(ServerContext* context, const statistics
     pageCount++;
     for (int i=0; i < sessionCount; i++){
       closedResponse = allSessions[i];
-      response = responses->add_sessioninfo();
+      response = responses->add_responsearray();
       response->set_sessionid(closedResponse->sessionId);
       response->set_sessionstate((SESSION_STATE)closedResponse->sessionState);
       response->set_inpackets(closedResponse->inPackets);
