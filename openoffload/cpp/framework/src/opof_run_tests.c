@@ -293,10 +293,11 @@ int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsi
   if (opof_delete_all_sessions(handle,pageSize) == FAILURE){
     return FAILURE;
   }
-  printf("\n\nRunning Test 1: ");
+  printf("\n\nRunning Test 1: Testing get closed sessions");
   printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
   //
   clock_t begin = clock();
+  printf("\n\tAdding %d sessions to cache\n", max_sessions);
   while(max_sessions > 0){
 
     sessionCount = max_sessions - pageSize;
@@ -323,6 +324,7 @@ int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsi
   if (verbose == true){
     print_response_header();
   }
+  printf("\n\tClosing sessions from cache\n");
   while(closed_sessions > 0){
     status = opof_get_closed_sessions(&args,responses,&closed_sessions);
     printf("Closed sessions: %lu\n", closed_sessions);
@@ -365,9 +367,10 @@ int opof_test2(const char *address, int max_sessions, unsigned int pageSize,unsi
   if (opof_delete_all_sessions(handle,pageSize) == FAILURE){
     return FAILURE;
   }
-  printf("\n\nRunning Test 2: ");
+  printf("\n\nRunning Test 2; Testing get all Sessions");
   printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
   //
+  printf("\n\tAdding %d sessions to cache\n", max_sessions);
   while(max_sessions > 0){
 
     sessionCount = max_sessions - pageSize;
@@ -395,6 +398,7 @@ int opof_test2(const char *address, int max_sessions, unsigned int pageSize,unsi
   printf("\nNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
   printf("\n\nDisplaying all Sessions\n");
 #endif
+  printf("\n\tGetting all sessions from cache\n");
   while (nsessions > 0 ){
     status = opof_get_all_sessions(handle, &sessionStart, pageSize, responses, &nsessions);
     if (nsessions > 0){
@@ -443,11 +447,12 @@ int opof_test3(const char *address, int max_sessions, unsigned int pageSize,unsi
   if (opof_delete_all_sessions(handle,pageSize) == FAILURE){
     return FAILURE;
   }
-  printf("\n\nRunning Test 3: ");
+  printf("\n\nRunning Test 3: Testing get sessions");
   printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
  
   //
   total_sessions = max_sessions;
+  printf("\n\tAdding %d sessions to cache\n", max_sessions);
   while(max_sessions > 0){
 
     sessionCount = max_sessions - pageSize;
@@ -470,6 +475,7 @@ int opof_test3(const char *address, int max_sessions, unsigned int pageSize,unsi
      sessionId += bufferSize;
   }
   if (verbose){
+    printf("\n\tGetting following sessions from cache\n");
     print_response_header();
   }
   for (int i = 0; i < total_sessions; i++){
@@ -488,7 +494,7 @@ int opof_test3(const char *address, int max_sessions, unsigned int pageSize,unsi
 
 int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose){
 
-  unsigned long nsessions = 1;
+  //unsigned long nsessions = 1;
   int status;
   
   sessionTable_t *handle;
@@ -497,25 +503,26 @@ int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsi
   sessionResponse_t resp;
   addSessionResponse_t addResp;
  
-  sessionResponse_t responses[BUFFER_MAX];
+  //sessionResponse_t responses[BUFFER_MAX];
   int sessionCount =1;
   int bufferSize;
   handle = opof_create_sessionTable(address, port, cert);
   int sessionId=0;
   int total_sessions;
   
-  uint64_t sessionStart = UINT_MAX;
+  //uint64_t sessionStart = UINT_MAX;
   /*
   *  Clean up any exisitng data in cache
   */
   if (opof_delete_all_sessions(handle,pageSize) == FAILURE){
     return FAILURE;
   }
-  printf("\n\nRunning Test 4: ");
+  printf("\n\nRunning Test 4: Testing delete sessions ");
   printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
   
   //
   total_sessions = max_sessions;
+  printf("\n\tAdding %d sessions to cache\n", max_sessions);
   while(max_sessions > 0){
 
     sessionCount = max_sessions - pageSize;
@@ -538,7 +545,7 @@ int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsi
      sessionId += bufferSize;
   }
   if (verbose){
-    printf("\n\nDeleting following sessions from cache\n");
+    printf("\n\tDeleting following sessions from cache\n");
     print_response_header();
   }
   for (int i = 0; i < total_sessions; i++){
@@ -549,33 +556,6 @@ int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsi
     if (status == FAILURE){
       printf("ERROR: deleting session: %d\n", sessionId);
       exit(-1);
-    }
-  }
-
-
-
-  //printf("\n\n Get all sessions test \n\n");
-  //printf("\nNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
-  if (verbose){
-    printf("\n\nDisplaying all Sessions\n");
-    print_response_header();
-  }
-  while (nsessions > 0 ){
-    status = opof_get_all_sessions(handle, &sessionStart, pageSize, responses, &nsessions);
-    //printf("Number of sessions for get all: %d\n",nsessions);
-    if (verbose){
-      if (nsessions > 0){
-        //printf("Page: %d\n",page_number);
-        
-        for (int i=0; i < nsessions; i++){
-          print_response(&responses[i]);
-        }
-        //printf("sessionStart: %lu\n",sessionStart);
-        //page_number++;
-        //if (page_number >5){
-        //  return SUCCESS;
-       // }
-      }
     }
   }
   
@@ -594,8 +574,6 @@ int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsi
   int sessionCount =1;
   int bufferSize;
   int sessionId=0;
-  int total_sessions = max_sessions;
-
  
   handle = opof_create_sessionTable(address, port, cert);
   args.handle = handle;
@@ -607,10 +585,9 @@ int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsi
   if (opof_delete_all_sessions(handle,pageSize) == FAILURE){
     return FAILURE;
   }
-  printf("\n\nRunning Test 5: ");
+  printf("\n\nRunning Test 5: Testing calling get_closed_sessions with zero sessions");
   printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
   //
-  clock_t begin = clock();
   while(max_sessions > 0){
 
     sessionCount = max_sessions - pageSize;
@@ -650,9 +627,6 @@ int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsi
       }
     }
   }
-  clock_t end = clock();
-  double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("\n\nSessions per second (add and close): %lf\n\n", ((double)total_sessions)/(time_spent));
   return SUCCESS;
 }
 
@@ -682,10 +656,9 @@ int opof_test6(const char *address, int max_sessions, unsigned int pageSize,unsi
   if (opof_delete_all_sessions(handle,pageSize) == FAILURE){
     return FAILURE;
   }
-  printf("\n\nRunning Test 6: ");
+  printf("\n\nRunning Test 6: Testing duplicate session adds");
   printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
   //
-  clock_t begin = clock();
   while(max_sessions > 0){
 
     sessionCount = max_sessions - pageSize;
@@ -748,9 +721,6 @@ int opof_test6(const char *address, int max_sessions, unsigned int pageSize,unsi
       }
     }
   }
-  clock_t end = clock();
-  double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("\n\nSessions per second (add and close): %lf\n\n", ((double)total_sessions)/(time_spent));
   return SUCCESS;
 }
 
@@ -779,7 +749,7 @@ int opof_test7(const char *address, int max_sessions, unsigned int pageSize,unsi
   if (opof_delete_all_sessions(handle,pageSize) == FAILURE){
     return FAILURE;
   }
-  printf("\n\nRunning Test 7: ");
+  printf("\n\nRunning Test 7: Testing get and delete on invalid sessions");
   printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
  
   //
@@ -805,16 +775,16 @@ int opof_test7(const char *address, int max_sessions, unsigned int pageSize,unsi
      max_sessions = sessionCount;
      sessionId += bufferSize;
   }
-  if (verbose){
-    print_response_header();
-  }
+  //if (verbose){
+  //  print_response_header();
+ // }
   status = opof_get_session(handle, total_sessions+1, &resp);
-  printf("Test 7 Get: %s\n", getStatusCode(status));
+  printf("\nTest 7 Get session ID: %d response: %s\n", total_sessions+1, getStatusCode(status));
   status = opof_del_session(handle, total_sessions+1, &resp);
-  printf("Test 7 Delete: %s\n", getStatusCode(status));
-  if (verbose){
-    print_response(&resp);
-  }
+  printf("Test 7 Delete session ID: %d response %s\n", total_sessions+1, getStatusCode(status));
+  //if (verbose){
+  //  print_response(&resp);
+  //}
   if (status == FAILURE){
     printf("ERROR: getting session: %d\n", sessionId);
     exit(-1);
@@ -848,7 +818,7 @@ int opof_test8(const char *address, int max_sessions, unsigned int pageSize,unsi
   if (opof_delete_all_sessions(handle,pageSize) == FAILURE){
     return FAILURE;
   }
-  printf("\n\nRunning Test 8: ");
+  printf("\n\nRunning Test 8: Test delete and recreating session table handle");
   printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
   //
   clock_t begin = clock();
