@@ -14,7 +14,7 @@ RUN rm cmake-linux.sh
 ENV PATH="$GRPC_INSTALL/bin:${PATH}"
 RUN echo $PATH
 RUN git config --global  http.sslVerify false
-RUN git clone --recurse-submodules -b v1.32.0 https://github.com/grpc/grpc
+RUN git clone --recurse-submodules -b v1.30.0 https://github.com/grpc/grpc
 RUN cd grpc
 RUN mkdir -p /home/grpc/local/grpc/cmake/build
 WORKDIR /home/grpc/local/grpc/cmake/build
