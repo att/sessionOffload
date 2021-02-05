@@ -1,7 +1,7 @@
 # Generic SmartNIC Architecture for OpenOffload
 
 ## Overview
-The following presents a generic SmartNIC architecture for OpenOffload and its interaction with an applicaiton. To make discussion of the architecture and the interaction between the application and the SmartNIC ore relevant, we use information from a Palo Alto (PAN) vFirewall integration in the example. The steps in the packet flow are presented to help SmartNIC developers design their implementations.
+The following presents a generic SmartNIC architecture for OpenOffload and its interaction with an applicaiton. To make discussion of the architecture and the interaction between the application and the SmartNIC more relevant, we use information from a Palo Alto (PAN) vFirewall integration in the example. The steps in the packet flow are presented to help SmartNIC developers design their implementations.
 
 ## Setup with virtual functions (VF)
 The firewall is connected to the SmartNIC through three virtual functions. The first two are for the data path interfaces. The third is used as a control channel to the SmartNIC. 
