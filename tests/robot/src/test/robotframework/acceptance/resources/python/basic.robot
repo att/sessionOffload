@@ -14,7 +14,7 @@ ${projectRoot}        ${EXECDIR}
 # ~/sessionOffload/tests/robot
 Run buildBasic Script 
      [Documentation]    Run scripts to create buildBasic directory 
-     Start Process	bash     builditBasic.sh    cwd=${projectRoot}/..    
+     Run Process	bash     builditBasic.sh    cwd=${projectRoot}/..    
 
 Start Offload Server 
      [Documentation]    Start gRPC Sessions Server 
