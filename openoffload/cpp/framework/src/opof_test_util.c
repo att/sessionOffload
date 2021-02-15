@@ -28,6 +28,32 @@
 
 #include "opof_test_util.h"
 
+
+/** \ingroup testlibrary
+* \brief Utility function to find and kill test server
+**/
+int kill_test_server(void){
+  int status = SUCCESS;
+
+  char pidline[1024];
+  char *pid;
+  int i =0;
+  int pidno[64];
+  FILE *fp = popen("pidof opof_server_test","r");
+  fgets(pidline,1024,fp);
+  printf("%s",pidline);
+  pid = strtok (pidline," ");
+ // while(pid != NULL)
+  //{
+    pidno[i] = atoi(pid);
+    printf("%d\n",pidno[i]);
+    kill(pidno[i], SIGKILL);
+    //i++;
+  //}
+
+  pclose(fp);
+  return status;
+}
 /** \ingroup testlibrary
 * \brief Utility function to read a SSL key from a local file system
 *
