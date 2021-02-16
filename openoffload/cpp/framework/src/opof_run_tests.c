@@ -34,8 +34,8 @@
   #include "opof_clientlib.h"
   #include "opof_test_util.h"
 
-unsigned int g_set_deadline(int deadline);
-unsigned int g_get_deadline(void);
+unsigned int opof_set_deadline(int deadline);
+unsigned int opof_get_deadline(void);
 int g_retryInterval=15;
 int g_retryAttempts=100;
 int setRetryInterval(int retryInterval);
@@ -1144,7 +1144,7 @@ int opof_test10(const char *address, int max_sessions, unsigned int pageSize,uns
   //
   clock_t begin = clock();
 
-  g_set_deadline(100);
+  opof_set_deadline(100);
   while(max_sessions > 0){
 
     sessionCount = max_sessions - pageSize;
@@ -1161,11 +1161,11 @@ int opof_test10(const char *address, int max_sessions, unsigned int pageSize,uns
      printf("Add Sessi{on Status: %d\n",status);
     if (status == 4){
       printf("Deadline exceeded retrying\n");
-      g_set_deadline(4000); 
+      opof_set_deadline(4000); 
       //opof_delete_sessionTable(handle);
       //handle = opof_create_sessionTable(address, port, cert);
       status = opof_add_session(bufferSize,handle, request, &addResp);
-      printf("Add Sessi{on Status: %d, deadline %d\n",status,g_get_deadline());
+      printf("Add Sessi{on Status: %d, deadline %d\n",status,opof_get_deadline());
     }
     if (status == 14){
       int retryInterval = getRetryInterval();
@@ -1197,7 +1197,7 @@ int opof_test10(const char *address, int max_sessions, unsigned int pageSize,uns
   if (verbose == true){
     print_response_header();
   }
-  g_set_deadline(100); 
+  opof_set_deadline(100); 
   opof_delete_sessionTable(handle);
   handle = opof_create_sessionTable(address, port, cert);
   args.handle = handle;
@@ -1207,11 +1207,11 @@ int opof_test10(const char *address, int max_sessions, unsigned int pageSize,uns
     status = opof_get_closed_sessions(&args,responses,&closed_sessions);
     if (status == 4){
       printf("Deadline exceeded for get closed sessions retrying\n");
-      g_set_deadline(4000); 
+      opof_set_deadline(4000); 
       //opof_delete_sessionTable(handle);
       //handle = opof_create_sessionTable(address, port, cert);
        status = opof_get_closed_sessions(&args,responses,&closed_sessions);
-      printf("get closed Sessi{on Status: %d, deadline %d\n",status,g_get_deadline());
+      printf("get closed Sessi{on Status: %d, deadline %d\n",status,opof_get_deadline());
     }
     printf("Closed sessions: %lu\n", closed_sessions);
     if (verbose == true){

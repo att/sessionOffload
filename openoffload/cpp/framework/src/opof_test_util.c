@@ -31,6 +31,12 @@
 
 /** \ingroup testlibrary
 * \brief Utility function to find and kill test server
+*
+* Simple function to kill the opof_server_test process. This is used to 
+* test the UNAVAILABLE error handling.
+*
+* \param void
+* \return SUCCESS or FAILURE
 **/
 int kill_test_server(void){
   int status = SUCCESS;
