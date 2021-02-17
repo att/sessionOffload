@@ -53,7 +53,9 @@ Status SessionTableImpl::addSession(ServerContext* context, ServerReader<session
   //if (context->IsCancelled()) {
   //  return Status(StatusCode::CANCELLED, "Deadline exceeded or Client cancelled, abandoning.");
   //}
+#ifdef TESTS
   sleep(1);
+#endif
   while(reader->Read(&request)){
     convertSessionRequest2c(request, &request_c);
     if (context->IsCancelled()) {
