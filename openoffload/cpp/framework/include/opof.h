@@ -11,6 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * @file opof.h
+ */
 #ifndef OPOF_H
 #define OPOF_H
 
@@ -181,9 +184,18 @@ typedef enum {
   _SESSION_TABLE_UNAVAILABLE =3,
   _SESSION_ALREADY_EXISTS=4,
 } ADD_SESSION_STATUS_T;
-
+/** @enum REQUEST_STATUS_T
+   *  Enum for the request status codes
+   *
+   *  @var REQUEST_STATUS_T::_ACCEPTED
+   *    The request was accepted
+   *  @var REQUEST_STATUS_T::_REJECTED
+   *    The request was rejected
+   *  @var REQUEST_STATUS_T::_REJECTED_INTERNAL_ERROR
+   *    The request was rejected with an internal error in the daemon
+   */
 typedef enum {
-  _ACCEPTED = 0,
+   _ACCEPTED = 0,
    _REJECTED = 1,
    _REJECTED_SESSION_NONEXISTENT = 2,
    _REJECTED_SESSION_TABLE_FULL = 3, //[deprecated=true]
@@ -192,21 +204,46 @@ typedef enum {
    _REJECTED_INTERNAL_ERROR =6,
 } REQUEST_STATUS_T;
 
-
+/** @struct streamArgs_t
+   *  This is a struct that handles the streaming arguments
+   *
+   *  @var streamArgs_t::handle
+   *    The handle to the C++ grpc class
+   *  @var streamArgs_t::pageSize
+   *    The size of the page for add session and get sessions
+   *
+   */
 typedef struct {
   void *handle;
   unsigned int pageSize;
 } streamArgs_t;
 
-//typedef struct sessionRequestTuple {
-//  int64_t  sessionId;
-//} sessionRequest_t;
+/** @struct addSessionErrors
+   *  This is a struct that returns the error associated with a session
 
+   *  @var addSessionErrors::sessionId
+   *    The sessionId that has an error
+   *  @var addSessionErrors::errorStatus
+   *    The error code for the session
+   *
+   */
 typedef struct {
   unsigned long sessionId;
   int errorStatus;
 } addSessionErrors; 
 
+/** @struct addSessionResponse_t
+   *  This is a struct that returns the add session response
+   *
+   *  @var addSessionResponse_t::requestStatus
+   *    The sessionId that has an error
+   *  @var addSessionResponse_t::sessionErrors
+   *    The error code for the session
+   *  @var addSessionResponse_t::number_errors
+   *    The number of errors returned
+   *  @var addSessionResponse_t::errorStatus
+   *    The error status
+   */
 typedef struct addSessionResponseTuple {
   REQUEST_STATUS_T requestStatus;
   addSessionErrors sessionErrors[BUFFER_MAX];
@@ -228,14 +265,19 @@ typedef struct sessionResponseTuple {
   //google.protobuf.Timestamp endTime = 10;
 } sessionResponse_t;
 
-typedef struct statisticsRequestArgsTuple{
-  //  pageSize = 0 will turn off paging
-  //  does paging make sense for a stream ?
-  //  the client should read/process each event on the stream anyway.
+/** @struct statisticsRequestArgs_t
+   *  This is a struct that returns the error associated with a session
+   *
+   *  @var statisticsRequestArgs_t::pageSize
+   *    The number of elements in a page
+   *  @var statisticsRequestArgs_t::page
+   *    The page number returned
+   *
+   */
+typedef struct {
   unsigned int pageSize;
   unsigned int page;
-  //  what other arguments make sense for retrieving or filtering streams 
-}statisticsRequestArgs_t;
+} statisticsRequestArgs_t;
 
 typedef struct sessionRequestTuple {
     unsigned long sessId;

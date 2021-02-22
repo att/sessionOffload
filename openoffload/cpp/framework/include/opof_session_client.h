@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-#ifndef __OPOF_SESSION_CLIENT_H
-#define __OPOF_SESSION_CLIENT_H
-
 /**
+*
+* \class SessionTableClient
+*
 * \defgroup clientlibrary  C++ Client Interfaces
 *
 * \brief Internal C++ Client Interfaces called by the external C Interfaces
 *
 */
+
+#ifndef __OPOF_SESSION_CLIENT_H
+#define __OPOF_SESSION_CLIENT_H
+
 
 extern "C" {
 #include "opof.h"
@@ -31,8 +35,20 @@ extern "C" {
 
 class SessionTableClient {
 public: 
+	/** \brief Constructor
+	 *
+	 */
     SessionTableClient(std::shared_ptr<Channel> channel)
     : stub_(SessionTable::NewStub(channel)) {};
+     /** \brief adds a session to the server
+      *
+      * \param size
+      * \param s
+      * \param resp
+      * \return int error code
+      * 
+      * This sends the session information to the server to offload.
+      */
     int addSessionClient(int size, sessionRequest_t **s, addSessionResponse_t *resp);
     int getSessionClient(int session, sessionResponse_t *resp);
     int deleteSessionClient(int session, sessionResponse_t *resp);

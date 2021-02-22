@@ -275,7 +275,7 @@ Create the basic build image with all the required libraries
 
 ```bash
 $ cd openoffload/cpp/framework/build
-$ docker build -t grpcbuild:v1alpha5 .
+$ docker build -t grpcbuild:v1beta1 .
 ```
 ## Step 2
 Create the build container from the base image
@@ -286,7 +286,7 @@ $ cd ..
 $ cp ../../../protos/openoffload.proto .
 ```
 ```bash
-$ docker build -t opofbld:v1alpha5 .
+$ docker build -t opofbld:v1beta1 .
 $ docker image ls
 ```
 ## Step 3
