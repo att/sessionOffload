@@ -232,9 +232,9 @@ def randomIpv6():
 
 def session_getOffloadedSessions(stub, paramPageSize, paramPage):
     sessionCnt=0
-    sessionResponseArray = stub.getAllSessions(openoffload_pb2.statisticsRequestArgs(pageSize=paramPageSize, page=paramPage))
+    sessionResponses = stub.getAllSessions(openoffload_pb2.sessionRequestArgs(pageSize=paramPageSize, page=paramPage))
 
-    for sessionResponse in sessionResponseArray.responseArray:
+    for sessionResponse in sessionResponses.sessionInfo:
       sessionCnt=sessionCnt+1
       #print(f"\n\n\n******************\ndump session = {sessionResponse}")
       print(f"SessionId: {sessionResponse.sessionId}")
