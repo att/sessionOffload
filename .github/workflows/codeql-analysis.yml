@@ -58,7 +58,12 @@ jobs:
     # ✏️ If the Autobuild fails above, remove it and uncomment the following three lines
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
-
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip3 install grpcio grpcio-tools
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi  
+    - name: Build framework
     - run: |
         cd openoffload/cpp/framework
         make
