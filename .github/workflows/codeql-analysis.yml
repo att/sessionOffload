@@ -64,7 +64,7 @@ jobs:
         pip3 install grpcio grpcio-tools
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi  
     - name: Build framework
-    - run: |
+      run: |
         cd openoffload/cpp/framework
         make
     #   make release
