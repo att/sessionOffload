@@ -45,7 +45,7 @@ vpath  %.cc $(C_SRC_DIR)
 #
 H_SRC_DIR := include
 vpath  %.h $(H_SRC_DIR)
-#vpath  %.h $(C_SRC_DIR)
+vpath  %.h $(C_SRC_DIR)
 
 OBJ_SRC_DIR := obj
 vpath %.o $(OBJ_SRC_DIR)
@@ -76,10 +76,10 @@ CC := gcc -g
 CPP := g++ -g
 
 #CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DDEBUG -DVISIBLE
-CFLAGS := -c -O0 -I include -Wno-undef -I $(ROOT_DIR)/local/include -std=gnu99  -Wall
+CFLAGS := -c -O0 -I include -Wno-undef -I $(ROOT_DIR)/local/include -std=gnu99  -Wall -DDEBUG
 #CPPFLAGS := -c -O2 -std=c++11 -I ./ -I include  -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations  -DDEBUG -DVISIBLE
 #CPPFLAGS := -c -O2 -std=c++11 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations -DSSL -DDEBUG
-CPPFLAGS := -c -O0 -std=c++11 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Werror -Wall -Wno-deprecated-declarations
+CPPFLAGS := -c -O0 -std=c++11 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Werror -Wall -Wno-deprecated-declarations -DDEBUG
 #
 #
 # Link Flags
@@ -161,11 +161,11 @@ $(DIRECTORIES):
 #
 $(PROTO_NAME).pb.cc: $(PROTO_NAME).proto
 	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=src $(PROTO_NAME).proto
-	mv src/$(PROTO_NAME).pb.h include/
+	mv src/$(PROTO_NAME).pb.h $(INC_DIR)
 #
 $(PROTO_NAME).grpc.pb.cc: $(PROTO_NAME).proto
 	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=src --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
-	mv src/$(PROTO_NAME).grpc.pb.h include/
+	mv src/$(PROTO_NAME).grpc.pb.h $(INC_DIR)
 #
 $(PROTOS):  $(PROTO_NAME).grpc.pb.cc $(PROTO_NAME).pb.cc
 
@@ -201,11 +201,18 @@ CLIENT_OBJS = \
 
 #
 
-openoffload.pb.o: $(SRC_DIR)/openoffload.pb.cc $(INC_DIR)/openoffload.pb.h
-	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
+#openoffload.pb.o: $(SRC_DIR)/openoffload.pb.cc $(INC_DIR)/openoffload.pb.h
+#	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
 
-openoffload.grpc.pb.o: $(SRC_DIR)/openoffload.grpc.pb.cc $(INC_DIR)/openoffload.grpc.pb.h $(INC_DIR)/openoffload.pb.h 
-	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
+#openoffload.grpc.pb.o: $(SRC_DIR)/openoffload.grpc.pb.cc $(INC_DIR)/openoffload.grpc.pb.h $(INC_DIR)/openoffload.pb.h 
+#	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
+
+
+openoffload.pb.o: openoffload.pb.cc
+	$(CPP) $(CPPFLAGS) $(SRC_DIR)/openoffload.pb.cc -o $(OBJ_DIR)/$@
+
+openoffload.grpc.pb.o: openoffload.grpc.pb.cc
+	$(CPP) $(CPPFLAGS) $(SRC_DIR)/openoffload.grpc.pb.cc -o $(OBJ_DIR)/$@
 
 opof_error.o: opof_error.c opof_error.h
 	$(CC) $(CFLAGS) $< -o $(OBJ_DIR)/$@
@@ -234,10 +241,10 @@ opof_clientlib.o: opof_clientlib.cc opof.h opof_error.h opof_clientlib.h
 opof_server.o: opof_server.cc opof.h opof_error.h opof_serverlib.h
 	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
 
-opof_session_client.o: opof_session_client.cc opof.h opof_error.h opof_session_client.h openoffload.grpc.pb.h openoffload.pb.h
+opof_session_client.o: opof_session_client.cc opof.h opof_error.h opof_session_client.h
 	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
 
-opof_session_server.o: opof_session_server.cc opof.h opof_error.h opof_session_server.h  openoffload.grpc.pb.h openoffload.pb.h
+opof_session_server.o: opof_session_server.cc opof.h opof_error.h opof_session_server.h
 	$(CPP) $(CPPFLAGS) $< -o $(OBJ_DIR)/$@
 
 opof_util.o: opof_util.cc opof.h opof_error.h opof_util.h
@@ -253,7 +260,7 @@ $(CLIENT_NAME): opof_client_main.o opof_config.o opof_error.o opof_test_util.o o
 $(SERVER_NAME): opof_server_main.o opof_server_test.o opof_error.o opof_test_util.o
 	$(LD) $(LDFLAGS)  $(OBJ_DIR)/opof_server_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_server_test.o  $(OBJ_DIR)/opof_test_util.o $(SERVERFLAGS) $(LIBCONFIG) $(LIBS)  -o $(BIN_DIR)/$@
 #
-$(SERVER_LIB): openoffload.pb.o openoffload.grpc.pb.o opof_session_server.o opof_server.o opof_util.o
+$(SERVER_LIB): 	openoffload.pb.o openoffload.grpc.pb.o opof_session_server.o opof_server.o opof_util.o
 	ar crv $(LIB_DIR)/$@ $(SERVER_OBJS)
 	ranlib $(LIB_DIR)/$@
 #
