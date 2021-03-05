@@ -67,6 +67,7 @@ void opof_server(const char* address, unsigned short port, const char* cert, con
   builder.SetSyncServerOption(ServerBuilder::SyncServerOption::NUM_CQS, 10);
   builder.SetSyncServerOption(ServerBuilder::SyncServerOption::MIN_POLLERS, 2);
   builder.SetSyncServerOption(ServerBuilder::SyncServerOption::MAX_POLLERS, 20);
+  builder.SetSyncServerOption(ServerBuilder::SyncServerOption::CQ_TIMEOUT_MSEC, 100);
 
   // Listen on the given address without any authentication mechanism.
 #ifdef SSL
