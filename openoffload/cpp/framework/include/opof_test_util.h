@@ -34,6 +34,7 @@ int range(int low, int high);
 int get_key(const char *filename, char *key);
 sessionResponse_t **createSessionResponse(int size, int *sessionCount);
 sessionRequest_t **createSessionRequest(int size, unsigned long start_sessionId);
+sessionRequest_t **createSessionRequest6(int size, unsigned long start_sessionId);
 void display_session_response(sessionResponse_t *response, const char *message);
 void display_session_request(sessionRequest_t *request, const char *message);
 void print_response_header(void);

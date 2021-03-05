@@ -193,11 +193,11 @@ sessionRequest_t **createSessionRequest(int size, unsigned long start_sessionId)
   }
   status = inet_pton(AF_INET,dst_addr, &dstip);
   if (status != 1){
-    fprintf(stderr,"ERROR: invalid address: %s %s\n",src_addr, strerror(errno));
+    fprintf(stderr,"ERROR: invalid address: %s %s\n",dst_addr, strerror(errno));
   }
   status = inet_pton(AF_INET,nextHop, &nexthopip);
   if (status != 1){
-    fprintf(stderr,"ERROR: invalid address: %s %s\n",src_addr, strerror(errno));
+    fprintf(stderr,"ERROR: invalid address: %s %s\n",nextHop, strerror(errno));
   }
   requests = (sessionRequest_t **)malloc(size * (sizeof(requests)));
   for (unsigned long i = 0; i < size; i++){
@@ -212,6 +212,55 @@ sessionRequest_t **createSessionRequest(int size, unsigned long start_sessionId)
     request->proto = proto;
     request->ipver = ipver;
     request->nextHop = nexthopip;
+    request->actType = action;
+    request->cacheTimeout = timeout;
+    requests[i] = request;
+  }
+  return requests;
+}
+
+sessionRequest_t **createSessionRequest6(int size, unsigned long start_sessionId){
+  int status;
+  unsigned int timeout = 15;
+  sessionRequest_t *request;
+  sessionRequest_t **requests = NULL;
+  PROTOCOL_ID_T proto;
+  IP_VERSION_T ipver;
+  ACTION_VALUE_T action;
+  proto = _TCP;
+  ipver = _IPV6;
+  action = _FORWARD;
+  struct in6_addr srcip;
+  struct in6_addr dstip;
+  struct in6_addr nexthopip;
+  const char *src_addr = "3FFE:0000:0000:0001:0200:F8FF:FE75:50DF";
+  const char *dst_addr=  "0002:0000:0000:0000:0000:FFFF:FE76:50DE";
+  const char *nextHop =                 "1:0:0:0:0:FFFF:0204:0160";
+  status = inet_pton(AF_INET6,src_addr, &srcip);
+  if (status != 1) {
+    fprintf(stderr,"ERROR: invalid address: %s %s\n",src_addr, strerror(errno));
+  }
+  status = inet_pton(AF_INET6,dst_addr, &dstip);
+  if (status != 1){
+    fprintf(stderr,"ERROR: invalid address: %s %s\n",dst_addr, strerror(errno));
+  }
+  status = inet_pton(AF_INET6,nextHop, &nexthopip);
+  if (status != 1){
+    fprintf(stderr,"ERROR: invalid address: %s %s\n",nextHop, strerror(errno));
+  }
+  requests = (sessionRequest_t **)malloc(size * (sizeof(requests)));
+  for (unsigned long i = 0; i < size; i++){
+    request = (sessionRequest_t *)malloc(sizeof(*request));
+    request->sessId = (i+start_sessionId);
+    request->inlif = 1;
+    request->outlif = 2;
+    request->srcIPV6 = srcip;
+    request->dstIPV6 = dstip;
+    request->srcPort = 80;
+    request->dstPort = 45678;
+    request->proto = proto;
+    request->ipver = ipver;
+    request->nextHopV6 = nexthopip;
     request->actType = action;
     request->cacheTimeout = timeout;
     requests[i] = request;
