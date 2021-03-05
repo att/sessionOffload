@@ -5,6 +5,23 @@
 * Centos 8
 * Ubuntu 18.04
 
+## Release v1beta1
+
+### Bug Fixes
+
+
+### Feature Changes
+
+- Removed Activation from protocol buffer defininition and reference implementations.  During implemenation a better approach was 
+  identofied and will be added in a later release. Config will be used until the new Activation approach is re-implemented.
+
+### Major Protocol Changes
+
+- Renamed statisticsRequestArgs to sessionRequestArgs
+- Renamed sessionResponseArray to sessionResponses
+- Removed Activation messages
+
+
 ## Release v1alpha5
 
 ### Bug Fixes

@@ -136,19 +136,19 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
 
     def getAllSessions(self, request, context):
             print("############ GET ALL SESSIONS ##################")
-            sessionResponseArray = openoffload_pb2.sessionResponseArray()
+            sessionResponses = openoffload_pb2.sessionResponses()
             timestamp = google.protobuf.timestamp_pb2.Timestamp()
             timestamp.GetCurrentTime()
 
             session1 = openoffload_pb2.sessionResponse(sessionId=1001, sessionState=openoffload_pb2._CLOSED,
               requestStatus=openoffload_pb2._ACCEPTED, inPackets=1000, outPackets=200000, startTime=timestamp)
-            sessionResponseArray.responseArray.append(session1)
+            sessionResponses.sessionInfo.append(session1)
 
             session2 = openoffload_pb2.sessionResponse(sessionId=1002, sessionState=openoffload_pb2._CLOSED,
               requestStatus=openoffload_pb2._ACCEPTED, inPackets=2000, outPackets=400000, startTime=timestamp)
-            sessionResponseArray.responseArray.append(session2)
+            sessionResponses.sessionInfo.append(session2)
 
-            return sessionResponseArray
+            return sessionResponses
 
 
 def sessionServe():
