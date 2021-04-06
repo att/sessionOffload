@@ -80,7 +80,8 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
         sessionErrors_value=AddSessionErrors()
         for request in request_iterator:
             print("############ ADD SESSION ##################")
-            print("protocolID 6=TCP,17=UDP:",request.protocolId)
+            #print("protocolID 6=TCP,17=UDP:",request.protocolId)
+            print("protocolID :",openoffload_pb2._PROTOCOL_ID.values_by_number[request.protocolId].name)
             print("IP Version:", openoffload_pb2._IP_VERSION.values_by_number[request.ipVersion].name)
             
 
@@ -94,7 +95,8 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
             else:
               print ("destinationIpV6:", socket.inet_ntop(socket.AF_INET6, request.destinationIpV6))
             print("destinationPort:", int(request.destinationPort))
-            print("ActionType 0=DROP,1=FORWARD,2=MIRROR,3=SNOOP:" , request.action.actionType)
+            #print("ActionType 0=DROP,1=FORWARD,2=MIRROR,3=SNOOP:" , request.action.actionType)
+            print("ActionType:" , openoffload_pb2._ACTION_TYPE.values_by_number[request.action.actionType].name)
             print("ActionNextHop:" , request.action.actionNextHop)
             if  request.sessionId == 99999999999:
                 print("Error test case")

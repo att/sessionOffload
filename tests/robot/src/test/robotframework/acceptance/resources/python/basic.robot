@@ -18,11 +18,8 @@ Run buildBasic Script
 
 Start Offload Server 
      [Documentation]    Start gRPC Sessions Server 
-     Start Process	python3   	sessions_server.py 	cwd=${projectRoot}/../buildBasic   alias=offload
-
-Start Activation Server
-     [Documentation]    Start gRPC Activation Server 
-     Start Process  python3    activation_server.py      cwd=${projectRoot}/../buildBasic   alias=activation 
+     #Start Process	python3   	sessions_server.py 	cwd=${projectRoot}/../buildBasic   alias=offload
+     Start Process	python3   	sessions_server.py 	cwd=${projectRoot}/../buildBasic   alias=offload    env:PYTHONUNBUFFERED=1     stdout=/tmp/session_offfload_stdout.txt
 
 Run Client
      [Documentation]    Start gRPC Client 
@@ -101,20 +98,8 @@ Run Get All Sessions
      Should Contain   ${result.stdout}     SessionId: 1002    
      Should Contain   ${result.stdout}     CLOSED 
 
-Run Activation Sequence
-    [Documentation]   Run Activation Sequence
-    Run Process        python3    -c  import sessions_client; sessions_client.run_activation_sequence();     cwd=${projectRoot}/../buildBasic   alias=client  
-     ${result} =	Get Process Result	client
-     Log       ${result.stderr}	
-     Log       ${result.stdout}	
-     Should Contain   ${result.stdout}     Status:  _DEVICE_REGISTERED
-     Should Contain   ${result.stdout}     Description:  Acme SmartNIC
-     Should Contain   ${result.stdout}     Status:  _DEVICE_ACTIVATED
-
 Stop Offload Server
    [Documentation]  Stop Offload Server
-   Terminate Process   offload 
-
-Stop Activation Server
-   [Documentation]  Stop Activation Server
-   Terminate Process   activation
+   #Terminate Process   offload 
+   ${result} =    Terminate Process    offload 
+   Log    ${result.stdout}

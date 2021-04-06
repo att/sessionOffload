@@ -231,57 +231,6 @@ def session_getAllSessions(stub):
         print("Session endTime",sessionResponse.endTime)
         print("##########################")
 
-def activation_registerDevice(stub):
-    register = openoffload_pb2.deviceDescription()
-    register.name="Acme-1"
-    register.description = "Acme SmartNIC"
-    register.type= openoffload_pb2._SMARTNIC
-    register.sessionCapacity = 2000000
-    register.sessionRate = 100000
-    register.tcpSessionTimeout = 15
-    register.udpSessionTimeout = 30
-    registerResponse =  stub.registerOffloadDevice(register)
-    print("Adding Device Description: ", register.name)
-    print("Status: ", openoffload_pb2._REGISTRATION_STATUS_TYPE.values_by_number[registerResponse.status].name)
-    register = openoffload_pb2.deviceDescription()
-    register.name="XDP"
-    register.description = "Software Implementation"
-    register.type= openoffload_pb2._SOFTWARE
-    register.sessionCapacity = 200000
-    register.sessionRate = 10000
-    register.tcpSessionTimeout = 15
-    register.udpSessionTimeout = 30
-    registerResponse =  stub.registerOffloadDevice(register)
-    print("Adding Device Description: ", register.name)
-    print("Status: ", openoffload_pb2._REGISTRATION_STATUS_TYPE.values_by_number[registerResponse.status].name)
-
-def activation_getAllDevices(stub):
-    Devices = stub.getRegisteredOffloadDevices(openoffload_pb2.Empty())
-    listDevices = Devices.devices
-    for device in listDevices:
-        print("### Registered Device ####")
-        print("Name: ", device.name)
-        print("Description: ", device.description)
-        print("Type: ", openoffload_pb2._INTERFACE_TYPE.values_by_number[device.type].name)
-        print("Session Capacity: ", device.sessionCapacity)
-        print("Session Rate: ",device.sessionRate)
-        print("TCP Session Timeout: ", device.tcpSessionTimeout)
-        print("UDP Session Timeout: ",device.udpSessionTimeout)
-
-def activation_activateDevice(stub):
-    register = openoffload_pb2.deviceDescription()
-    print("### Activating Device ####")
-    register.name="Acme-1"
-    register.description = "Acme SmartNIC"
-    register.type= openoffload_pb2._SMARTNIC
-    register.sessionCapacity = 2000000
-    register.sessionRate = 100000
-    register.tcpSessionTimeout = 15
-    register.udpSessionTimeout = 30
-    activateStatus = stub.activateOffload(register)
-    print("Activated Device: ", register.name)
-    print("Status: ", openoffload_pb2._ACTIVATION_STATUS_TYPE.values_by_number[activateStatus.status].name)
-
 def run_add_session_ipv4():
     with open('ssl/server.crt', 'rb') as f:
         creds = grpc.ssl_channel_credentials(f.read())
@@ -343,19 +292,6 @@ def run_get_all_sessions():
         print("-------------- Get All Sessions --------------")
         session_getAllSessions(stub)
 
-def run_activation_sequence():
-    with open('ssl/server.crt', 'rb') as f:
-        creds = grpc.ssl_channel_credentials(f.read())
-        activationChannel =  grpc.secure_channel('localhost:3445',creds)
-        activationStub = openoffload_pb2_grpc.ActivationStub(activationChannel)
-        print("\n\n------------Creating new devices---------------------\n")
-        activation_registerDevice(activationStub)
-        print("\n------------- Listing available Devices --------------------\n")
-        activation_getAllDevices(activationStub)
-        print("\n------------- Activating Device --------------------\n")
-        activation_activateDevice(activationStub)
-        print("\n------------- Activation Tests Complete --------------------\n")
-
 def run():
     # NOTE(gRPC Python Team): openoffload_pb2.close() is possible on a channel and should be
     # used in circumstances in which the with statement does not fit the needs
@@ -377,19 +313,6 @@ def run():
         print("-------------- Check for Closed Sessions --------------")
         session_getClosedSessions(stub)
         session_getAllSessions(stub)
-
-    with open('ssl/server.crt', 'rb') as f:
-        creds = grpc.ssl_channel_credentials(f.read())
-        activationChannel =  grpc.secure_channel('localhost:3445',creds)
-        activationStub = openoffload_pb2_grpc.ActivationStub(activationChannel)
-        print("\n\n------------Creating new devices---------------------\n")
-        activation_registerDevice(activationStub)
-        print("\n------------- Listing available Devices --------------------\n")
-        activation_getAllDevices(activationStub)
-        print("\n------------- Activating Device --------------------\n")
-        activation_activateDevice(activationStub)
-        print("\n------------- Activation Tests Complete --------------------\n")
-
 
 if __name__ == '__main__':
     logging.basicConfig()
