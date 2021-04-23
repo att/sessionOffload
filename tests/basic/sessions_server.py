@@ -80,6 +80,7 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
         sessionErrors_value=AddSessionErrors()
         for request in request_iterator:
             print("############ ADD SESSION ##################")
+            #print("sessionID:",request.sessionId)
             #print("protocolID 6=TCP,17=UDP:",request.protocolId)
             print("protocolID :",openoffload_pb2._PROTOCOL_ID.values_by_number[request.protocolId].name)
             print("IP Version:", openoffload_pb2._IP_VERSION.values_by_number[request.ipVersion].name)
