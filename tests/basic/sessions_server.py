@@ -80,8 +80,7 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
         sessionErrors_value=AddSessionErrors()
         for request in request_iterator:
             print("############ ADD SESSION ##################")
-            #print("sessionID:",request.sessionId)
-            #print("protocolID 6=TCP,17=UDP:",request.protocolId)
+            print("sessionId:",request.sessionId)
             print("protocolID :",openoffload_pb2._PROTOCOL_ID.values_by_number[request.protocolId].name)
             print("IP Version:", openoffload_pb2._IP_VERSION.values_by_number[request.ipVersion].name)
             
@@ -96,8 +95,15 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
             else:
               print ("destinationIpV6:", socket.inet_ntop(socket.AF_INET6, request.destinationIpV6))
             print("destinationPort:", int(request.destinationPort))
-            #print("ActionType 0=DROP,1=FORWARD,2=MIRROR,3=SNOOP:" , request.action.actionType)
             print("ActionType:" , openoffload_pb2._ACTION_TYPE.values_by_number[request.action.actionType].name)
+            print("MatchType:", openoffload_pb2._MATCH_TYPE.values_by_number[request.matchType].name)
+            print("tunnelEndpointId:", request.tunnelEndpointId)
+            if request.action.actionType == 4:
+                print("encapTunnelEndpointId:" , request.action.encapTunnelEndpointId)
+                print("encapMatchDestinationIp:" , socket.inet_ntop(socket.AF_INET,request.action.encapMatchDestinationIp.to_bytes(4,byteorder=sys.byteorder)))
+                print("encapTrafficMarking:" , request.action.encapTrafficMarking)
+                print("ingressTrafficRate:" , request.action.ingressTrafficRate)
+                print("egressTrafficRate:" , request.action.egressTrafficRate)
             print("ActionNextHop:" , request.action.actionNextHop)
             if  request.sessionId == 99999999999:
                 print("Error test case")
@@ -122,7 +128,7 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
             print("sessionId:",request.sessionId)
             timestamp = google.protobuf.timestamp_pb2.Timestamp()
             timestamp.GetCurrentTime()
-            return openoffload_pb2.sessionResponse(sessionId=1001, sessionState=openoffload_pb2._CLOSING_1,
+            return openoffload_pb2.sessionResponse(sessionId=request.sessionId, sessionState=openoffload_pb2._CLOSING_1,
               requestStatus=openoffload_pb2._ACCEPTED, inPackets=2000, outPackets=400000,
               startTime=timestamp, endTime=timestamp)
 
@@ -164,6 +170,7 @@ def sessionServe():
          certificate_chain = f.read()
     server_credentials = grpc.ssl_server_credentials( ( (private_key, certificate_chain), ) )
     server.add_secure_port('localhost:3443', server_credentials)
+    #server.add_insecure_port('localhost:3443') 
     server.start()
     server.wait_for_termination()
 

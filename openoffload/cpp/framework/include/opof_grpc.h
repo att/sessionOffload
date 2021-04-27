@@ -62,6 +62,8 @@ using openoffload::v1beta1::sessionId;
 using openoffload::v1beta1::IP_VERSION;
 using openoffload::v1beta1::PROTOCOL_ID;
 using openoffload::v1beta1::ACTION_TYPE;
+using openoffload::v1beta1::ENCAP_TYPE;
+using openoffload::v1beta1::MATCH_TYPE;
 using openoffload::v1beta1::REQUEST_STATUS;
 using openoffload::v1beta1::ADD_SESSION_STATUS;
 using openoffload::v1beta1::SESSION_STATE;

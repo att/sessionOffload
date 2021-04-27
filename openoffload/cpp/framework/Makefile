@@ -197,7 +197,9 @@ CLIENT_OBJS = \
 	$(OBJ_DIR)/openoffload.grpc.pb.o \
 	$(OBJ_DIR)/opof_session_client.o \
 	$(OBJ_DIR)/opof_clientlib.o \
-	$(OBJ_DIR)/opof_util.o
+	$(OBJ_DIR)/opof_util.o \
+	$(OBJ_DIR)/opof_test_util.o 
+	
 
 #
 
@@ -264,7 +266,8 @@ $(SERVER_LIB): 	openoffload.pb.o openoffload.grpc.pb.o opof_session_server.o opo
 	ar crv $(LIB_DIR)/$@ $(SERVER_OBJS)
 	ranlib $(LIB_DIR)/$@
 #
-$(CLIENT_LIB): openoffload.pb.o openoffload.grpc.pb.o opof_session_client.o opof_clientlib.o opof_util.o
+#$(CLIENT_LIB): openoffload.pb.o openoffload.grpc.pb.o opof_session_client.o opof_clientlib.o opof_util.o 
+$(CLIENT_LIB): openoffload.pb.o openoffload.grpc.pb.o opof_session_client.o opof_clientlib.o opof_util.o opof_test_util.o
 	ar crv $(LIB_DIR)/$@ $(CLIENT_OBJS)
 	ranlib $(LIB_DIR)/$@
 #

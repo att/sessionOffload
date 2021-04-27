@@ -158,6 +158,37 @@ def session_addSession_ipv6(stub):
     print("addSessionResponse:",addSessionResponse.requestStatus)
     return addSessionResponse.requestStatus
 
+def session_addSession_ipv4_encap(stub):
+    session=openoffload_pb2.sessionRequest()
+    session.sessionId= 92345678910
+    session.inLif= 1
+    session.outLif= 2
+    session.sourceIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.3.0.1"), byteorder=sys.byteorder)
+    session.sourcePort=2152
+    session.destinationIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.4.0.3"), byteorder=sys.byteorder)
+    session.destinationPort=2152
+    session.protocolId=openoffload_pb2._UDP
+    session.ipVersion=openoffload_pb2._IPV4
+    session.matchType=openoffload_pb2._GTP
+    session.tunnelEndpointId= 2001234
+    session.action.actionType=openoffload_pb2._ENCAP_DECAP
+    session.action.encapTunnelEndpointId= 1005678
+    session.action.encapMatchDestinationIp = int.from_bytes(socket.inet_pton(socket.AF_INET,"12.2.3.4"),byteorder=sys.byteorder)
+    session.action.ingressTrafficRate= 100000
+    session.action.egressTrafficRate= 100000
+    session.action.encapTrafficMarking= 7
+    sessions_value=Sessions()
+    sessions_value.addSessionMembers(session)
+    session_iterator=iter(sessions_value)
+    addSessionResponse =  stub.addSession( session_iterator)
+    print("addSessionResponse:",addSessionResponse.requestStatus)
+
+    sessionErrors_value=addSessionResponse.responseError
+    sessionErrors_iterator=iter(sessionErrors_value)
+
+    for sessionError in sessionErrors_iterator:
+         print("addSessionErrorResponse:",sessionError.requestStatus)
+
 def session_getSession(stub):
     sessionResponse =  stub.getSession( openoffload_pb2.sessionId(sessionId=1001))
     print("Getting Session")
@@ -231,6 +262,43 @@ def session_getAllSessions(stub):
         print("Session endTime",sessionResponse.endTime)
         print("##########################")
 
+def activation_registerDevice(stub):
+    register = openoffload_pb2.deviceDescription()
+    register.name="Acme-1"
+    register.description = "Acme SmartNIC"
+    register.type= openoffload_pb2._SMARTNIC
+    register.sessionCapacity = 2000000
+    register.sessionRate = 100000
+    register.tcpSessionTimeout = 15
+    register.udpSessionTimeout = 30
+    registerResponse =  stub.registerOffloadDevice(register)
+    print("Adding Device Description: ", register.name)
+    print("Status: ", openoffload_pb2._REGISTRATION_STATUS_TYPE.values_by_number[registerResponse.status].name)
+    register = openoffload_pb2.deviceDescription()
+    register.name="XDP"
+    register.description = "Software Implementation"
+    register.type= openoffload_pb2._SOFTWARE
+    register.sessionCapacity = 200000
+    register.sessionRate = 10000
+    register.tcpSessionTimeout = 15
+    register.udpSessionTimeout = 30
+    registerResponse =  stub.registerOffloadDevice(register)
+    print("Adding Device Description: ", register.name)
+    print("Status: ", openoffload_pb2._REGISTRATION_STATUS_TYPE.values_by_number[registerResponse.status].name)
+
+def activation_getAllDevices(stub):
+    Devices = stub.getRegisteredOffloadDevices(openoffload_pb2.Empty())
+    listDevices = Devices.devices
+    for device in listDevices:
+        print("### Registered Device ####")
+        print("Name: ", device.name)
+        print("Description: ", device.description)
+        print("Type: ", openoffload_pb2._INTERFACE_TYPE.values_by_number[device.type].name)
+        print("Session Capacity: ", device.sessionCapacity)
+        print("Session Rate: ",device.sessionRate)
+        print("TCP Session Timeout: ", device.tcpSessionTimeout)
+        print("UDP Session Timeout: ",device.udpSessionTimeout)
+
 def run_add_session_ipv4():
     with open('ssl/server.crt', 'rb') as f:
         creds = grpc.ssl_channel_credentials(f.read())
@@ -238,6 +306,14 @@ def run_add_session_ipv4():
         stub = openoffload_pb2_grpc.SessionTableStub(channel)
         print("-------------- Add IPv4 Session --------------")
         result = session_addSession(stub)
+        print("Request Status=",result)
+def run_add_session_ipv4_encap():
+    with open('ssl/server.crt', 'rb') as f:
+        creds = grpc.ssl_channel_credentials(f.read())
+        channel = grpc.secure_channel('localhost:3443', creds)
+        stub = openoffload_pb2_grpc.SessionTableStub(channel)
+        print("-------------- Add IPv4 ENCAP DECAP Session --------------")
+        result = session_addSession_ipv4_encap(stub)
         print("Request Status=",result)
 def run_add_session_ipv4_error():
     with open('ssl/server.crt', 'rb') as f:
@@ -292,6 +368,7 @@ def run_get_all_sessions():
         print("-------------- Get All Sessions --------------")
         session_getAllSessions(stub)
 
+
 def run():
     # NOTE(gRPC Python Team): openoffload_pb2.close() is possible on a channel and should be
     # used in circumstances in which the with statement does not fit the needs
@@ -304,6 +381,8 @@ def run():
         session_addSession(stub)
         print("-------------- Add IPv6 Session --------------")
         session_addSession_ipv6(stub)
+        print("-------------- Add IPv6 ENCAP DECAP Session --------------")
+        session_addSession_ipv4_encap(stub)
         print("-------------- Get Session --------------")
         session_getSession(stub)
         print("-------------- Delete Session --------------")
@@ -313,6 +392,7 @@ def run():
         print("-------------- Check for Closed Sessions --------------")
         session_getClosedSessions(stub)
         session_getAllSessions(stub)
+
 
 if __name__ == '__main__':
     logging.basicConfig()

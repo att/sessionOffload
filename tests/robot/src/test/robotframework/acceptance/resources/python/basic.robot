@@ -18,7 +18,6 @@ Run buildBasic Script
 
 Start Offload Server 
      [Documentation]    Start gRPC Sessions Server 
-     #Start Process	python3   	sessions_server.py 	cwd=${projectRoot}/../buildBasic   alias=offload
      Start Process	python3   	sessions_server.py 	cwd=${projectRoot}/../buildBasic   alias=offload    env:PYTHONUNBUFFERED=1     stdout=/tmp/session_offfload_stdout.txt
 
 Run Client
@@ -31,6 +30,14 @@ Run Client
 Run Add Session Ipv4
      [Documentation]    Add IPv4 Session
      Run Process	python3   	-c   import sessions_client; sessions_client.run_add_session_ipv4(); 	cwd=${projectRoot}/../buildBasic   alias=client
+     ${result} =	Get Process Result	client
+     Log       ${result.stderr}
+     Log       ${result.stdout}
+     Should Contain   ${result.stdout}    Request Status=   0
+
+Run Add Session Ipv4 ENCAP
+     [Documentation]    Add IPv4 Session ENCAP
+     Run Process	python3   	-c   import sessions_client; sessions_client.run_add_session_ipv4_encap(); 	cwd=${projectRoot}/../buildBasic   alias=client
      ${result} =	Get Process Result	client
      Log       ${result.stderr}
      Log       ${result.stdout}
@@ -100,6 +107,6 @@ Run Get All Sessions
 
 Stop Offload Server
    [Documentation]  Stop Offload Server
-   #Terminate Process   offload 
    ${result} =    Terminate Process    offload 
    Log    ${result.stdout}
+

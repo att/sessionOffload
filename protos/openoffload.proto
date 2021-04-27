@@ -115,7 +115,26 @@ enum ACTION_TYPE{
    _FORWARD = 1;
    _MIRROR = 2;
    _SNOOP = 3;
+   _ENCAP_DECAP = 4;
+   _ENCAP_DECAP_MIRROR = 5;
+   _ENCAP_DECAP_SNOOP = 6;
 }
+
+// Encapsulation Type when Action type is _ENCAP_DECAP
+
+enum ENCAP_TYPE{
+   _NONE = 0;
+   _GTP  = 1;
+}
+
+//  TODO: what are the types of MATCH_TYPE we need 
+//  outer packet headers
+//  inner packet headers 
+enum MATCH_TYPE {
+   _IP_HEADER = 0;
+   _GTP_HEADER = 1;
+}
+
 
 //
 // The session table was combined with the statistices service
@@ -156,15 +175,54 @@ message sessionId{
 // DROP and FORWARD do not have an actionNextHop
 // The IPV4 nextHop definition maps to the V4 struct returned by inet_pton whcih is a uint32_t.
 // The IPV6 nextHop definition maps to the V6 struct returned by inet_ptoN which is a uint8_t s6_addr[16]
+// 
+// traffiMarking  is based on BGP FlowSpec
+//    Traffic Marking:  The traffic marking extended community instructs a
+//      system to modify the DSCP bits of a transiting IP packet to the
+//      corresponding value.  This extended community is encoded as a
+//      sequence of 5 zero bytes followed by the DSCP value encoded in the
+//      6 least significant bits of 6th byte.
+// TODO: Need to understand which direction the marking occurs on if not both directions ?
+//
+// trafficRate
+//    Bytes/second for consistency with BGP FlowSpec as a float
+//    0 Bytes/second means to discard
+//        From BGP Flowspec:
+//         ....   The remaining 4 octets carry the rate information in IEEE
+//         floating point [IEEE.754.1985] format, units being bytes per
+//         second.  A traffic-rate of 0 should result on all traffic for
+//         the particular flow to be discarded.
+
+
+
 message actionParameters{
      ACTION_TYPE  actionType = 1;
      uint32 actionNextHop = 2;
      bytes actionNextHopV6 = 3;
+     ENCAP_TYPE  encapType = 4;
+     uint32 encapTrafficMarking = 5 ; 
+     float ingressTrafficRate  = 6;
+     float egressTrafficRate  = 7;
+     uint32 encapTunnelEndpointId = 8;
+     uint32 encapMatchDestinationIp = 9;
+     bytes encapMatchDestinationIpV6 =10;
 }
+
 
 // sessionId is returned by server side upon successful addSession
 // The IPV4 definition maps to the V4 struct returned by inet_pton whcih is a uint32_t.
 // The IPV6 definition maps to the V6 struct returned by inet_ptoN which is a uint8_t s6_addr[16]
+// 
+// actionParametes could be an array again 
+// TODO: Do we need a matchType (ip_5_tuple vs TEID  ) or can we set src/dest IP AND TEID for the match ?
+// MATCH parameters vs ACTION  parameters  
+//
+// encapTunnelEndpointId is part of action when doing encap
+// tunnelEndpointId is part of match when doing decap
+//
+// chacheThresholdPackets - used to determine when stats collection should be triggered when a timeout mechanism
+//                          doesnt apply.
+//
 message sessionRequest{
   uint64  sessionId = 1 ;
   int32  inLif = 2;
@@ -179,6 +237,9 @@ message sessionRequest{
   PROTOCOL_ID protocolId = 11;
   actionParameters action = 12;
   uint32 cacheTimeout = 13;
+  MATCH_TYPE matchType = 14;
+  uint32 tunnelEndpointId = 15;
+  uint32 cacheThresholdPackets = 16;
 }
 
 message sessionResponseError {

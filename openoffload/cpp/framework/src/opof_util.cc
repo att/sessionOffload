@@ -70,9 +70,14 @@ void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *requ
     } else {
       action.set_actionnexthop(request_c->nextHop.s_addr);
     }
+    action.set_encaptype((ENCAP_TYPE) request_c->encapType);
+    action.set_encaptunnelendpointid(request_c->encapTunnelEndpointId);
+    action.set_encapmatchdestinationip(request_c->encapMatchDestinationIp.s_addr);
+
     request->mutable_action()->CopyFrom(action);
     request->set_cachetimeout(request_c->cacheTimeout);
-
+    request->set_matchtype((MATCH_TYPE)request_c->matchType);
+    request->set_tunnelendpointid(request_c->tunnelEndpointId);
 }
 /** \ingroup utilities
 *

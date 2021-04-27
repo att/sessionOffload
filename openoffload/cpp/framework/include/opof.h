@@ -41,6 +41,9 @@ typedef enum {
    _FORWARD = 1,
    _MIRROR = 2,
    _SNOOP = 3,
+   _ENCAP_DECAP = 4,
+   _ENCAP_DECAP_MIRROR = 5,
+   _ENCAP_DECAP_SNOOP = 6,
  } ACTION_VALUE_T;
 
 typedef enum {
@@ -50,6 +53,16 @@ typedef enum {
   _CLOSED      = 3,
   _UNKNOWN_STATE     = 4,
 } SESSION_STATE_T;
+
+typedef enum {
+	_NONE = 0,
+	_GTP = 1,
+} ENCAP_TYPE_T;
+
+typedef enum {
+  _IP_HEADER=0,
+  _GTP_HEADER = 1,
+} MATCH_TYPE_T;
 
 typedef enum {
   _NOT_CLOSED = 0,
@@ -295,6 +308,16 @@ typedef struct sessionRequestTuple {
     struct in_addr  nextHop;
     struct in6_addr nextHopV6;
     unsigned int cacheTimeout;
+    MATCH_TYPE_T matchType ;
+    unsigned int tunnelEndpointId ;
+    ENCAP_TYPE_T   encapType;
+    unsigned int encapTrafficMarking ;
+    float  ingressTrafficRate;
+    float  egressTrafficRate;
+    unsigned int encapTunnelEndpointId;
+    struct in_addr  encapMatchDestinationIp;
+    struct in6_addr encapMatchDestinationIpV6;
+
 } sessionRequest_t;
 
 
