@@ -27,7 +27,7 @@ jobs:
           name: doxgen archive
           path: openoffload/cpp/framework/doc/html
       if: always()
-      
+
     - name: Deploy to github Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
