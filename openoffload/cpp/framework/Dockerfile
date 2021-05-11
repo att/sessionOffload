@@ -1,4 +1,4 @@
-FROM grpcbuild:v1alpha5
+FROM grpcbuild:v1beta1
 #
 USER root
 ENV PATH="/home/grpc/local/bin:${PATH}"

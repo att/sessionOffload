@@ -37,5 +37,5 @@ void convertAddSessionResponse2c(addSessionResponse_t *response_c, addSessionRes
 void convertSessionResponse2c(sessionResponse *responsecpp, sessionResponse_t *responsec);
 void convertSessionResponse2cpp(sessionResponse *responsecpp, sessionResponse_t *responsec);
 void convertSessionRequest2c(sessionRequest request, sessionRequest_t *request_c);
-  
+
 #endif

@@ -50,8 +50,17 @@ Status SessionTableImpl::addSession(ServerContext* context, ServerReader<session
   sessionRequest request;
   response->clear_responseerror();
   //std::cout << "response size: " << response->responseerror_size() << std::endl;
+  //if (context->IsCancelled()) {
+  //  return Status(StatusCode::CANCELLED, "Deadline exceeded or Client cancelled, abandoning.");
+  //}
+#ifdef TESTS
+  sleep(1);
+#endif
   while(reader->Read(&request)){
     convertSessionRequest2c(request, &request_c);
+    if (context->IsCancelled()) {
+      return Status(StatusCode::CANCELLED, "Deadline exceeded or Client cancelled, abandoning.");
+    }
     status = opof_add_session_server(&request_c, &addResponse_c);
     if (status != _OK){
       errorMessage = response->add_responseerror();
@@ -76,6 +85,9 @@ Status SessionTableImpl::getSession(ServerContext* context, const sessionId* sid
   sessionResponse_t response_c;
   int status;
   uint64_t session;
+  if (context->IsCancelled()) {
+      return Status(StatusCode::CANCELLED, "Deadline exceeded or Client cancelled, abandoning.");
+  }
   session = sid->sessionid();
   status = opof_get_session_server(session, &response_c);
   if (status == _OK){
@@ -99,6 +111,9 @@ Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* 
   sessionResponse* response) {
   int status;
   sessionResponse_t response_c;
+  if (context->IsCancelled()) {
+    return Status(StatusCode::CANCELLED, "Deadline exceeded or Client cancelled, abandoning.");
+  }
   status = opof_del_session_server(sid->sessionid(), &response_c);
   if (status == _OK){
     convertSessionResponse2cpp(response, &response_c);
@@ -117,7 +132,7 @@ Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* 
 * \param reader
 * \param response
 */
-Status SessionTableImpl::getAllSessions(ServerContext* context, const statisticsRequestArgs* request, sessionResponseArray *responses) {
+Status SessionTableImpl::getAllSessions(ServerContext* context, const sessionRequestArgs* request, sessionResponses *responses) {
   
   Status status;
   sessionResponse_t **allSessions= NULL;
@@ -128,6 +143,9 @@ Status SessionTableImpl::getAllSessions(ServerContext* context, const statistics
   
   int nresponses = BUFFER_MAX;
   uint64_t start_session;
+  if (context->IsCancelled()) {
+      return Status(StatusCode::CANCELLED, "Deadline exceeded or Client cancelled, abandoning.");
+  }
   start_session = request->startsession();
   
   allSessions = (sessionResponse_t **)malloc(nresponses * sizeof(sessionResponse_t *));
@@ -143,7 +161,7 @@ Status SessionTableImpl::getAllSessions(ServerContext* context, const statistics
     pageCount++;
     for (int i=0; i < sessionCount; i++){
       closedResponse = allSessions[i];
-      response = responses->add_responsearray();
+      response = responses->add_sessioninfo();
       response->set_sessionid(closedResponse->sessionId);
       response->set_sessionstate((SESSION_STATE)closedResponse->sessionState);
       response->set_inpackets(closedResponse->inPackets);
@@ -168,17 +186,22 @@ Status SessionTableImpl::getAllSessions(ServerContext* context, const statistics
 * \param reader
 * \param response
 */
-Status SessionTableImpl::getClosedSessions(ServerContext* context, const statisticsRequestArgs* request, ServerWriter<sessionResponse>* writer) {
+Status SessionTableImpl::getClosedSessions(ServerContext* context, const sessionRequestArgs* request, ServerWriter<sessionResponse>* writer) {
   
   sessionResponse response;
   sessionResponse_t closedResponse;
   statisticsRequestArgs_t request_c;
   int sessionCount = 0;
   //Status status;
+  if (context->IsCancelled()) {
+      return Status(StatusCode::CANCELLED, "Deadline exceeded or Client cancelled, abandoning.");
+  }
   int nresponses = request->pagesize();
   request_c.pageSize = nresponses;
   sessionResponse_t closedSessions[BUFFER_MAX];
-
+#ifdef TESTS
+  sleep(1);
+#endif
   sessionCount = opof_get_closed_sessions_server(&request_c, closedSessions);
   if (sessionCount == 0){
     return Status(grpc::StatusCode::NOT_FOUND,"No Closed Sessions");

@@ -1,0 +1,51 @@
+# This workflow will build a Java project with Maven
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: robotframework-tests-v1beta1
+
+on:
+  push:
+    branches: [ v1beta1 ]
+  pull_request:
+    branches: [ v1beta1 ]
+
+defaults:
+  run:
+    working-directory: tests/robot
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '2.x'
+        architecture:  'x64'
+    - uses: actions/setup-python@v2
+      with:
+         python-version: '3.7' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+         architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip3 install grpcio grpcio-tools
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi  
+    - name: Build with Maven
+      run: mvn clean install --file pom.xml
+    - name: Delete output.xml (on Unix-like)
+      run: |
+        find $GITHUB_WORKSPACE/tests/robot/target/robotframework-reports -type f -name 'output.xml' -exec rm {} +
+      if: always() 
+    - name: Archive acceptances test results
+      uses: actions/upload-artifact@v2
+      with:
+          name: robot-results
+          path: tests/robot/target/robotframework-reports
+      if: always()

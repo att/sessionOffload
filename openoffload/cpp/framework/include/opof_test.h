@@ -23,7 +23,7 @@
 * intention is to provide a test framework to test the underlying client/server code and test
 * performance.
 */
-#define OPOF_VERSION "v1alpha5"
+#define OPOF_VERSION "v1beta1"
 #define LOG_DIR "log/opof"
 #define LOG_FILE "log/opof/opof.log"
 #define CERT_FILE "ssl/server.crt"

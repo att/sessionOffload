@@ -20,9 +20,9 @@ syntax = "proto3";
 // will move to v1 at release 
 // increment beta1 to beta2 , etc for changes during development
 
-package openoffload.v1alpha5;
+package openoffload.v1beta1;
 
-option go_package = ".;openoffload_v1alpha5";
+option go_package = ".;openoffload_v1beta1";
 
 import "google/protobuf/timestamp.proto";
 
@@ -104,9 +104,9 @@ enum REQUEST_STATUS{
    _ACCEPTED = 0;
    _REJECTED = 1;
    _REJECTED_SESSION_NONEXISTENT = 2;
-   _REJECTED_SESSION_TABLE_FULL = 3 [deprecated=true];
-   _REJECTED_SESSION_ALREADY_EXISTS = 4 [deprecated=true];
-   _NO_CLOSED_SESSIONS = 5 [deprecated=true];
+   _REJECTED_SESSION_TABLE_FULL = 3 ;
+   _REJECTED_SESSION_ALREADY_EXISTS = 4 ;
+   _NO_CLOSED_SESSIONS = 5 ;
    _REJECTED_INTERNAL_ERROR =6;
 }
 
@@ -122,25 +122,25 @@ enum ACTION_TYPE{
 // in v1alpha4 to simplfy the code.
 //
 service SessionTable {
-
-
+//
 // Adds a session
 // This was changed in v1alpha4 to be a streaming API, for performance
 // reasons.
 rpc addSession(stream sessionRequest) returns (addSessionResponse) {}
-
+//
 // Obtains the session 
 rpc getSession(sessionId) returns (sessionResponse) {}
-
+//
 // Delete a session
 rpc deleteSession(sessionId) returns (sessionResponse) {}
-
+//
 // Stream back all current sessions
 //rpc getAllSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
-rpc getAllSessions(statisticsRequestArgs) returns (sessionResponseArray) {}
+rpc getAllSessions(sessionRequestArgs) returns (sessionResponses) {}
+//
 // statistics as a outgoing session from the WB to Applications ?
 // grpc seems to need a request input streamId is a placeholder
-rpc getClosedSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
+rpc getClosedSessions(sessionRequestArgs) returns (stream sessionResponse) {}
 
 
 }
@@ -187,8 +187,8 @@ message sessionResponseError {
 }
 
 
-message sessionResponseArray {
-  repeated sessionResponse responseArray = 1;
+message sessionResponses {
+  repeated sessionResponse sessionInfo = 1;
   uint64 nextkey =2;
 }
 //
@@ -196,8 +196,8 @@ message sessionResponseArray {
 // of errors for each of the sesssions sent in a stream (max 64).
 //
 message addSessionResponse{
-  ADD_SESSION_STATUS requestStatus = 1 [deprecated = true];
-  uint64 errorStatus = 2 [deprecated = true];
+  ADD_SESSION_STATUS requestStatus = 1;
+  uint64 errorStatus = 2 ;
   google.protobuf.Timestamp startTime = 3;
   repeated sessionResponseError responseError = 4;
 }
@@ -210,12 +210,12 @@ message sessionResponse{
   uint64  outBytes = 5;
   SESSION_STATE sessionState = 6 ;
   SESSION_CLOSE_CODE sessionCloseCode = 7 ;
-  REQUEST_STATUS requestStatus = 8 [deprecated = true];
+  REQUEST_STATUS requestStatus = 8;
   google.protobuf.Timestamp startTime = 9;
   google.protobuf.Timestamp endTime = 10;
 }
 
-message statisticsRequestArgs{
+message sessionRequestArgs{
   //  pageSize = 0 will turn off paging
   //  does paging make sense for a stream ?
   //  the client should read/process each event on the stream anyway.
@@ -223,91 +223,4 @@ message statisticsRequestArgs{
   uint32  page=2;
   uint64  startSession=3;
   //  what other arguments make sense for retrieving or filtering streams 
-}
-//////////////////////////////////////////////////////////////////////////////////
-//
-// Activation Service
-//
-enum INTERFACE_TYPE{
-  _NONE = 0;
-  _SOFTWARE = 1;
-  _SMARTNIC = 2;
-  _NOS    = 3; 
-}
-
-
-enum ACTIVATION_STATUS_TYPE {
-  _DEVICE_ACTIVATED = 0;
-  _DEVICE_DEACTIVATED = 1;
-}
-
-enum REGISTRATION_STATUS_TYPE {
-  _DEVICE_REGISTERED = 0;
-  _DEVICE_DEREGISTERED = 1;
-}
-//
-// Empty message simulating void
-message Empty {
-
-}
-service Activation {
-  //
-  // Register OpenOffload devices with a network function. Currently multiple
-  // devices could be registered. For instance a SmartNIC device and a Software
-  // device could be registered and the operator could decide to activate one or
-  // the other
-  //
-
-  // 
-  // Device registeration
-  //
-  // Registration is the process of telling the network function that a offload device
-  // is available for use and some metadata about the device. The metadata is there only
-  // for the operator to make a decision on which device to activate.
-  //
-  rpc registerOffloadDevice(deviceDescription) returns (registrationStatus){}
-  rpc deregisterOffloadDevice(deviceDescription) returns (registrationStatus){}
-  rpc getRegisteredOffloadDevices(Empty) returns (deviceList) {}
-  //
-  // Device activation
-  //
-  // Activation is the process of selecting a registered device and activating it on 
-  // the netwwork function. Currently only one network device is supported per network
-  // element.
-  //
-  rpc activateOffload(deviceDescription) returns (activationStatus) {}
-  rpc deactivateOffload(deviceDescription) returns (activationStatus) {}
-  rpc getActivatedOffload(Empty) returns (deviceDescription) {}
-}
-//
-//
-message deviceDescription {
-  string name = 1;
-  INTERFACE_TYPE type = 2;
-  string description = 3;
-  int32  sessionCapacity = 4;
-  int32  sessionRate = 5;
-  int32 tcpSessionTimeout =  6;
-  int32 udpSessionTimeout = 7;
-}
-
-//
-// List of Offload devices available to be activated
-//
-message deviceList {
-  repeated deviceDescription devices = 1;
-}
-//
-// Status of a registration request
-//
-message registrationStatus {
-  REGISTRATION_STATUS_TYPE status = 1;
-}
-//
-// Status of registration de-registration
-// may want to expand to include reason for failures
-//
-message activationStatus {
-  ACTIVATION_STATUS_TYPE status = 1;
-  deviceDescription device = 2;
 }

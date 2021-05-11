@@ -14,7 +14,7 @@ ${projectRoot}        ${EXECDIR}
 # ~/sessionOffload/tests/robot
 Run buildPythonSimulator Script 
      [Documentation]    Run scripts to create buildPythonSimulator directory 
-     Start Process	bash     builditPythonSimulator.sh     cwd=${projectRoot}/..    
+     Run Process	bash     builditPythonSimulator.sh     cwd=${projectRoot}/..    
 
 Start Offload Simulator Server 
      [Documentation]    Start gRPC Sessions Server 

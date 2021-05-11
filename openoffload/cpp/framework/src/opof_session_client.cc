@@ -20,7 +20,33 @@ extern "C" {
 #ifdef DEBUG
 #include "opof_test_util.h"
 #endif
-}
+  //
+  // Set default deadline on API calls to 100 milli seconds
+  //
+  unsigned int g_deadline = 100;
+  /**  \ingroup clientcinterface
+  * \brief gets the deadline value in milli-seconds
+  *
+  * \param void
+  * \return value of global value deadline
+  *
+  */
+  unsigned int opof_get_deadline(void){
+    return g_deadline;
+  }
+ /**  \ingroup clientcinterface
+  * \brief sets the deadline value in milli-seconds
+  *
+  * \param int
+  * \return value of global value deadline
+  *
+  */
+  unsigned int opof_set_deadline(int deadline){
+    g_deadline = deadline;
+    return g_deadline;
+  }
+} // extern C
+
 #include "opof_util.h"
 #include "opof_grpc.h"
 #include "opof_session_client.h"
@@ -41,6 +67,11 @@ int SessionTableClient::addSessionClient(int size, sessionRequest_t **s, addSess
   addSessionResponse response;
   ClientContext context;
   Status status;
+  std::chrono::system_clock::time_point deadline = std::chrono::system_clock::now() + std::chrono::milliseconds(opof_get_deadline());
+  context.set_deadline(deadline);
+  #ifdef DEBUG
+  std::cout << "Deadline set for add session: " << opof_get_deadline() << " milli seconds" << endl;
+  #endif
   std::unique_ptr<ClientWriter <sessionRequest> > writer(
           stub_->addSession(&context, &response));
 
@@ -72,7 +103,11 @@ int SessionTableClient::getSessionClient(int sessionid,sessionResponse_t *resp){
   sessionResponse response;
   sid.set_sessionid(sessionid);
   ClientContext context;
-
+  std::chrono::system_clock::time_point deadline = std::chrono::system_clock::now() + std::chrono::milliseconds(opof_get_deadline());
+  context.set_deadline(deadline);
+  #ifdef DEBUG
+  std::cout << "Deadline set for get session: " << opof_get_deadline() << " milli seconds" << endl;
+  #endif
   Status status = stub_->getSession(&context, sid, &response);
   convertSessionResponse2c(&response, resp);
   return static_cast<int>(status.error_code());
@@ -92,6 +127,11 @@ int SessionTableClient::deleteSessionClient(int sessionid,sessionResponse_t *res
   sessionResponse response;
   sid.set_sessionid(sessionid);
   ClientContext context;
+  std::chrono::system_clock::time_point deadline = std::chrono::system_clock::now() + std::chrono::milliseconds(opof_get_deadline());
+  context.set_deadline(deadline);
+  #ifdef DEBUG
+  std::cout << "Deadline set for delete session: " << opof_get_deadline() << " milli seconds" << endl;
+  #endif
   Status status = stub_->deleteSession(&context, sid, &response);
 
   convertSessionResponse2c(&response, resp);
@@ -111,10 +151,14 @@ int SessionTableClient::deleteSessionClient(int sessionid,sessionResponse_t *res
 */
 int SessionTableClient::getClosedSessions(statisticsRequestArgs_t *args, sessionResponse_t responses[], unsigned long *sessionCount){
   sessionResponse response;
-  statisticsRequestArgs request;
+  sessionRequestArgs request;
   ClientContext context;
   request.set_pagesize(args->pageSize);
-  
+  std::chrono::system_clock::time_point deadline = std::chrono::system_clock::now() + std::chrono::milliseconds(opof_get_deadline());
+  context.set_deadline(deadline);
+  #ifdef DEBUG
+  std::cout << "Deadline set for get closed sessions: " << opof_get_deadline() << " milli seconds" << endl;
+  #endif
   *sessionCount = 0;
   std::unique_ptr<ClientReader <sessionResponse> > reader(
         stub_->getClosedSessions(&context, request));
@@ -136,22 +180,26 @@ int SessionTableClient::getClosedSessions(statisticsRequestArgs_t *args, session
 int  SessionTableClient::getAllSessions(int pageSize, uint64_t *session_start_id, uint64_t *session_count, sessionResponse_t responses[], unsigned long *sessionCount){
   
   Status status;
-  sessionResponseArray response;
-  statisticsRequestArgs request;
+  sessionResponses response;
+  sessionRequestArgs request;
   ClientContext context;
  
   int array_size;
-
+  std::chrono::system_clock::time_point deadline = std::chrono::system_clock::now() + std::chrono::milliseconds(opof_get_deadline());
+  context.set_deadline(deadline);
+  #ifdef DEBUG
+  std::cout << "Deadline set for get all sessions: " << opof_get_deadline() << " milli seconds" << endl;
+  #endif
   request.set_pagesize(pageSize);
   request.set_startsession(*session_start_id);
   
   status = stub_->getAllSessions(&context, request, &response);
-  array_size = response.responsearray_size();
+  array_size = response.sessioninfo_size();
   *session_start_id = response.nextkey();
  
 
   for (int i = 0; i < array_size; i++ ){
-    convertSessionResponse2c(response.mutable_responsearray(i), &responses[i]);
+    convertSessionResponse2c(response.mutable_sessioninfo(i), &responses[i]);
   }
 
   *session_count = array_size;
