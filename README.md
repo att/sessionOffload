@@ -22,16 +22,19 @@ $ make all-py
 ```
 
 ```
-### C++ (recommended method using docker container for dependencies)
+### C++ recommended method using docker container for dependencies
 
 #### Step 1
+
 Create the basic build image with all the required libraries
 
 ```bash
 $ cd openoffload/cpp/framework/build
 $ docker build -t grpcbuild:v1beta1 .
 ```
+
 #### Step 2
+
 Create the build container from the base image
 There is a little hack necessary to get the proto file in the right place for docker
 
@@ -43,6 +46,7 @@ $ cp ../../../protos/openoffload.proto .
 $ docker build -t opofbld:v1beta1 .
 $ docker image ls
 ```
+
 #### Step 3
 Access the container to get the files
 
@@ -54,7 +58,7 @@ $ cd results
 $ mkdir log
 
 
-### C++ (assumes all dependencies are installed on the build path) 
+### C++ alternate method assumes all dependencies are installed on the build path
 
 ```bash
 $ cd openoffload
