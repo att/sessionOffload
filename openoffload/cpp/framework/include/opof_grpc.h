@@ -50,22 +50,21 @@ using grpc::ServerReader;
 using grpc::ServerWriter;
 using grpc::ClientWriter;
 //
-using openoffload::v1beta1::SessionTable;
-//using openoffload::v1alpha4::SessionStatisticsTable;
-using openoffload::v1beta1::sessionRequest;
-using openoffload::v1beta1::sessionRequestArgs;
-using openoffload::v1beta1::addSessionResponse;
-using openoffload::v1beta1::sessionResponse;
-using openoffload::v1beta1::sessionResponses;
-using openoffload::v1beta1::sessionResponseError;
-using openoffload::v1beta1::sessionId;
-using openoffload::v1beta1::IP_VERSION;
-using openoffload::v1beta1::PROTOCOL_ID;
-using openoffload::v1beta1::ACTION_TYPE;
-using openoffload::v1beta1::REQUEST_STATUS;
-using openoffload::v1beta1::ADD_SESSION_STATUS;
-using openoffload::v1beta1::SESSION_STATE;
-using openoffload::v1beta1::SESSION_CLOSE_CODE;
-using openoffload::v1beta1::actionParameters;
+using openoffload::v1::SessionTable;
+using openoffload::v1::sessionRequest;
+using openoffload::v1::sessionRequestArgs;
+using openoffload::v1::addSessionResponse;
+using openoffload::v1::sessionResponse;
+using openoffload::v1::sessionResponses;
+using openoffload::v1::sessionResponseError;
+using openoffload::v1::sessionId;
+using openoffload::v1::IP_VERSION;
+using openoffload::v1::PROTOCOL_ID;
+using openoffload::v1::ACTION_TYPE;
+using openoffload::v1::REQUEST_STATUS;
+using openoffload::v1::ADD_SESSION_STATUS;
+using openoffload::v1::SESSION_STATE;
+using openoffload::v1::SESSION_CLOSE_CODE;
+using openoffload::v1::actionParameters;
 
 #endif // _OPOF_GRPC_H
