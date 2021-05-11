@@ -2,9 +2,9 @@ name: doc-gen
 
 on:
   push:
-    branches: [ v1beta1 ]
+    branches: [ master ]
   pull_request:
-    branches: [ v1beta1 ]
+    branches: [ master ]
 
 jobs:
   build:
