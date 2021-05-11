@@ -5,10 +5,9 @@ gRPC API to offload TCP and UDP packet processing from an application to a hardw
 
 # Creating Language Bindings
 
-There are three language bindings implemented in the language Makefile.
+There are two language bindings implemented in the language Makefile.
 
 - Python
-- Golang
 - C++
 
 To generate the language bindings for a specific language the appropriate language and related gRPC tools need to be installed. It is the responsibility of individual implementer to create there client and server code. 
@@ -22,13 +21,40 @@ $ cd openoffload
 $ make all-py
 ```
 
-### Golang
+```
+### C++ (recommended method using docker container for dependencies)
+
+#### Step 1
+Create the basic build image with all the required libraries
 
 ```bash
-$ cd openoffload
-$ make all-go
+$ cd openoffload/cpp/framework/build
+$ docker build -t grpcbuild:v1beta1 .
 ```
-### C++
+#### Step 2
+Create the build container from the base image
+There is a little hack necessary to get the proto file in the right place for docker
+
+```bash
+$ cd ..
+$ cp ../../../protos/openoffload.proto .
+```
+```bash
+$ docker build -t opofbld:v1beta1 .
+$ docker image ls
+```
+#### Step 3
+Access the container to get the files
+
+```bash
+$ mkdir results
+$ docker create -it --name results opofbld:v1alpha5 /bin/bash
+$ docker cp results:/home/grpc/local/tests/bin/ results/
+$ cd results
+$ mkdir log
+
+
+### C++ (assumes all dependencies are installed on the build path) 
 
 ```bash
 $ cd openoffload
@@ -73,6 +99,8 @@ Full Client Tests                                                     | PASS |
 ------------------------------------------------------------------------------
 Add IPv4 Session Test                                                 | PASS |
 ------------------------------------------------------------------------------
+Add IPv4 Session Error Test                                           | PASS |
+------------------------------------------------------------------------------
 Add IPV6 Session Test                                                 | PASS |
 ------------------------------------------------------------------------------
 Get Session Test                                                      | PASS |
@@ -85,54 +113,47 @@ Get Closed Sessions Test                                              | PASS |
 ------------------------------------------------------------------------------
 Get All Closed Sessions Test                                          | PASS |
 ------------------------------------------------------------------------------
-Activation Tests                                                      | PASS |
-------------------------------------------------------------------------------
 Suite Teardown                                                        | PASS |
 ------------------------------------------------------------------------------
 Acceptance.pythonBasicTests :: Executes the python basic gRPC Tests   | PASS |
 11 critical tests, 11 passed, 0 failed
 11 tests total, 11 passed, 0 failed
 ==============================================================================
-Acceptance                                                            | PASS |
-11 critical tests, 11 passed, 0 failed
-11 tests total, 11 passed, 0 failed
+Acceptance.pythonSimulatorTests :: Executes the python basic gRPC Tests       
 ==============================================================================
-Output:  /home/bf1936/WB/sessionOffload.v1alpha4/tests/robot/target/robotframework-reports/output.xml
-XUnit:   /home/bf1936/WB/sessionOffload.v1alpha4/tests/robot/target/robotframework-reports/TEST-acceptance.xml
-Log:     /home/bf1936/WB/sessionOffload.v1alpha4/tests/robot/target/robotframework-reports/log.html
-Report:  /home/bf1936/WB/sessionOffload.v1alpha4/tests/robot/target/robotframework-reports/report.html
-[INFO] 
-[INFO] --- maven-install-plugin:2.4:install (default-install) @ sessionOffload ---
-[INFO] Installing /home/bf1936/WB/sessionOffload.v1alpha4/tests/robot/pom.xml to /root/.m2/repository/com/att/app/sessionOffload/1/sessionOffload-1.pom
+Setup gRPC Tests                                                      | PASS |
+------------------------------------------------------------------------------
+Run Client Tests                                                      | PASS |
+------------------------------------------------------------------------------
+Suite Teardown                                                        | PASS |
+------------------------------------------------------------------------------
+Acceptance.pythonSimulatorTests :: Executes the python basic gRPC ... | PASS |
+3 critical tests, 3 passed, 0 failed
+3 tests total, 3 passed, 0 failed
+==============================================================================
+Acceptance                                                            | PASS |
+14 critical tests, 14 passed, 0 failed
+14 tests total, 14 passed, 0 failed
+==============================================================================
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  7.996 s
-[INFO] Finished at: 2020-10-16T19:36:40Z
+[INFO] Total time:  36.208 s
+[INFO] Finished at: 2021-05-11T12:36:34Z
 [INFO] ------------------------------------------------------------------------
-```
-
 
 
 ## Testing the sample code with python directly
 
 Create four separate terminal windows a client and three server windows
 
-### Server 1  Window (Offload sessions)
+### Server Window (Offload sessions)
 
 Start the offload server in one window by going to the build directory and running the script below.
 
 ```bash
 $ cd buildBasic
 $ ./runOffloadServer.sh
-```
-### Server 2 Window (activation)
-
-Start the activation server in another window by going to the build directory and running the script below.
-
-```bash
-$ cd buildBasic
-$ ./runActivationServer.sh
 ```
 
 ### Client window
@@ -273,6 +294,7 @@ Developed for AT&T by Brian Freeman and Richard Bowman, June 2020
 Current maintainers:
  * Brian Freeman (at&t)
  * Richard Bowman (at&t)
+ * John McDowall (palo alto networks)
 
 # References
 

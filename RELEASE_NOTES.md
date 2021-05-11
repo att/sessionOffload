@@ -9,6 +9,7 @@
 
 ### Bug Fixes
 
+- For python tests, updated the ssl certificate since the original had expired. Changed expiry to 10 years.
 
 ### Feature Changes
 
