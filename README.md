@@ -21,7 +21,6 @@ $ cd openoffload
 $ make all-py
 ```
 
-```
 ### C++ recommended method using docker container for dependencies
 
 #### Step 1
