@@ -61,6 +61,23 @@ int kill_test_server(void){
   return status;
 }
 /** \ingroup testlibrary
+* \brief Utility function start test server
+*
+* Simple function to start the opof_server_test process. This is used to 
+* test the UNAVAILABLE error handling.
+*
+* \param void
+* \return SUCCESS or FAILURE
+**/
+int start_test_server(void){
+  if (!fork()){
+    printf("\n\t Restarting opof test server\n");
+    system("./bin/opof_server_test >/dev/null 2>&1");
+    printf("\n\t Restarted opof test server\n");
+    return 0;
+  }
+}
+/** \ingroup testlibrary
 * \brief Utility function to read a SSL key from a local file system
 *
 * This function creates a "fake" array of sessionResponse_t structs. The statistics
