@@ -10,7 +10,9 @@ This is not intended to be a comprehensive list of answers, but rather a compend
 **Answer:** Yes, there are a few implementations that are available.
 
 *Python:* There is a test Python implementation in this github repository under the test directory.
+
 *C/C++:* There is a sample C++ implementation in this github repository under the openoffload directory.
+
 *C Implementation:* Nivdia has kindly put their implementation in github under open source at: [Firewall Offload]https://github.com/BodongWang/firewall_offload
 
 **Question:** Can multiple VMs talking to the same SmartNIC be supported?
