@@ -5,9 +5,9 @@ This is not intended to be a comprehensive list of answers, but rather a compend
 
 ## FAQ
 
-**Question: ** Is there any examples of an open offload server that can be used get started?
+**Question:** Is there any examples of an open offload server that can be used get started?
 
-**Answer: ** Yes, there are a few implementations that are available.
+**Answer:** Yes, there are a few implementations that are available.
 
 *Python:* There is a test Python implementation in this github repository under the test directory.
 *C/C++:* There is a sample C++ implementation in this github repository under the openoffload directory.
