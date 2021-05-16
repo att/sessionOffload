@@ -42,3 +42,7 @@ This is not intended to be a comprehensive list of answers, but rather a compend
 **Question:** Where is the TCP State managed?
 
 **Answer:** All TCP state is managed by the firewall, as there are several TCP attack vectors that the firewall needs to protect against and it is easier if there is only one entity managing state. Therefore all all TCP control packets must be sent to the firewall and the offload device should not act on them.
+
+**Question:** Is there a preferred implementation technology for the offload server?
+
+**Answer:** Providing the server implements the gRPC API to the offload client the implementation approach and technology is left open to the developers of the offload device.
