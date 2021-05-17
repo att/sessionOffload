@@ -55,6 +55,7 @@ $ docker create -it --name results opofbld:v1alpha5 /bin/bash
 $ docker cp results:/home/grpc/local/tests/bin/ results/
 $ cd results
 $ mkdir log
+```
 
 
 ### C++ alternate method assumes all dependencies are installed on the build path

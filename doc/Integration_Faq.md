@@ -17,15 +17,15 @@ This is not intended to be a comprehensive list of answers, but rather a compend
 
 **Question:** Can multiple VMs talking to the same SmartNIC be supported?
 
-**Answer:** Currently the implementation is focused on a single VM supporting a single SmartNIC. However more deployments model could be supported depending on customer use cases.
+**Answer:** Currently the implementation is focused on a single VM supporting a single SmartNIC. However more deployment models could be supported depending on customer use cases.
 
 **Question:** What is the impact/use of inLIF/outLIF for SmartNIC deployments?
 
-**Answer:** The inLIF/outLIF parameters are just placeholders for the future router case. They can be just hardwired to 1 and 2 for the basic SmartNIC case.
+**Answer:** The inLIF/outLIF parameters are just placeholders for the future network router case. They can be just hardwired to 1 and 2 for the basic SmartNIC case.
 
 **Question:** Are there any management functions in the gRPC API?
 
-**Answer:** Not currently but something we would like to add and are actively soliciting feedback and suggestions.
+**Answer:** Not currently but this is something we would like to add and are actively soliciting feedback and suggestions.
 
 **Question:** Does the current implementation support IPv6?
 
@@ -46,3 +46,12 @@ This is not intended to be a comprehensive list of answers, but rather a compend
 **Question:** Is there a preferred implementation technology for the offload server?
 
 **Answer:** Providing the server implements the gRPC API to the offload client the implementation approach and technology is left open to the developers of the offload device.
+
+**Question:** Can other applications beside firewall use the API?
+
+**Answer:** Yes. Any application that can use the match/action parameters in the API can use the API for session offload.
+
+.
+**Question:** Are additional offload types like UPF accelleration supported ?
+
+**Answer:** Not at this time. The plan is to extend the API over time to handle more use cases through extenstion to the match/action parameters. We encourage suggestions on additional  offload use cses.
