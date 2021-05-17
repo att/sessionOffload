@@ -51,7 +51,6 @@ This is not intended to be a comprehensive list of answers, but rather a compend
 
 **Answer:** Yes. Any application that can use the match/action parameters in the API can use the API for session offload.
 
-.
-**Question:** Are additional offload types like UPF accelleration supported ?
+**Question:** Are additional offload types like UPF accelleration supported?
 
-**Answer:** Not at this time. The plan is to extend the API over time to handle more use cases through extenstion to the match/action parameters. We encourage suggestions on additional  offload use cses.
+**Answer:** Not at this time. The plan is to extend the API over time to handle more use cases through extenstion to the match/action parameters. We encourage suggestions on additional  offload use cases.
