@@ -5,6 +5,11 @@
 * Centos 8
 * Ubuntu 18.04
 
+## Release v1
+
+-  Promote v1beta1 to v1 as the first official release.
+
+
 ## Release v1beta1
 
 ### Bug Fixes
