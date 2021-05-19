@@ -41,7 +41,7 @@ This is not intended to be a comprehensive list of answers, but rather a compend
 
 8. **Question:** Where is the TCP State managed?
 
-    **Answer:** All TCP state is managed by the firewall, as there are several TCP attack vectors that the firewall needs to protect against and it is easier if there is only one entity managing state. Therefore all all TCP control packets must be sent to the firewall and the offload device should not act on them.
+    **Answer:** All TCP state is managed by the firewall, as there are several TCP attack vectors that the firewall needs to protect against and it is easier if there is only one entity managing state. Therefore all TCP control packets must be sent to the firewall and the offload device should not act on them.
 
 9. **Question:** Is there a preferred implementation technology for the offload server?
 
@@ -54,3 +54,7 @@ This is not intended to be a comprehensive list of answers, but rather a compend
 11. **Question:** Are additional offload types like UPF accelleration supported?
 
      **Answer:** Not at this time. The plan is to extend the API over time to handle more use cases through extenstion to the match/action parameters. We encourage suggestions on additional  offload use cases.
+
+12. **Question:** How are timeouts handled?
+
+     **Answer:**  The device will track the cacheTimeout setting on each session entry. When no packets are received after the timeout period, the device will remove the session from the session table. The application will handle the TCP and UDP overall timeout and if additional packets are recieved , it will be a cache miss so the application will process these packets and determine if the session should be re-inserted into the session table. The device does not need to track anything about the two disjoint session table entries. 
