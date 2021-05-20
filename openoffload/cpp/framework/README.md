@@ -275,7 +275,7 @@ Create the basic build image with all the required libraries
 
 ```bash
 $ cd openoffload/cpp/framework/build
-$ docker build -t grpcbuild:v1beta1 .
+$ docker build -t grpcbuild:v1 .
 ```
 ## Step 2
 Create the build container from the base image
@@ -286,7 +286,7 @@ $ cd ..
 $ cp ../../../protos/openoffload.proto .
 ```
 ```bash
-$ docker build -t opofbld:v1beta1 .
+$ docker build -t opofbld:v1 .
 $ docker image ls
 ```
 ## Step 3
@@ -294,7 +294,7 @@ Access the container to get the files
 
 ```bash
 $ mkdir results
-$ docker create -it --name results opofbld:v1alpha5 /bin/bash
+$ docker create -it --name results opofbld:v1 /bin/bash
 $ docker cp results:/home/grpc/local/tests/bin/ results/
 $ cd results
 $ mkdir log
@@ -302,7 +302,7 @@ $ mkdir log
 
 Start the server  (optionally set -p port, -a address )
 ```bash
-$ ./opof_server_test
+$ ./bin/opof_server_test
 
 OPOF: Starting OPOF Version  0.1
 Info: Creating Insecure Server
@@ -311,7 +311,7 @@ Server listening on: localhost:3443
 ```
 Check the client main program for the available performance and config tests to run
 ```bash
-$ ./opof_server_client -f -v
+$ ./bin/opof_client_test -f -v
 
 ```
 # References
