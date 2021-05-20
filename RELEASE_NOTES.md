@@ -8,6 +8,7 @@
 ## Release v1
 
 -  Promote v1beta1 to v1 as the first official release.
+-  Add Integration FAQ to help hardware developers understand details of the solution
 
 
 ## Release v1beta1
