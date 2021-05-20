@@ -29,7 +29,7 @@ Create the basic build image with all the required libraries
 
 ```bash
 $ cd openoffload/cpp/framework/build
-$ docker build -t grpcbuild:v1beta1 .
+$ docker build -t grpcbuild:v1 .
 ```
 
 #### Step 2
@@ -42,7 +42,7 @@ $ cd ..
 $ cp ../../../protos/openoffload.proto .
 ```
 ```bash
-$ docker build -t opofbld:v1beta1 .
+$ docker build -t opofbld:v1 .
 $ docker image ls
 ```
 
@@ -51,10 +51,17 @@ Access the container to get the files
 
 ```bash
 $ mkdir results
-$ docker create -it --name results opofbld:v1alpha5 /bin/bash
+$ docker create -it --name results opofbld:v1 /bin/bash
 $ docker cp results:/home/grpc/local/tests/bin/ results/
 $ cd results
 $ mkdir log
+```
+Run the binaries in separate windows :
+```bash
+./bin/opof_server_test 
+and 
+./bin/opof_client_test -f -v
+```
 
 
 ### C++ alternate method assumes all dependencies are installed on the build path

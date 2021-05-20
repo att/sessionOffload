@@ -119,7 +119,6 @@ int main(int argc, char ** argv){
     sigaction(SIGILL, &newSigAction, NULL);     /* catch illegal instruction signal */
     sigaction(SIGABRT, &newSigAction, NULL);     /* catch abort signal */
     sigaction(SIGSEGV, &newSigAction, NULL);     /* catch segv signal */
-    sigaction(SIGKILL, &newSigAction, NULL);     /* catch segv signal */
 
 
 #ifdef FORK

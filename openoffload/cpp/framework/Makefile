@@ -22,7 +22,7 @@ SERVER_NAME :=opof_server_test
 PROTO_NAME := openoffload
 DIRECTORIES := directories
 PROTOS := protos
-VERSION=0.1
+VERSION=1.0
 SERVER_LIB := libopof_server.a
 CLIENT_LIB := libopof_client.a
 #
@@ -76,10 +76,10 @@ CC := gcc -g
 CPP := g++ -g
 
 #CFLAGS := -c -O2 -I include -I /usr/local/include -I $(ROOT_DIR)/local/include -std=gnu99 -Wall -DDEBUG -DVISIBLE
-CFLAGS := -c -O0 -I include -Wno-undef -I $(ROOT_DIR)/local/include -std=gnu99  -Wall -DDEBUG
+CFLAGS := -c -O0 -I include -Wno-undef -I $(ROOT_DIR)/local/include -std=gnu99  -Wall
 #CPPFLAGS := -c -O2 -std=c++11 -I ./ -I include  -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations  -DDEBUG -DVISIBLE
 #CPPFLAGS := -c -O2 -std=c++11 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Wno-deprecated-declarations -DSSL -DDEBUG
-CPPFLAGS := -c -O0 -std=c++11 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Werror -Wall -Wno-deprecated-declarations -DDEBUG
+CPPFLAGS := -c -O0 -std=c++11 -Wno-undef -I include -I $(ROOT_DIR)/local/include -Werror -Wall -Wno-deprecated-declarations
 #
 #
 # Link Flags

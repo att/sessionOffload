@@ -30,6 +30,7 @@ extern "C" {
 *
 */
 int kill_test_server(void);
+int start_test_server(void);
 int range(int low, int high);
 int get_key(const char *filename, char *key);
 sessionResponse_t **createSessionResponse(int size, int *sessionCount);
