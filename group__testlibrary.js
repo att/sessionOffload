@@ -9,5 +9,6 @@ var group__testlibrary =
     [ "opof_shutdown", "group__testlibrary.html#gaec8118709406a3ea5be32cc6f21a2ce5", null ],
     [ "range", "group__testlibrary.html#gaf37cb4fc11be70a06fc398a9b47f8458", null ],
     [ "read_config", "group__testlibrary.html#ga853f6a7f7b57adbdbd9f18b5f9e8106a", null ],
-    [ "signal_handler", "group__testlibrary.html#ga6aa59f98cad89c73966351ad7afb303c", null ]
+    [ "signal_handler", "group__testlibrary.html#ga6aa59f98cad89c73966351ad7afb303c", null ],
+    [ "start_test_server", "group__testlibrary.html#ga46589068c6552fe50e891a845c4fcd33", null ]
 ];

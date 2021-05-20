@@ -26,7 +26,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">OpenOffload
-   &#160;<span id="projectnumber">v1beta1</span>
+   &#160;<span id="projectnumber">v1</span>
    </div>
    <div id="projectbrief">Open gRPC API to enable hardware offload for network services</div>
   </td>
@@ -113,6 +113,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grou
 <tr class="memitem:gae2d1090757db0a2f6803b550e9a02619"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__testlibrary.html#gae2d1090757db0a2f6803b550e9a02619">opof_set_deadline</a> (int deadline)</td></tr>
 <tr class="memdesc:gae2d1090757db0a2f6803b550e9a02619"><td class="mdescLeft">&#160;</td><td class="mdescRight">gRPC Test Library for C/C++  <a href="group__testlibrary.html#gae2d1090757db0a2f6803b550e9a02619">More...</a><br /></td></tr>
 <tr class="separator:gae2d1090757db0a2f6803b550e9a02619"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga46589068c6552fe50e891a845c4fcd33"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__testlibrary.html#ga46589068c6552fe50e891a845c4fcd33">start_test_server</a> (void)</td></tr>
+<tr class="memdesc:ga46589068c6552fe50e891a845c4fcd33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Utility function start test server.  <a href="group__testlibrary.html#ga46589068c6552fe50e891a845c4fcd33">More...</a><br /></td></tr>
+<tr class="separator:ga46589068c6552fe50e891a845c4fcd33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa84356cbddf915b61ff3e464654cc598"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__testlibrary.html#gaa84356cbddf915b61ff3e464654cc598">get_key</a> (const char *filename, char *key)</td></tr>
 <tr class="memdesc:gaa84356cbddf915b61ff3e464654cc598"><td class="mdescLeft">&#160;</td><td class="mdescRight">Utility function to read a SSL key from a local file system.  <a href="group__testlibrary.html#gaa84356cbddf915b61ff3e464654cc598">More...</a><br /></td></tr>
 <tr class="separator:gaa84356cbddf915b61ff3e464654cc598"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -391,6 +394,34 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grou
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>int Random value within the input range </dd></dl>
+
+</div>
+</div>
+<a id="ga46589068c6552fe50e891a845c4fcd33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga46589068c6552fe50e891a845c4fcd33">&#9670;&nbsp;</a></span>start_test_server()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int start_test_server </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Utility function start test server. </p>
+<p>Simple function to start the opof_server_test process. This is used to test the UNAVAILABLE error handling.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">void</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>SUCCESS or FAILURE </dd></dl>
 
 </div>
 </div>

@@ -26,7 +26,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">OpenOffload
-   &#160;<span id="projectnumber">v1beta1</span>
+   &#160;<span id="projectnumber">v1</span>
    </div>
    <div id="projectbrief">Open gRPC API to enable hardware offload for network services</div>
   </td>
@@ -289,26 +289,26 @@ $(document).ready(function(){initNavTree('md__r_e_a_d_m_e.html',''); initResizab
 <h2>Step 1</h2>
 <p>Create the basic build image with all the required libraries</p>
 <div class="fragment"><div class="line">$ cd openoffload/cpp/framework/build</div>
-<div class="line">$ docker build -t grpcbuild:v1beta1 .</div>
+<div class="line">$ docker build -t grpcbuild:v1 .</div>
 </div><!-- fragment --> <h2>Step 2</h2>
 <p>Create the build container from the base image There is a little hack necessary to get the proto file in the right place for docker</p>
 <div class="fragment"><div class="line">$ cd ..</div>
 <div class="line">$ cp ../../../protos/openoffload.proto .</div>
-</div><!-- fragment --> <div class="fragment"><div class="line">$ docker build -t opofbld:v1beta1 .</div>
+</div><!-- fragment --> <div class="fragment"><div class="line">$ docker build -t opofbld:v1 .</div>
 <div class="line">$ docker image ls</div>
 </div><!-- fragment --> <h2>Step 3</h2>
 <p>Access the container to get the files</p>
 <div class="fragment"><div class="line">$ mkdir results</div>
-<div class="line">$ docker create -it --name results opofbld:v1alpha5 /bin/bash</div>
+<div class="line">$ docker create -it --name results opofbld:v1 /bin/bash</div>
 <div class="line">$ docker cp results:/home/grpc/local/tests/bin/ results/</div>
 <div class="line">$ cd results</div>
 <div class="line">$ mkdir log</div>
-</div><!-- fragment --><p>Start the server (optionally set -p port, -a address ) </p><div class="fragment"><div class="line">$ ./opof_server_test</div>
+</div><!-- fragment --><p>Start the server (optionally set -p port, -a address ) </p><div class="fragment"><div class="line">$ ./bin/opof_server_test</div>
 <div class="line"> </div>
 <div class="line">OPOF: Starting OPOF Version  0.1</div>
 <div class="line">Info: Creating Insecure Server</div>
 <div class="line">Server listening on: localhost:3443</div>
-</div><!-- fragment --><p> Check the client main program for the available performance and config tests to run </p><div class="fragment"><div class="line">$ ./opof_server_client -f -v</div>
+</div><!-- fragment --><p> Check the client main program for the available performance and config tests to run </p><div class="fragment"><div class="line">$ ./bin/opof_client_test -f -v</div>
 </div><!-- fragment --> <h1>References</h1>
 <ol type="1">
 <li><a href="https://grpc.io/docs/languages/cpp/quickstart/">gRPC Quick Start Install</a></li>
