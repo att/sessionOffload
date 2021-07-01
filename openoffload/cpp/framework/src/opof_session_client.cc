@@ -23,7 +23,7 @@ extern "C" {
   //
   // Set default deadline on API calls to 100 milli seconds
   //
-  unsigned int g_deadline = 100;
+  unsigned int g_deadline = 10000;
   /**  \ingroup clientcinterface
   * \brief gets the deadline value in milli-seconds
   *
@@ -85,8 +85,9 @@ int SessionTableClient::addSessionClient(int size, sessionRequest_t **s, addSess
   }
   writer->WritesDone();
   status = writer->Finish();
-  convertAddSessionResponse2c(resp,&response);
-  //std::cout << "Status code: " <<  static_cast<int>(status.error_code()) << endl;
+  if (status.ok()) {
+    convertAddSessionResponse2c(resp,&response);
+  }
   return static_cast<int>(status.error_code());
 }
 /**  \ingroup clientlibrary
@@ -109,7 +110,9 @@ int SessionTableClient::getSessionClient(int sessionid,sessionResponse_t *resp){
   std::cout << "Deadline set for get session: " << opof_get_deadline() << " milli seconds" << endl;
   #endif
   Status status = stub_->getSession(&context, sid, &response);
-  convertSessionResponse2c(&response, resp);
+  if (status.ok()) {
+    convertSessionResponse2c(&response, resp);
+  }
   return static_cast<int>(status.error_code());
 }
 
@@ -133,12 +136,12 @@ int SessionTableClient::deleteSessionClient(int sessionid,sessionResponse_t *res
   std::cout << "Deadline set for delete session: " << opof_get_deadline() << " milli seconds" << endl;
   #endif
   Status status = stub_->deleteSession(&context, sid, &response);
-
-  convertSessionResponse2c(&response, resp);
-  #ifdef DEBUG
+ if (status.ok()) {
+    convertSessionResponse2c(&response, resp);
+#ifdef DEBUG
     display_session_response(resp, "delSessionClient");
-  #endif
-
+#endif
+  }
   return static_cast<int>(status.error_code());
 }
 /**  \ingroup clientlibrary
@@ -194,15 +197,29 @@ int  SessionTableClient::getAllSessions(int pageSize, uint64_t *session_start_id
   request.set_startsession(*session_start_id);
   
   status = stub_->getAllSessions(&context, request, &response);
-  array_size = response.sessioninfo_size();
-  *session_start_id = response.nextkey();
+  if (status.ok()) {
+    array_size = response.sessioninfo_size();
+    *session_start_id = response.nextkey();
  
 
-  for (int i = 0; i < array_size; i++ ){
-    convertSessionResponse2c(response.mutable_sessioninfo(i), &responses[i]);
-  }
+    for (int i = 0; i < array_size; i++ ){
+      convertSessionResponse2c(response.mutable_sessioninfo(i), &responses[i]);
+    }
 
-  *session_count = array_size;
-  
+    *session_count = array_size;
+  }
+  return static_cast<int>(status.error_code());
+}
+
+int SessionTableClient::shutdownServer(unsigned long deadline){
+
+  Status status;
+  shutdownRequest request;
+  shutdownResponse response;
+  ClientContext context;
+
+  request.set_deadline(deadline);
+
+  status = stub_->shutdownServer(&context, request,&response);
   return static_cast<int>(status.error_code());
 }

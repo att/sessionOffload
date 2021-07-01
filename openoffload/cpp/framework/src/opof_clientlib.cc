@@ -198,3 +198,16 @@ int opof_get_all_sessions(sessionTable_t *sessionHandle, uint64_t *startSession,
 	status = client->getAllSessions(pageSize, startSession, sessionCount,responses, sessionCount);
 	return status;
 }
+
+
+int opof_shutdown_server(sessionTable_t *sessionHandle, uint64_t deadline){
+	int status;
+	SessionTableClient *client;
+	std::string reply;
+	
+
+	client = static_cast<SessionTableClient *>(sessionHandle->obj);
+
+	status = client->shutdownServer(deadline);
+	return status;
+}

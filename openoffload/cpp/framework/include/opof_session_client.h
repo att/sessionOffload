@@ -54,6 +54,7 @@ public:
     int deleteSessionClient(int session, sessionResponse_t *resp);
     int getAllSessions(int pageSize, uint64_t *start_session, uint64_t *sessions, sessionResponse_t responses[],unsigned long *sessionCount);
     int getClosedSessions(statisticsRequestArgs_t *args, sessionResponse_t responses[], unsigned long *sessionCount);
+    int shutdownServer(unsigned long deadline);
 private:
     std::unique_ptr<SessionTable::Stub> stub_;
 };

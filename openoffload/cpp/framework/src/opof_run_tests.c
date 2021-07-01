@@ -142,7 +142,7 @@ int getRetryAttempts(void){
         if (testid == -1){
           printf("\nINFO: Full Test Suite ran successfully\n\n");
         } else {
-          printf("\n\tINFO: Test: %d ran successfully\n\n", testid);
+          printf("\nINFO: Test: %d ran successfully\n\n", testid);
         }
       } else {
         printf("ERROR: Test: %d Failed\n", testid);
@@ -207,37 +207,29 @@ int opof_fullTestSuite(const char *address, unsigned short port, const char *cer
       status = opof_test1(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 1 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 1 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test2(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 2 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 2 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test3(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 3 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 3 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test4(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 4 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 4 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
      
@@ -246,82 +238,57 @@ int opof_fullTestSuite(const char *address, unsigned short port, const char *cer
       status = opof_test1(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 1 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 1 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test2(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 2 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 2 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test3(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 3 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 3 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test4(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 4 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 4 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test5(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 5 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 5 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test6(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 6 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 6 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test7(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 7 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 7 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test8(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 8 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 8 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
-        return FAILURE;
-      }
-      status = opof_test11(address,  max_sessions, pageSize,port, cert, verbose);
-      if (status == SUCCESS){
-        printf("Passed Test 11 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
-      } else {
-        printf("Failed Test 11 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
 
@@ -330,82 +297,57 @@ int opof_fullTestSuite(const char *address, unsigned short port, const char *cer
       status = opof_test1(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 1 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 1 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test2(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 2 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 2 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test3(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 3 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 3 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test4(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 4 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 4 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
             status = opof_test5(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 5 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 5 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test6(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 6 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 6 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test7(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 7 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 7 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test8(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 8 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 8 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
-        return FAILURE;
-      }
-      status = opof_test11(address,  max_sessions, pageSize,port, cert, verbose);
-      if (status == SUCCESS){
-        printf("Passed Test 11 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
-      } else {
-        printf("Failed Test 11 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
 
@@ -414,82 +356,57 @@ int opof_fullTestSuite(const char *address, unsigned short port, const char *cer
       status = opof_test1(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 1 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 1 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test2(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 2 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 2 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test3(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 3 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 3 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test4(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 4 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 4 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
             status = opof_test5(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 5 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 5 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test6(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 6 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 6 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test7(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 7 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 7 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
       status = opof_test8(address,  max_sessions, pageSize,port, cert, verbose);
       if (status == SUCCESS){
         printf("Passed Test 8 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
       } else {
         printf("Failed Test 8 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
-        return FAILURE;
-      }
-      status = opof_test11(address,  max_sessions, pageSize,port, cert, verbose);
-      if (status == SUCCESS){
-        printf("Passed Test 11 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
-      } else {
-        printf("Failed Test 11 with max sessions: %d\n",max_sessions);
-        printf("\n--------------------------------------------------------------------------------\n");
         return FAILURE;
       }
   return SUCCESS;
@@ -542,11 +459,9 @@ int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsi
       return FAILURE;
     }
     if (addResp.number_errors > 0){
-      if (verbose){
-        printf("\n\nErrors in the following sessions\n");
-        for (int i=0; i < addResp.number_errors; i++){
-          printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
-        }
+      printf("\n\nErrors in the following sessions\n");
+      for (int i=0; i < addResp.number_errors; i++){
+        printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
       }
     }
      max_sessions = sessionCount;
@@ -558,14 +473,8 @@ int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsi
   printf("\n\tClosing sessions from cache\n");
   while(closed_sessions > 0){
     status = opof_get_closed_sessions(&args,responses,&closed_sessions);
-    if (closed_sessions > 0 && status == _NOT_FOUND){
-      if (status != _OK){
-        printf("ERROR: Closing sessions: %d\n",status);
-        return FAILURE;
-      }
-    }
+    printf("Closed sessions: %lu\n", closed_sessions);
     if (verbose == true){
-      printf("\tClosed sessions: %lu\n", closed_sessions);
       if (closed_sessions > 0){
         for (int i=0; i < closed_sessions; i++){
           print_response( &responses[i]);
@@ -573,10 +482,14 @@ int opof_test1(const char *address, int max_sessions, unsigned int pageSize,unsi
       }
     }
   }
-  printf("\tSuccessfully closed all %d sessions: \n", total_sessions);
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("\n\tSessions per second (add and close): %lf\n", ((double)total_sessions)/(time_spent));
+  printf("\n\nSessions per second (add and close): %lf\n\n", ((double)total_sessions)/(time_spent));
+ 
+  if (opof_delete_all_sessions(handle,pageSize) == FAILURE){
+    return FAILURE;
+  }
+  opof_shutdown_server(handle, 30);
   return SUCCESS;
 }
 
@@ -584,14 +497,12 @@ int opof_test2(const char *address, int max_sessions, unsigned int pageSize,unsi
 
   unsigned long nsessions = 1;
   int status;
-  int total_sessions;
-
+ 
   sessionTable_t *handle;
   
   sessionRequest_t **request;
   addSessionResponse_t addResp;
   
-  total_sessions = max_sessions;
   sessionResponse_t responses[BUFFER_MAX];
   int page_number =1;
   int sessionCount =1;
@@ -659,14 +570,17 @@ int opof_test2(const char *address, int max_sessions, unsigned int pageSize,unsi
       //}
     }
   }
-  printf("\n\tGetting all %d sessions, with page size: %d\n",total_sessions, pageSize);
+  if (opof_delete_all_sessions(handle,pageSize) == FAILURE){
+    return FAILURE;
+  }
+  opof_shutdown_server(handle, 30);
   return SUCCESS;
 }
 
 int opof_test3(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose){
 
   int status;
-
+  
   sessionTable_t *handle;
   
   
@@ -679,6 +593,8 @@ int opof_test3(const char *address, int max_sessions, unsigned int pageSize,unsi
   handle = opof_create_sessionTable(address, port, cert);
   int sessionId=0;
   int total_sessions;
+  
+
   /*
   *  Clean up any exisitng data in cache
   */
@@ -686,7 +602,7 @@ int opof_test3(const char *address, int max_sessions, unsigned int pageSize,unsi
     return FAILURE;
   }
   printf("\n\nRunning Test 3: Testing get sessions");
-  printf("\n\tNumber of sessions to get: %d\n",max_sessions);
+  printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
  
   //
   total_sessions = max_sessions;
@@ -726,7 +642,10 @@ int opof_test3(const char *address, int max_sessions, unsigned int pageSize,unsi
       exit(-1);
     }
   }
-   printf("\n\tGetting %d individual sessions\n",total_sessions);
+  if (opof_delete_all_sessions(handle,pageSize) == FAILURE){
+    return FAILURE;
+  }
+  opof_shutdown_server(handle, 30);
   return SUCCESS;
 }
 
@@ -757,7 +676,7 @@ int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsi
     return FAILURE;
   }
   printf("\n\nRunning Test 4: Testing delete sessions ");
-  printf("\n\tNumber of sessions to delete: %d\n",max_sessions);
+  printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
   
   //
   total_sessions = max_sessions;
@@ -797,7 +716,10 @@ int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsi
       exit(-1);
     }
   }
-  printf("\n\tDeleting %d individual sessions\n",total_sessions);
+  if (opof_delete_all_sessions(handle,pageSize) == FAILURE){
+    return FAILURE;
+  }
+   opof_shutdown_server(handle, 30);
   return SUCCESS;
 }
  int opof_test5(const char *address, int max_sessions, unsigned int pageSize,unsigned short port, const char *cert, bool verbose){
@@ -825,7 +747,7 @@ int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsi
     return FAILURE;
   }
   printf("\n\nRunning Test 5: Testing calling get_closed_sessions with zero sessions");
-  printf("\n\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
+  printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
   //
   while(max_sessions > 0){
 
@@ -842,11 +764,9 @@ int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsi
       return FAILURE;
     }
     if (addResp.number_errors > 0){
-      if (verbose){
-        printf("\n\nErrors in the following sessions\n");
-        for (int i=0; i < addResp.number_errors; i++){
-          printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
-        }
+      printf("\n\nErrors in the following sessions\n");
+      for (int i=0; i < addResp.number_errors; i++){
+        printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
       }
     }
      max_sessions = sessionCount;
@@ -858,7 +778,7 @@ int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsi
   while(closed_sessions > 0){
     status = opof_get_closed_sessions(&args,responses, &closed_sessions);
     if (status != _OK){
-      printf("\tTest 5: %s\n", getStatusCode(status));
+      printf("Test 5: %s\n", getStatusCode(status));
     }
     if (verbose == true){
       if (closed_sessions > 0){
@@ -868,6 +788,7 @@ int opof_test4(const char *address, int max_sessions, unsigned int pageSize,unsi
       }
     }
   }
+   opof_shutdown_server(handle, 30);
   return SUCCESS;
 }
 
@@ -898,7 +819,7 @@ int opof_test6(const char *address, int max_sessions, unsigned int pageSize,unsi
     return FAILURE;
   }
   printf("\n\nRunning Test 6: Testing duplicate session adds");
-  printf("\n\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
+  printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
   //
   while(max_sessions > 0){
 
@@ -915,11 +836,9 @@ int opof_test6(const char *address, int max_sessions, unsigned int pageSize,unsi
       return FAILURE;
     }
     if (addResp.number_errors > 0){
-      if (verbose){
-        printf("\n\nErrors in the following sessions\n");
-        for (int i=0; i < addResp.number_errors; i++){
-          printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
-        }
+      printf("\n\nErrors in the following sessions\n");
+      for (int i=0; i < addResp.number_errors; i++){
+        printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
       }
     }
      max_sessions = sessionCount;
@@ -942,11 +861,9 @@ int opof_test6(const char *address, int max_sessions, unsigned int pageSize,unsi
       return FAILURE;
     }
     if (addResp.number_errors > 0){
-      if (verbose){
-        printf("\n\nErrors in the following sessions\n");
-        for (int i=0; i < addResp.number_errors; i++){
-          printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
-        }
+      printf("\n\nErrors in the following sessions\n");
+      for (int i=0; i < addResp.number_errors; i++){
+        printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
       }
     }
      max_sessions = sessionCount;
@@ -957,9 +874,8 @@ int opof_test6(const char *address, int max_sessions, unsigned int pageSize,unsi
   }
   while(closed_sessions > 0){
     status = opof_get_closed_sessions(&args,responses,&closed_sessions);
-   
+    printf("Closed sessions: %lu\n", closed_sessions);
     if (verbose == true){
-      printf("Closed sessions: %lu\n", closed_sessions);
       if (closed_sessions > 0){
         for (int i=0; i < closed_sessions; i++){
           print_response( &responses[i]);
@@ -967,7 +883,7 @@ int opof_test6(const char *address, int max_sessions, unsigned int pageSize,unsi
       }
     }
   }
-  printf("\n\tAdded %d duplicate sessions\n", total_sessions);
+   opof_shutdown_server(handle, 30);
   return SUCCESS;
 }
 
@@ -997,7 +913,7 @@ int opof_test7(const char *address, int max_sessions, unsigned int pageSize,unsi
     return FAILURE;
   }
   printf("\n\nRunning Test 7: Testing get and delete on invalid sessions");
-  printf("\n\tNumber of Sessions: %d\n",max_sessions);
+  printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
  
   //
   total_sessions = max_sessions;
@@ -1026,9 +942,9 @@ int opof_test7(const char *address, int max_sessions, unsigned int pageSize,unsi
   //  print_response_header();
  // }
   status = opof_get_session(handle, total_sessions+1, &resp);
-  printf("\n\tTest 7 Get session ID: %d response: %s\n", total_sessions+1, getStatusCode(status));
+  printf("\nTest 7 Get session ID: %d response: %s\n", total_sessions+1, getStatusCode(status));
   status = opof_del_session(handle, total_sessions+1, &resp);
-  printf("\tTest 7 Delete session ID: %d response %s\n", total_sessions+1, getStatusCode(status));
+  printf("Test 7 Delete session ID: %d response %s\n", total_sessions+1, getStatusCode(status));
   //if (verbose){
   //  print_response(&resp);
   //}
@@ -1066,7 +982,7 @@ int opof_test8(const char *address, int max_sessions, unsigned int pageSize,unsi
     return FAILURE;
   }
   printf("\n\nRunning Test 8: Test delete and recreating session table handle");
-  printf("\n\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
+  printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
   //
   clock_t begin = clock();
   while(max_sessions > 0){
@@ -1084,11 +1000,9 @@ int opof_test8(const char *address, int max_sessions, unsigned int pageSize,unsi
       return FAILURE;
     }
     if (addResp.number_errors > 0){
-      if (verbose){
-        printf("\n\nErrors in the following sessions\n");
-        for (int i=0; i < addResp.number_errors; i++){
-          printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
-        }
+      printf("\n\nErrors in the following sessions\n");
+      for (int i=0; i < addResp.number_errors; i++){
+        printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
       }
     }
      max_sessions = sessionCount;
@@ -1105,9 +1019,8 @@ int opof_test8(const char *address, int max_sessions, unsigned int pageSize,unsi
 
   while(closed_sessions > 0){
     status = opof_get_closed_sessions(&args,responses,&closed_sessions);
-    
+    printf("Closed sessions: %lu\n", closed_sessions);
     if (verbose == true){
-      printf("Closed sessions: %lu\n", closed_sessions);
       if (closed_sessions > 0){
         for (int i=0; i < closed_sessions; i++){
           print_response( &responses[i]);
@@ -1117,7 +1030,7 @@ int opof_test8(const char *address, int max_sessions, unsigned int pageSize,unsi
   }
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("\n\n\tSessions per second (add and close): %lf\n\n", ((double)total_sessions)/(time_spent));
+  printf("\n\nSessions per second (add and close): %lf\n\n", ((double)total_sessions)/(time_spent));
   return SUCCESS;
 }
 
@@ -1150,11 +1063,11 @@ int opof_test9(const char *address, int max_sessions, unsigned int pageSize,unsi
     return FAILURE;
   }
   printf("\n\nRunning Test 9: Test session opof_clientlib timeout and restart\n");
-  printf("\n\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
+  printf("\tNumber of Sessions: %d page size: %d\n",max_sessions, pageSize);
   //
   clock_t begin = clock();
   if (kill_test_server() == SUCCESS){
-    printf("\tTest server killed\n");
+    printf("Test server killed\n");
   }
   while(max_sessions > 0){
 
@@ -1174,7 +1087,6 @@ int opof_test9(const char *address, int max_sessions, unsigned int pageSize,unsi
       int retryAttempts = getRetryAttempts();
       for(int i =0; i < retryAttempts; i++){
         sleep(retryInterval);
-        (void)start_test_server();
         status = opof_add_session(bufferSize,handle, request, &addResp);
         if (status != 14){
           break;
@@ -1188,11 +1100,9 @@ int opof_test9(const char *address, int max_sessions, unsigned int pageSize,unsi
 
     
     if (addResp.number_errors > 0){
-      if(verbose){
-        printf("\n\nErrors in the following sessions\n");
-        for (int i=0; i < addResp.number_errors; i++){
-          printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
-        }
+      printf("\n\nErrors in the following sessions\n");
+      for (int i=0; i < addResp.number_errors; i++){
+        printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
       }
     }
      max_sessions = sessionCount;
@@ -1209,8 +1119,8 @@ int opof_test9(const char *address, int max_sessions, unsigned int pageSize,unsi
 
   while(closed_sessions > 0){
     status = opof_get_closed_sessions(&args,responses,&closed_sessions);
+    printf("Closed sessions: %lu\n", closed_sessions);
     if (verbose == true){
-      printf("\tClosed sessions: %lu\n", closed_sessions);
       if (closed_sessions > 0){
         for (int i=0; i < closed_sessions; i++){
           print_response( &responses[i]);
@@ -1244,7 +1154,7 @@ int opof_test10(const char *address, int max_sessions, unsigned int pageSize,uns
   handle = opof_create_sessionTable(address, port, cert);
   args.handle = handle;
   args.pageSize = pageSize;
-  //printf("Handle %p\n", handle);
+  printf("Handle %p\n", handle);
 
   /*
   *  Clean up any exisitng data in cache
@@ -1257,7 +1167,7 @@ int opof_test10(const char *address, int max_sessions, unsigned int pageSize,uns
   //
   clock_t begin = clock();
 
-  opof_set_deadline(1);
+  opof_set_deadline(100);
   while(max_sessions > 0){
 
     sessionCount = max_sessions - pageSize;
@@ -1271,16 +1181,15 @@ int opof_test10(const char *address, int max_sessions, unsigned int pageSize,uns
     /*
     * Check server is up - if not wait for it to come up
     */
-     printf("\tAdd Session Status: %d\n",status);
+    printf("Add Session Status: %d\n",status);
     if (status == 4){
-      printf("\tDeadline exceeded retrying\n");
+      printf("Deadline exceeded retrying\n");
       opof_set_deadline(4000); 
       //opof_delete_sessionTable(handle);
       //handle = opof_create_sessionTable(address, port, cert);
       status = opof_add_session(bufferSize,handle, request, &addResp);
-      printf("\tAdd Session Status: %d, deadline %d\n",status,opof_get_deadline());
+      printf("Add Sessi{on Status: %d, deadline %d\n",status,opof_get_deadline());
     }
-#if 0
     if (status == 14){
       int retryInterval = getRetryInterval();
       int retryAttempts = getRetryAttempts();
@@ -1293,7 +1202,6 @@ int opof_test10(const char *address, int max_sessions, unsigned int pageSize,uns
         }
       }
     }
-#endif
     if (status != _OK){
       printf("ERROR: Adding sessions: %d\n",status);
       return FAILURE;
@@ -1301,11 +1209,9 @@ int opof_test10(const char *address, int max_sessions, unsigned int pageSize,uns
 
     
     if (addResp.number_errors > 0){
-      if (verbose){
-        printf("\n\nErrors in the following sessions\n");
-        for (int i=0; i < addResp.number_errors; i++){
-          printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
-        }
+      printf("\n\nErrors in the following sessions\n");
+      for (int i=0; i < addResp.number_errors; i++){
+        printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
       }
     }
      max_sessions = sessionCount;
@@ -1314,25 +1220,24 @@ int opof_test10(const char *address, int max_sessions, unsigned int pageSize,uns
   if (verbose == true){
     print_response_header();
   }
-  opof_set_deadline(1); 
-  //opof_delete_sessionTable(handle);
-  //handle = opof_create_sessionTable(address, port, cert);
-  //args.handle = handle;
-  //args.pageSize = pageSize;
+  opof_set_deadline(100); 
+  opof_delete_sessionTable(handle);
+  handle = opof_create_sessionTable(address, port, cert);
+  args.handle = handle;
+  args.pageSize = pageSize;
 
   while(closed_sessions > 0){
     status = opof_get_closed_sessions(&args,responses,&closed_sessions);
     if (status == 4){
-      printf("\tDeadline exceeded for get closed sessions retrying\n");
+      printf("Deadline exceeded for get closed sessions retrying\n");
       opof_set_deadline(4000); 
       //opof_delete_sessionTable(handle);
       //handle = opof_create_sessionTable(address, port, cert);
        status = opof_get_closed_sessions(&args,responses,&closed_sessions);
       printf("get closed Sessi{on Status: %d, deadline %d\n",status,opof_get_deadline());
     }
-    
+    printf("Closed sessions: %lu\n", closed_sessions);
     if (verbose == true){
-      printf("\tClosed sessions: %lu\n", closed_sessions);
       if (closed_sessions > 0){
         for (int i=0; i < closed_sessions; i++){
           print_response( &responses[i]);
@@ -1393,11 +1298,9 @@ int opof_test11(const char *address, int max_sessions, unsigned int pageSize,uns
       return FAILURE;
     }
     if (addResp.number_errors > 0){
-      if (verbose){
-        printf("\n\nErrors in the following sessions\n");
-        for (int i=0; i < addResp.number_errors; i++){
-          printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
-        }
+      printf("\n\nErrors in the following sessions\n");
+      for (int i=0; i < addResp.number_errors; i++){
+        printf("\tSessionId: %lu\t error: %s\n", addResp.sessionErrors[i].sessionId, getAddResponseError(addResp.sessionErrors[i].errorStatus));
       }
     }
      max_sessions = sessionCount;
@@ -1409,9 +1312,8 @@ int opof_test11(const char *address, int max_sessions, unsigned int pageSize,uns
   printf("\n\tClosing sessions from cache\n");
   while(closed_sessions > 0){
     status = opof_get_closed_sessions(&args,responses,&closed_sessions);
-   
+    printf("Closed sessions: %lu\n", closed_sessions);
     if (verbose == true){
-      printf("\tClosed sessions: %lu\n", closed_sessions);
       if (closed_sessions > 0){
         for (int i=0; i < closed_sessions; i++){
           print_response( &responses[i]);
@@ -1421,7 +1323,7 @@ int opof_test11(const char *address, int max_sessions, unsigned int pageSize,uns
   }
   clock_t end = clock();
   double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("\n\n\tSessions per second (add and close): %lf\n\n", ((double)total_sessions)/(time_spent));
+  printf("\n\nSessions per second (add and close): %lf\n\n", ((double)total_sessions)/(time_spent));
   return SUCCESS;
 }
 

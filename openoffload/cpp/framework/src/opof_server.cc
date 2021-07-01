@@ -26,8 +26,13 @@ extern "C" {
 #include "opof_grpc.h"
 #include "opof_session_server.h"
 
-
+//
+// Global Promise for graceful shutdown
+//
+std::promise<void> exit_requested;
 extern "C" void opof_server(const char *address, unsigned short port, const char* cert, const char* key);
+
+
 
 /**
 * \brief  gRPC C++ Server Implementation
@@ -83,6 +88,15 @@ void opof_server(const char* address, unsigned short port, const char* cert, con
 
   // Wait for the server to shutdown. Note that some other thread must be
   // responsible for shutting down the server for this call to ever return.
-  server->Wait();
+  auto serveFn = [&]() {
+    server->Wait();
+  };
+  std::thread serving_thread(serveFn);
+
+  auto f = exit_requested.get_future();
+  f.wait();
+  server->Shutdown();
+  serving_thread.join();
+  std::cout << "Shutting down opof server " << std::endl;
   
 }

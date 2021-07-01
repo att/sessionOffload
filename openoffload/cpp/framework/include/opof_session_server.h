@@ -30,12 +30,13 @@ extern "C" {
 
 
 class SessionTableImpl final : public SessionTable::Service {
-public:  
+public:
     Status addSession(ServerContext* context, ServerReader<sessionRequest>* reader, addSessionResponse* response) override;
     Status getSession(ServerContext* context, const sessionId* sid, sessionResponse* response) override;
     Status deleteSession(ServerContext* context, const sessionId* sid, sessionResponse* response) override;
     Status getAllSessions(ServerContext* context, const sessionRequestArgs* request, sessionResponses *responseArray) override;
     Status getClosedSessions(ServerContext* context,  const sessionRequestArgs* response,ServerWriter<sessionResponse>* writer) override;
+    Status shutdownServer(ServerContext* context,  const shutdownRequest* request, shutdownResponse* response) override;
 };
 
 

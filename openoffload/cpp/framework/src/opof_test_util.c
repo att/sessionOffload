@@ -76,6 +76,7 @@ int start_test_server(void){
     printf("\n\t Restarted opof test server\n");
     return 0;
   }
+  return SUCCESS;
 }
 /** \ingroup testlibrary
 * \brief Utility function to read a SSL key from a local file system

@@ -40,6 +40,9 @@ extern "C" {
 * \param reader
 * \param response
 */
+
+//extern std::promise<void> exit_requested;
+
 Status SessionTableImpl::addSession(ServerContext* context, ServerReader<sessionRequest>* reader, addSessionResponse* response) {
   int status;
   //int index=0;
@@ -53,21 +56,26 @@ Status SessionTableImpl::addSession(ServerContext* context, ServerReader<session
   //if (context->IsCancelled()) {
   //  return Status(StatusCode::CANCELLED, "Deadline exceeded or Client cancelled, abandoning.");
   //}
-#ifdef TESTS
-  sleep(1);
-#endif
+
+//int count = 0;
+//#ifdef TESTS
+ // sleep(1);
+//#endif
   while(reader->Read(&request)){
     convertSessionRequest2c(request, &request_c);
     if (context->IsCancelled()) {
       return Status(StatusCode::CANCELLED, "Deadline exceeded or Client cancelled, abandoning.");
     }
     status = opof_add_session_server(&request_c, &addResponse_c);
+    //if (count == 20){
+      //sleep(1);
+    //}
     if (status != _OK){
       errorMessage = response->add_responseerror();
       errorMessage->set_sessionid(request.sessionid());
       errorMessage->set_errorstatus(status);
     }
-    //index++;
+    //count++;
   }
   //response->set_requeststatus(reqStatus);
   return Status::OK;
@@ -199,9 +207,9 @@ Status SessionTableImpl::getClosedSessions(ServerContext* context, const session
   int nresponses = request->pagesize();
   request_c.pageSize = nresponses;
   sessionResponse_t closedSessions[BUFFER_MAX];
-#ifdef TESTS
-  sleep(1);
-#endif
+//#ifdef TESTS
+  //sleep(1);
+//#endif
   sessionCount = opof_get_closed_sessions_server(&request_c, closedSessions);
   if (sessionCount == 0){
     return Status(grpc::StatusCode::NOT_FOUND,"No Closed Sessions");
@@ -219,6 +227,12 @@ Status SessionTableImpl::getClosedSessions(ServerContext* context, const session
     writer->Write(response);
     
   }
-  
+ 
+  return Status::OK;
+}
+
+Status SessionTableImpl::shutdownServer(ServerContext* context, const shutdownRequest* request, shutdownResponse* response){
+
+  exit_requested.set_value();
   return Status::OK;
 }

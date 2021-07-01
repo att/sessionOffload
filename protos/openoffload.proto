@@ -20,9 +20,9 @@ syntax = "proto3";
 // will move to v1 at release 
 // increment beta1 to beta2 , etc for changes during development
 
-package openoffload.v1;
+package openoffload.v1_1;
 
-option go_package = ".;openoffload_v1beta1";
+option go_package = ".;openoffload_v1_1";
 
 import "google/protobuf/timestamp.proto";
 
@@ -141,7 +141,10 @@ rpc getAllSessions(sessionRequestArgs) returns (sessionResponses) {}
 // statistics as a outgoing session from the WB to Applications ?
 // grpc seems to need a request input streamId is a placeholder
 rpc getClosedSessions(sessionRequestArgs) returns (stream sessionResponse) {}
-
+//
+// Shutdown Server method
+//
+rpc shutdownServer(shutdownRequest) returns (shutdownResponse) {}
 
 }
 
@@ -190,6 +193,15 @@ message sessionResponseError {
 message sessionResponses {
   repeated sessionResponse sessionInfo = 1;
   uint64 nextkey =2;
+}
+
+// Empty message simulating void
+message shutdownRequest {
+ int32 deadline = 1;
+}
+
+message shutdownResponse {
+  uint64 errorStatus = 1 ;
 }
 //
 // In v1apha4 the errorstatus was added to act as a bitmask
