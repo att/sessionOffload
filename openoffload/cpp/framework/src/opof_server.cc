@@ -30,7 +30,7 @@ extern "C" {
 // Global Promise for graceful shutdown
 //
 std::promise<void> exit_requested;
-extern "C" void opof_server(const char *address, unsigned short port, const char* cert, const char* key);
+extern "C" int opof_server(const char *address, unsigned short port, const char* cert, const char* key);
 
 
 
@@ -43,7 +43,7 @@ extern "C" void opof_server(const char *address, unsigned short port, const char
 * \parman key    The privaste key of the TLS connection
 *
 */
-void opof_server(const char* address, unsigned short port, const char* cert, const char* key){
+int opof_server(const char* address, unsigned short port, const char* cert, const char* key){
 
   SessionTableImpl service;
   std::string cppaddress(address);
@@ -98,5 +98,5 @@ void opof_server(const char* address, unsigned short port, const char* cert, con
   server->Shutdown();
   serving_thread.join();
   std::cout << "Shutting down opof server " << std::endl;
-  
+  return 5;
 }

@@ -40,15 +40,23 @@ void signal_handler(int signo)
                 syslog(LOG_WARNING, "Received SIGHUP signal.");
                 break;
             case SIGINT:
-            case SIGKILL:
-            case SIGTERM:
-            case SIGSEGV:
-                syslog(LOG_INFO, "Daemon exiting due to signal");
+             	syslog(LOG_INFO, "Daemon exiting due to control C");
                 opof_shutdown();
-                exit(EXIT_SUCCESS);
+                exit(1);
+                break;
+            case SIGTERM:
+            	syslog(LOG_INFO, "Daemon exiting due to kill command");
+                opof_shutdown();
+                exit(2);
+                break;
+            case SIGSEGV:
+                syslog(LOG_INFO, "Daemon exiting due to segmentation violation");
+                opof_shutdown();
+                exit(3);
                 break;
             default:
                 syslog(LOG_WARNING, "Unhandled signal %s", strsignal(signo));
+                exit(4);
                 break;
         }
 }
