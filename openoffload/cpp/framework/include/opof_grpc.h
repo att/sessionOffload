@@ -63,6 +63,7 @@ using openoffload::v1_1::shutdownRequest;
 using openoffload::v1_1::sessionId;
 using openoffload::v1_1::IP_VERSION;
 using openoffload::v1_1::PROTOCOL_ID;
+using openoffload::v1_1::PARENT_TUNNEL_TYPE;
 using openoffload::v1_1::ACTION_TYPE;
 using openoffload::v1_1::REQUEST_STATUS;
 using openoffload::v1_1::ADD_SESSION_STATUS;

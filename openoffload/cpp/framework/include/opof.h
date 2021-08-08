@@ -184,6 +184,13 @@ typedef enum {
   _SESSION_TABLE_UNAVAILABLE =3,
   _SESSION_ALREADY_EXISTS=4,
 } ADD_SESSION_STATUS_T;
+
+
+typedef enum {
+    _TUNNEL_NONE = 0,
+    _TUNNEL_GTPU = 1,
+} PARENT_TUNNEL_T;
+
 /** @enum REQUEST_STATUS_T
    *  Enum for the request status codes
    *
@@ -295,6 +302,7 @@ typedef struct sessionRequestTuple {
     struct in_addr  nextHop;
     struct in6_addr nextHopV6;
     unsigned int cacheTimeout;
+    PARENT_TUNNEL_T parentTunnel;
 } sessionRequest_t;
 
 

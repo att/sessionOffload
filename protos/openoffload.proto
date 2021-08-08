@@ -117,6 +117,11 @@ enum ACTION_TYPE{
    _SNOOP = 3;
 }
 
+enum PARENT_TUNNEL_TYPE{
+  _TUNNEL_NONE = 0;
+  _TUNNEL_GTPU = 1;
+}
+
 //
 // The session table was combined with the statistices service
 // in v1alpha4 to simplfy the code.
@@ -157,8 +162,8 @@ message sessionId{
 
 // MIRROR and SNOOP require an actionNextHop
 // DROP and FORWARD do not have an actionNextHop
-// The IPV4 nextHop definition maps to the V4 struct returned by inet_pton whcih is a uint32_t.
-// The IPV6 nextHop definition maps to the V6 struct returned by inet_ptoN which is a uint8_t s6_addr[16]
+// The IPV4 nextHop definition maps to the V4 struct returned by inet_pton which is a uint32_t.
+// The IPV6 nextHop definition maps to the V6 struct returned by inet_pton which is a uint8_t s6_addr[16]
 message actionParameters{
      ACTION_TYPE  actionType = 1;
      uint32 actionNextHop = 2;
@@ -182,6 +187,7 @@ message sessionRequest{
   PROTOCOL_ID protocolId = 11;
   actionParameters action = 12;
   uint32 cacheTimeout = 13;
+  PARENT_TUNNEL_TYPE parentTunnelType = 14;
 }
 
 message sessionResponseError {

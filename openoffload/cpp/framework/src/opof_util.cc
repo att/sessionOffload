@@ -63,7 +63,9 @@ void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *requ
     } 
     request->set_destinationport((unsigned int)request_c->dstPort);
     request->set_protocolid((PROTOCOL_ID)request_c->proto);
+    request->set_parenttunneltype((PARENT_TUNNEL_TYPE)request_c->parentTunnel);
     action.set_actiontype((ACTION_TYPE)request_c->actType);
+
     if (request_c->ipver == _IPV6){
       s.assign(request_c->nextHopV6.s6_addr, request_c->nextHopV6.s6_addr+ 16);
       action.set_actionnexthopv6(s);
@@ -152,6 +154,7 @@ void convertSessionRequest2c(sessionRequest request, sessionRequest_t *request_c
     request_c->srcPort = (unsigned short)request.sourceport();
     request_c->dstPort = (unsigned short)request.destinationport();
     request_c->proto = (PROTOCOL_ID_T)request.protocolid();
+    request_c->parentTunnel = (PARENT_TUNNEL_T)request.parenttunneltype();
     action = request.action();
     request_c->actType= (ACTION_VALUE_T)action.actiontype();
     request_c->cacheTimeout = request.cachetimeout();
