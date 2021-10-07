@@ -58,3 +58,7 @@ This is not intended to be a comprehensive list of answers, but rather a compend
 12. **Question:** How are timeouts handled?
 
      **Answer:**  The device will track the cacheTimeout setting on each session entry. When no packets are received after the timeout period, the device will remove the session from the session table and stream the closed session and stats to the application over the getClosedSessions gRPC call. The application will handle the TCP and UDP overall timeout. If additional packets are received , it will be a cache miss so the application will process these packets and determine if the session should be re-inserted into the session table. The device does not need to track anything about the two disjoint in time session table entries, the application will sum up the total packet/byte counts. 
+
+13. **Question:** Does the application send a deleteSession for every offloaded session?
+
+     **Answer:**  No. The device session timeout processing will handle deletes for normal operation so no deleteSession message is needed for a normal life cycle of a session offload entry. This reduces the messages over the gRPC control channgel between the application and the device. The deleteSession message is used for situations where the policy has changed. For example, if the firewall policy allowed a session to flow but an update is processed to change the policy to block a flow that is in progress with offload, the application will send a deleteSession to remove the flow that is no longer valid.
