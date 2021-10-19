@@ -275,7 +275,7 @@ Create the basic build image with all the required libraries
 
 ```bash
 $ cd openoffload/cpp/framework/build
-$ docker build -t grpcbuild:v1 .
+$ docker build -t grpcbuild:v1beta1 .
 ```
 ## Step 2
 Create the build container from the base image
