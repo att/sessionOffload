@@ -113,7 +113,7 @@ The following command will generate about 100 Gbps and about 150,000 sessions of
 
 <pre><code>
 
-sudo ./t-rex-64 -f astf/http_eflow.py --astf -m 1000 -c 16 -l 1000 -d 240 -t size=2048,loop=100
+sudo ./t-rex-64 -f astf/ito_single_flow.py --astf -m 1000 -c 16 -l 1000 -d 240 -t size=2048,loop=100
 
 </code></pre>
 
@@ -121,7 +121,7 @@ The Python Code in the command is in the TREX directory. It should be copied to 
 
 
 #### Enterprise Traffic Test
-The following command will generate about 100 Gbps and 200,000 sessions of traffic with TREX if the test server has sufficient CPU. NOTE: To enable this in NGFW the Application Override must be configured with HTTP and port 80.
+The following command will generate about 100 Gbps and 250,000 sessions of traffic with TREX if the test server has sufficient CPU. NOTE: To enable this in NGFW the Application Override must be configured with HTTP and port 80.
 
 
 <pre><code>
