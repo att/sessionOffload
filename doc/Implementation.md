@@ -7,7 +7,7 @@ This document is intended for implementation engineers who are working to implem
 
 This section gives a packet walkthrough of the system to provide context for the overall architecture
 
-![DPU Implementation Overview](images/smartnic_arch.png)
+![DPU Implementation Overview](images/smartnic_arch.r1.png)
 
 <ol>
 <li>Packet arrives at ens0 from test server</li>
