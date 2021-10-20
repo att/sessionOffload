@@ -118,7 +118,7 @@ sudo ./t-rex-64 -f astf/ito_single_flow.py --astf -m 1000 -c 16 -l 1000 -d 240 -
 
 </code></pre>
 
-The Python Code in the command is in the TREX directory. It should be copied to the TREX astf directory as it references PCAP files from TREX.
+The Python Code in the command [ito_single_flow.py](../tests/TREX/ito_single_flow.py) is in the TREX directory. It should be copied to the TREX astf directory as it references PCAP files from TREX.
 
 
 #### Enterprise Traffic Test
@@ -131,7 +131,7 @@ sudo ./t-rex-64 -f astf/ito_enterprise.py --astf -m 10 -c 16 -l 1000 -d 240 -t s
 
 </code></pre>
 
-The Python Code in the command is in the TREX directory. It should be copied to the TREX astf directory as it references PCAP files from TREX.
+The Python Code in the command [ito_enterprise.py](../tests/TREX/ito_enterprise.py) is in the TREX directory. It should be copied to the TREX astf directory as it references PCAP files from TREX.
 
 
 #### Session Insertion Rate Test
