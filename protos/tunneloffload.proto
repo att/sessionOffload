@@ -1,0 +1,352 @@
+// Add licensing
+
+syntax = "proto3";
+
+package tunneloffload.v1;
+
+//
+// Errors for adding a session
+// If all sessions are successful inserted return _ACCEPTED
+//
+// If check of session capacity in offload device is insufficient to add all sessions 
+// do not insert any sessions and return  _REJECTED_SESSION_TABLE_FULL. It is the 
+// responsibility of the client to re-try
+//
+// If the server is unavailable for some other reason then return _REJECTED_SESSION_TABLE_UNAVAILABLE.
+// It is the  responsibility of the client to re-try
+//
+// All other errors will return _REJECTED with a buit mask of the failed sessions and it is the responsibility
+// of the client to address the issues
+//
+// ADD_SESSION_STATUS Codes Description
+//
+// _SESSION_ACCEPTED: Session is accepted by the server and the client performs normal operation
+// _SESSION_REJECTED: Session is rejected by the server as the message 
+//    is invalid, the client needs to correct the error.
+// _SESSION_TABLE_FULL: Session is rejected by the server as its session table is full, 
+//    the client needs to backoff until more space is available
+// _SESSION_TABLE_UNAVAILABLE: Session is rejected by the server due to an internal error 
+//    in the server, the client needs to back off until error is corrected.
+// _SESSION_ALREADY_EXISTS: Session is rejected by the the server as it already exists 
+//    in the server session table, the client will take corrective action to ensure state is consistent.
+//
+enum ADD_TUNNEL_STATUS {
+  _SESSION_ACCEPTED = 0;
+  _SESSION_REJECTED = 1;
+  _SESSION_TABLE_FULL = 2;
+  _SESSION_TABLE_UNAVAILABLE = 3;
+  _SESSION_ALREADY_EXISTS= 4;
+}
+
+service ipTunnelService {
+  // Get which capabilities are available while using the  
+  rpc Capabilities(CapabilityRequest) returns (CapabilityResponse);
+
+  // Creation of IP Tunnel
+  // This API shuold be generic and allow creations of many IP tunnels
+  rpc createIpTunnel(stream ipTunnelRule) returns (ipTunnelResponses) {}
+
+  // Updating the tunnel,
+  // Only the tunnelId should be constant, all other parameters can be changed in the tunnel
+  rpc updateIpTunnel(stream ipTunnelRule) returns (ipTunnelResponses) {}
+
+  // Getting a tunnel by it's ID 
+  rpc getIpTunnel(tunnelId) returns (ipTunnelResponse) {} 
+
+  // Deleting a session by it's ID
+  rpc deleteIpTunnel(tunnelId) returns (ipTunnelResponse) {} 
+
+  // Getting all the ipTunnels currently configured
+  rpc getAllIpTunnels(tunnelRequestArgs) returns (ipTunnelResponses) {} // Contains the page size / etc
+} 
+
+// Capabilty request is empty since no paramteres are supplied to it,
+// all capabilities will be provided at response
+message CapabilityRequest {
+}
+
+
+enum ENC_TYPE {
+  _AES = 0;
+}
+
+enum AUTH_TYPE {
+  _SHA256 = 0;
+}
+
+message CapabilityResponse {
+  // We'll have capability for matching, and for every tunnel
+
+  message MatchCapabilities {
+    bool ingressInterfaceMatching = 1; // Is interface can be matched for encapsulation / decapsulation
+    bool vxlanMatching = 2; // Match with VXLAN VNI
+    bool geneveMatching = 3; // Match with geneve can happen
+    bool vrfMatching = 4; // Is vrf matching possible
+    bool tunnelMatching = 5; // Matching on tunnel
+    bool ipsecMatching = 6; // Can match on IPSec
+  }
+
+  MatchCapabilities matchCapabilities = 1;
+
+  message TunnelCapabilties {
+    bool ipsecOffload = 1; // Can the device offload ipsec
+    bool geneveOffload = 2; // Can the device offload geneve
+  }
+  
+  TunnelCapabilties tunnelCapabilities = 2;
+
+  message IPSecCapabilities {
+    repeated IPSecTunnelType tunnelTypeSupported = 1;
+    repeated AUTH_TYPE authSupported = 2;
+    repeated ENC_TYPE encryptionSupported = 3;
+  }
+  
+  IPSecCapabilities ipsecCapabilities = 3;
+  
+}
+
+enum ACTION {
+  // In this action packet will be forwarded right away
+  FORWARD = 0;
+  // In this action packet will continue processing, to other tunnel
+  RECIRCULATE = 1;
+}
+
+
+message MatchCriteria {
+    // In case it's not present, untagged traffic will be matched
+    string ingressInterface = 1; // Optional field, in which interface this tunnel will be encapsulated
+
+    MacPair macMatch = 2; // MAC of the packet itself
+
+    oneof ip_match {
+      IPV4Match ipv4Match = 3;
+      IPV6Match ipv6Match = 4;
+    }
+
+    string vrf = 5; // Optional field, not indicating VRF means that 
+    // the match will be on default VRF 
+
+    tunnelId tunnelID = 6; // Match on specific tunnel
+    
+    message IPSecMatch {
+      uint32 spi = 1;
+      uint32 sn = 2; 
+    } 
+    
+    message GeneveMatch {
+      uint32 vni = 1;
+      MacPair macMatch = 2; // Inner Match of GENEVE Packet
+      oneof ip_match {
+        IPV4Match ipv4Match = 3;
+        IPV6Match ipv6Match = 4;
+      }
+   }
+   
+   message VXLanMatch {
+      uint32 vni = 1;
+      MacPair macMatch = 2;
+      oneof ip_match {
+        IPV4Match ipv4Match = 3;
+        IPV6Match ipv6Match = 4;
+      }
+   }
+
+    // Tunnel Matching
+    oneof match {
+      IPSecMatch ipsecMatch = 7;
+      GeneveMatch geneveMatch = 8;
+      VXLanMatch vxlanMatch = 9;
+    }
+
+}
+
+message ipTunnelRule { 
+
+  MatchCriteria match_criteria = 1; // When hitting this match, 
+
+  ACTION nextAction = 2; // What we'll do after matching the packet, shuold we 
+                         // keep process it or we'll just forward it 
+
+  oneof tunnel { 
+      IPSecTunnel ipsecTunnel = 3;  // Tunnel that will be used for encapsulation, can be both 
+      GENEVE geneve = 4;
+  };
+
+}
+
+message GENEVE {
+  oneof encap_decap {
+    GENEVEEncap geneveEncap = 1;
+    GENEVEDecap geneveDecap = 2;
+  }
+}
+
+message GENEVEOption {
+  uint32 optionClass = 1;
+  uint32 type = 2;
+  uint32 length = 3; // Only 5 bits used
+  // Length is multiple of 4 bit (see https://datatracker.ietf.org/doc/html/rfc8926#section-3.5)
+  bytes data = 4; // Only 4-128 bytes are acceptable
+}
+
+
+message GENEVEEncap {
+  /*
+  Defining the GENEVE Header at encpasulation
+  Fields names are identical to the fields as described in the RFC:
+  https://datatracker.ietf.org/doc/html/rfc8926
+  For details of each fields, please refer to the RFC
+
+  Notes:
+  - Version field is not present since always 0
+  */  
+
+  // IP's that will be in the outer IP of encapsulated packet
+  oneof ip {
+    IPV4Pair outerIpv4Pair = 1;
+    IPV6Pair outerIpv6Pair = 2;
+  }
+
+  // Source & Dest mac of inner GENEVE packet 
+  MacPair innerMacPair = 3;
+
+  uint32 optionLength = 4; // 6 bits 
+  bool controlPacket = 5; // O bit at rfc. True is '1', False is '0'. Default is False.
+  bool criticalOptionPresent = 6; // C bit at rfc. True is '1', False is '0'. Default is False.
+  uint32 vni = 7; // Virtual Network Identifier - 24 bits
+  repeated GENEVEOption geneveOption = 8;
+}
+
+message GENEVEDecap {
+  // GENEVEDecap can only be used if GENEVE 
+  // is on the match of the tunnel
+}
+
+message NATAction {
+  fixed32 sourceIp = 1;
+}
+
+message MacPair {
+  bytes sourceMac = 1;
+  bytes destinationMac = 2;
+}
+
+message IPV4Pair {  
+  fixed32 sourceIp = 1;
+  fixed32 destinationIp = 2;
+}
+
+message IPV6Pair {
+  bytes sourceIp = 1;
+  bytes destinationIp = 2; 
+}
+
+message IPV4Match {
+  fixed32 sourceIp = 1;
+  uint32 sourceIpPrefix = 2;
+  fixed32 destinationIp = 3;
+  uint32 destinationIpPrefix = 4;
+}
+
+message IPV6Match {
+  bytes sourceIp = 1;
+  uint32 sourceIpPrefix = 2;
+  bytes destinationIp = 3;
+  uint32 destinationIpPrefix = 4;
+}
+
+enum IPSecTunnelType {
+  TRANSPORT = 0;
+  TUNNEL = 1;
+  TRANSPORT_NAT_TRAVERSAL = 2; 
+  TUNNEL_NAT_TRAVERSAL = 3;
+}
+
+message IPSecEnc {
+  IPSecTunnelType tunnelType = 1;
+  ENC_TYPE encryptionType = 2;
+  bytes authenticationKey = 3;
+  AUTH_TYPE authenticationType = 4;
+  bytes encryptionKey = 5;
+  // SPI should be unique for every session
+  uint32 SPI = 6;
+  // In case the ipsec tunnel is with tunnel mode,
+  // one of the messages below should present
+  oneof tunnelIps {
+    IPV4Pair ipv4_tunnel = 7;
+    IPV6Pair ipv6_tunnel = 8;
+  }
+}
+
+message IPSecDec {
+  IPSecTunnelType tunnelType = 1;
+  ENC_TYPE encryptionType = 2;
+  bytes authenticationKey = 3;
+  AUTH_TYPE authenticationType = 4;
+  bytes encryptionKey = 5;
+  oneof tunnelIps {
+    IPV4Pair ipv4_tunnel = 6;
+    IPV6Pair ipv6_tunnel = 7;
+  }
+  
+}
+
+message IPSecTunnel {
+  oneof ipsec {
+    IPSecEnc ipsecEnc = 1;
+    IPSecDec ipsecDec = 2;
+  }
+
+}
+
+message tunnelId {
+  uint64 tunnelId = 1;
+}
+
+message counters {
+  uint64 inPackets = 1;
+  uint64 outPackets = 2;
+  uint64 inBytes  = 3;
+  uint64 outBytes = 4;
+  uint64 inPacketsDrops = 5;
+  uint64 outPacketsDrops = 6;
+  uint64 inBytesDrops  = 7;
+  uint64 outBytesDrops = 8;
+
+}
+
+message ipTunnelResponses {
+  ADD_TUNNEL_STATUS requestStatus = 1;
+  uint64 errorStatus = 2;
+  repeated ipTunnelResponse responses = 3;
+}
+
+message ipTunnelResponse {
+  // Tunnel ID assigned to this tunnel
+  uint64 tunnelId = 1;
+
+  // Information regards the ipTunnel (including match, tunnel information)
+  ipTunnelRule ipTunnel = 2; 
+
+  // The status of adding the request / response
+  ADD_TUNNEL_STATUS requestStatus = 3; 
+
+  // Error code describing the error with the request
+  uint64 errorStatus = 4; 
+
+  // Counters of the session
+  counters tunnelCounters = 5;
+
+}
+
+
+message tunnelRequestArgs {
+  //  pageSize = 0 will turn off paging
+  //  does paging make sense for a stream ?
+  //  the client should read/process each event on the stream anyway.
+  uint32  pageSize= 1;
+  uint32  page= 2;
+  uint32  firstTunnelId= 3;
+  //  what other arguments make sense for retrieving or filtering streams 
+}

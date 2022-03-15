@@ -1,0 +1,43 @@
+<mxfile host="65bd71144e">
+    <diagram id="V7hC7Ia_DJyM14xFZ34Q" name="Page-1">
+        <mxGraphModel dx="2103" dy="990" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="17" value="Outer Source IP:&lt;br style=&quot;font-size: 15px;&quot;&gt;1.2.3.4" style="rounded=0;whiteSpace=wrap;html=1;fontSize=15;" parent="1" vertex="1">
+                    <mxGeometry x="423" y="690" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="Outer&lt;br style=&quot;font-size: 15px;&quot;&gt;Source MAC" style="rounded=0;whiteSpace=wrap;html=1;fontSize=15;" parent="1" vertex="1">
+                    <mxGeometry x="170" y="690" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="Outer&amp;nbsp;&lt;br style=&quot;font-size: 15px;&quot;&gt;Destination MAC" style="rounded=0;whiteSpace=wrap;html=1;fontSize=15;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="690" width="121" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="Outer Destination IP:&lt;br style=&quot;font-size: 15px;&quot;&gt;5.5.5.5" style="rounded=0;whiteSpace=wrap;html=1;fontSize=15;" parent="1" vertex="1">
+                    <mxGeometry x="573" y="690" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="UDP Header&lt;br style=&quot;font-size: 15px;&quot;&gt;Port: 4789" style="rounded=0;whiteSpace=wrap;html=1;fontSize=15;" parent="1" vertex="1">
+                    <mxGeometry x="723" y="690" width="157" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="VXLAN Header&lt;br style=&quot;font-size: 15px;&quot;&gt;(VNI = 466)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=15;" vertex="1" parent="1">
+                    <mxGeometry x="880" y="690" width="157" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="Inner Source MAC&lt;br style=&quot;font-size: 15px;&quot;&gt;0x102030405060" style="rounded=0;whiteSpace=wrap;html=1;fontSize=15;" vertex="1" parent="1">
+                    <mxGeometry x="1037" y="690" width="170" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="Outer Detination MAC&lt;br style=&quot;font-size: 15px;&quot;&gt;0x605040302010" style="rounded=0;whiteSpace=wrap;html=1;fontSize=15;" vertex="1" parent="1">
+                    <mxGeometry x="1208" y="690" width="170" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="Inner &lt;br&gt;Source IP" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="1378" y="690" width="112" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="Inner&lt;br style=&quot;font-size: 15px;&quot;&gt;Destination IP" style="rounded=0;whiteSpace=wrap;html=1;fontSize=15;" vertex="1" parent="1">
+                    <mxGeometry x="1490" y="690" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="Payload" style="rounded=0;whiteSpace=wrap;html=1;fontSize=15;" vertex="1" parent="1">
+                    <mxGeometry x="1610" y="690" width="110" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
