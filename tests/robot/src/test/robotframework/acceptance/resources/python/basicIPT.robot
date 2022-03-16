@@ -19,7 +19,7 @@ Run buildIPTBasic Script
 Start IPTOffload Server 
      [Documentation]    Start gRPC Tunnel Server 
      #Start Process	python3   	tunnels_server.py 	cwd=${projectRoot}/../buildIPTBasic   alias=tunnel
-     Start Process	python3   	tunnels_server.py 	cwd=${projectRoot}/../buildIPTBasic   alias=tunnel  senv:PYTHONUNBUFFERED=1     stdout=/tmp/tunnel_offfload_stdout.txt
+     Start Process	python3   	tunnels_server.py 	cwd=${projectRoot}/../buildIPTBasic   alias=tunnel    env:PYTHONUNBUFFERED=1     stdout=/tmp/tunnel_offfload_stdout.txt
 
 Stop IPTOffload Server
    [Documentation]  Stop IPTOffload Server
