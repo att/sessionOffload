@@ -13,7 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #============LICENSE_END===============================================================================================================
+set -x
+
 targetdir=buildIPTBasic
+
 if [ ! -d "$targetdir/ssl" ]; then
     mkdir -p $targetdir/ssl
 fi

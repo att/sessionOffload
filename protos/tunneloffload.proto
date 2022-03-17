@@ -99,6 +99,7 @@ message CapabilityResponse {
     repeated IPSecTunnelType tunnelTypeSupported = 1;
     repeated AUTH_TYPE authSupported = 2;
     repeated ENC_TYPE encryptionSupported = 3;
+    uint32 shuli = 4;
   }
   
   IPSecCapabilities ipsecCapabilities = 3;
