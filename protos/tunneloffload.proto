@@ -1,64 +1,81 @@
-// Add licensing
+// Copyright (C) 2022 DriveNets Ltd. Intellectual Property. All rights reserved.
+// Copyright (C) 2022 VMware, Inc. All rights reserved.
+// Copyright (C) 2022 AT&T Intellectual Property. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
 
 syntax = "proto3";
 
 package tunneloffload.v1;
 
 //
-// Errors for adding a session
-// If all sessions are successful inserted return _ACCEPTED
+// Errors for adding a tunnel
+// If all tunnels are successful inserted return _ACCEPTED
 //
-// If check of session capacity in offload device is insufficient to add all sessions 
-// do not insert any sessions and return  _REJECTED_SESSION_TABLE_FULL. It is the 
+// If check of tunnel capacity in offload device is insufficient to add all tunnels
+// do not insert any tunnels and return  _REJECTED_TUNNEL_TABLE_FULL. It is the
 // responsibility of the client to re-try
 //
-// If the server is unavailable for some other reason then return _REJECTED_SESSION_TABLE_UNAVAILABLE.
+// If the server is unavailable for some other reason then return _REJECTED_TUNNEL_TABLE_UNAVAILABLE.
 // It is the  responsibility of the client to re-try
 //
 // All other errors will return _REJECTED with a buit mask of the failed sessions and it is the responsibility
 // of the client to address the issues
 //
-// ADD_SESSION_STATUS Codes Description
+// ADD_TUNNEL_STATUS Codes Description
 //
-// _SESSION_ACCEPTED: Session is accepted by the server and the client performs normal operation
-// _SESSION_REJECTED: Session is rejected by the server as the message 
+// _TUNNEL_ACCEPTED: Tunnel is accepted by the server and the client performs normal operation
+// _TUNNEL_REJECTED: Tunnel is rejected by the server as the message
 //    is invalid, the client needs to correct the error.
-// _SESSION_TABLE_FULL: Session is rejected by the server as its session table is full, 
+// _TUNNEL_TABLE_FULL: Tunnel is rejected by the server as its session table is full,
 //    the client needs to backoff until more space is available
-// _SESSION_TABLE_UNAVAILABLE: Session is rejected by the server due to an internal error 
+// _TUNNEL_TABLE_UNAVAILABLE: Tunnel is rejected by the server due to an internal error
 //    in the server, the client needs to back off until error is corrected.
-// _SESSION_ALREADY_EXISTS: Session is rejected by the the server as it already exists 
+// _TUNNEL_ALREADY_EXISTS: Tunnel is rejected by the the server as it already exists
 //    in the server session table, the client will take corrective action to ensure state is consistent.
 //
 enum ADD_TUNNEL_STATUS {
-  _SESSION_ACCEPTED = 0;
-  _SESSION_REJECTED = 1;
-  _SESSION_TABLE_FULL = 2;
-  _SESSION_TABLE_UNAVAILABLE = 3;
-  _SESSION_ALREADY_EXISTS= 4;
+  _TUNNEL_ACCEPTED = 0;
+  _TUNNEL_REJECTED = 1;
+  _TUNNEL_TABLE_FULL = 2;
+  _TUNNEL_TABLE_UNAVAILABLE = 3;
+  _TUNNEL_ALREADY_EXISTS= 4;
 }
 
 service ipTunnelService {
-  // Get which capabilities are available while using the  
+  // Get which capabilities are available while using the
   rpc Capabilities(CapabilityRequest) returns (CapabilityResponse);
 
   // Creation of IP Tunnel
-  // This API shuold be generic and allow creations of many IP tunnels
-  rpc createIpTunnel(stream ipTunnelRule) returns (ipTunnelResponses) {}
+  // This API should be generic and allow creations of many IP tunnels
+  rpc createIpTunnel(stream ipTunnelRequest) returns (createIpTunnelResponses) {}
 
   // Updating the tunnel,
   // Only the tunnelId should be constant, all other parameters can be changed in the tunnel
-  rpc updateIpTunnel(stream ipTunnelRule) returns (ipTunnelResponses) {}
+  //   Not clear what happens to packets in flight. I think this needs to be an Add and a Delete of the old tunnel definition
+  //rpc updateIpTunnel(stream ipTunnelRequest) returns (changeIpTunnelResponses) {}
 
-  // Getting a tunnel by it's ID 
-  rpc getIpTunnel(tunnelId) returns (ipTunnelResponse) {} 
+  // Getting a tunnel by it's ID
+  rpc getIpTunnel(tunnelId) returns (ipTunnelResponse) {}
 
   // Deleting a session by it's ID
-  rpc deleteIpTunnel(tunnelId) returns (ipTunnelResponse) {} 
+  rpc deleteIpTunnel(tunnelId) returns (ipTunnelResponse) {}
 
   // Getting all the ipTunnels currently configured
   rpc getAllIpTunnels(tunnelRequestArgs) returns (ipTunnelResponses) {} // Contains the page size / etc
-} 
+}
 
 // Capabilty request is empty since no paramteres are supplied to it,
 // all capabilities will be provided at response
@@ -92,7 +109,7 @@ message CapabilityResponse {
     bool ipsecOffload = 1; // Can the device offload ipsec
     bool geneveOffload = 2; // Can the device offload geneve
   }
-  
+
   TunnelCapabilties tunnelCapabilities = 2;
 
   message IPSecCapabilities {
@@ -101,9 +118,9 @@ message CapabilityResponse {
     repeated ENC_TYPE encryptionSupported = 3;
     uint32 shuli = 4;
   }
-  
+
   IPSecCapabilities ipsecCapabilities = 3;
-  
+
 }
 
 enum ACTION {
@@ -125,16 +142,16 @@ message MatchCriteria {
       IPV6Match ipv6Match = 4;
     }
 
-    string vrf = 5; // Optional field, not indicating VRF means that 
-    // the match will be on default VRF 
+    string vrf = 5; // Optional field, not indicating VRF means that
+    // the match will be on default VRF
 
     tunnelId tunnelID = 6; // Match on specific tunnel
-    
+
     message IPSecMatch {
       uint32 spi = 1;
-      uint32 sn = 2; 
-    } 
-    
+      uint32 sn = 2;
+    }
+
     message GeneveMatch {
       uint32 vni = 1;
       MacPair macMatch = 2; // Inner Match of GENEVE Packet
@@ -143,7 +160,7 @@ message MatchCriteria {
         IPV6Match ipv6Match = 4;
       }
    }
-   
+
    message VXLanMatch {
       uint32 vni = 1;
       MacPair macMatch = 2;
@@ -162,16 +179,18 @@ message MatchCriteria {
 
 }
 
-message ipTunnelRule { 
+message ipTunnelRequest {
 
-  MatchCriteria match_criteria = 1; // When hitting this match, 
+  uint64 tunnelId = 1;
 
-  ACTION nextAction = 2; // What we'll do after matching the packet, shuold we 
-                         // keep process it or we'll just forward it 
+  MatchCriteria match_criteria = 2; // When hitting this match,
 
-  oneof tunnel { 
-      IPSecTunnel ipsecTunnel = 3;  // Tunnel that will be used for encapsulation, can be both 
-      GENEVE geneve = 4;
+  ACTION nextAction = 3; // What we'll do after matching the packet, should we
+                         // keep process it or we'll just forward it
+
+  oneof tunnel {
+      IPSecTunnel ipsecTunnel = 4;  // Tunnel that will be used for encapsulation, can be both
+      GENEVE geneve = 5;
   };
 
 }
@@ -201,7 +220,7 @@ message GENEVEEncap {
 
   Notes:
   - Version field is not present since always 0
-  */  
+  */
 
   // IP's that will be in the outer IP of encapsulated packet
   oneof ip {
@@ -209,10 +228,10 @@ message GENEVEEncap {
     IPV6Pair outerIpv6Pair = 2;
   }
 
-  // Source & Dest mac of inner GENEVE packet 
+  // Source & Dest mac of inner GENEVE packet
   MacPair innerMacPair = 3;
 
-  uint32 optionLength = 4; // 6 bits 
+  uint32 optionLength = 4; // 6 bits
   bool controlPacket = 5; // O bit at rfc. True is '1', False is '0'. Default is False.
   bool criticalOptionPresent = 6; // C bit at rfc. True is '1', False is '0'. Default is False.
   uint32 vni = 7; // Virtual Network Identifier - 24 bits
@@ -220,7 +239,7 @@ message GENEVEEncap {
 }
 
 message GENEVEDecap {
-  // GENEVEDecap can only be used if GENEVE 
+  // GENEVEDecap can only be used if GENEVE
   // is on the match of the tunnel
 }
 
@@ -233,14 +252,14 @@ message MacPair {
   bytes destinationMac = 2;
 }
 
-message IPV4Pair {  
+message IPV4Pair {
   fixed32 sourceIp = 1;
   fixed32 destinationIp = 2;
 }
 
 message IPV6Pair {
   bytes sourceIp = 1;
-  bytes destinationIp = 2; 
+  bytes destinationIp = 2;
 }
 
 message IPV4Match {
@@ -260,7 +279,7 @@ message IPV6Match {
 enum IPSecTunnelType {
   TRANSPORT = 0;
   TUNNEL = 1;
-  TRANSPORT_NAT_TRAVERSAL = 2; 
+  TRANSPORT_NAT_TRAVERSAL = 2;
   TUNNEL_NAT_TRAVERSAL = 3;
 }
 
@@ -290,7 +309,7 @@ message IPSecDec {
     IPV4Pair ipv4_tunnel = 6;
     IPV6Pair ipv6_tunnel = 7;
   }
-  
+
 }
 
 message IPSecTunnel {
@@ -317,27 +336,40 @@ message counters {
 
 }
 
-message ipTunnelResponses {
+message createIpTunnelResponses {
   ADD_TUNNEL_STATUS requestStatus = 1;
   uint64 errorStatus = 2;
+  repeated createIpTunnelResponse responses = 3;
+}
+
+
+message createIpTunnelResponse {
+  // Tunnel ID assigned to this tunnel
+  uint64 tunnelId = 1;
+
+  // The status of adding the request / response
+  ADD_TUNNEL_STATUS requestStatus = 2;
+
+  // Error code describing the error with the request
+  uint64 errorStatus = 3;
+
+}
+
+
+message ipTunnelResponses {
   repeated ipTunnelResponse responses = 3;
 }
+
 
 message ipTunnelResponse {
   // Tunnel ID assigned to this tunnel
   uint64 tunnelId = 1;
 
   // Information regards the ipTunnel (including match, tunnel information)
-  ipTunnelRule ipTunnel = 2; 
-
-  // The status of adding the request / response
-  ADD_TUNNEL_STATUS requestStatus = 3; 
-
-  // Error code describing the error with the request
-  uint64 errorStatus = 4; 
+  ipTunnelRequest  ipTunnel = 2;
 
   // Counters of the session
-  counters tunnelCounters = 5;
+  counters tunnelCounters = 3;
 
 }
 
@@ -349,5 +381,5 @@ message tunnelRequestArgs {
   uint32  pageSize= 1;
   uint32  page= 2;
   uint32  firstTunnelId= 3;
-  //  what other arguments make sense for retrieving or filtering streams 
+  //  what other arguments make sense for retrieving or filtering streams
 }
