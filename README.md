@@ -79,6 +79,9 @@ Depending on which language binding used different development tools need to be 
 
 * Install Python
 * Install gRPC for Python (see References)
+* Install python pudb (debugger)
+
+See the github workflow main.yaml for details on the require library installations (.github/workflows/main.yaml)
 
 ## Build
 
