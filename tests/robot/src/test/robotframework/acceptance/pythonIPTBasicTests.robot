@@ -6,5 +6,7 @@ Resource         ./resources/python/basicIPT.robot
 Setup gRPC Tests
     Run buildIPTBasic Script
     Start IPTOffload Server 
+Full IPT Client Tests
+    Run IPT Client
 Suite Teardown
     Stop IPTOffload Server

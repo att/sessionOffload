@@ -21,6 +21,13 @@ Start IPTOffload Server
      #Start Process	python3   	tunnels_server.py 	cwd=${projectRoot}/../buildIPTBasic   alias=tunnel
      Start Process	python3   	tunnels_server.py 	cwd=${projectRoot}/../buildIPTBasic   alias=tunnel    env:PYTHONUNBUFFERED=1     stdout=/tmp/tunnel_offfload_stdout.txt
 
+Run IPT Client
+     [Documentation]    Start gRPC IPT Client
+     Run Process        python3         tunnels_client.py      cwd=${projectRoot}/../buildIPTBasic   alias=iptclient
+     ${result} =        Get Process Result      iptclient
+     Log       ${result.stderr}
+     Log       ${result.stdout}
+
 Stop IPTOffload Server
    [Documentation]  Stop IPTOffload Server
    ${result} =    Terminate Process    tunnel 
