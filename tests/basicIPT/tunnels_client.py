@@ -34,13 +34,14 @@ def ipv4_to_int(ipv4):
 
 
 def geneveEncapsulation(stub):
-    tunnel=tunneloffload_pb2.ipTunnelRule()
-    
+    tunnel=tunneloffload_pb2.ipTunnelRequest()
+   
+    tunnel.tunnelId=10001
     # Assigning the match criteria
     match_criteria = tunnel.match_criteria
     match_criteria.ipv4Match.sourceIp = int.from_bytes(socket.inet_pton(socket.AF_INET, "10.0.0.1"), byteorder=sys.byteorder)
     match_criteria.ipv4Match.sourceIpPrefix = 32
-    match_criteria.ipv4Match.destinationIp = int.from_bytes(socket.inet_pton(socket.AF_INET, "10.0.0.1"), byteorder=sys.byteorder)
+    match_criteria.ipv4Match.destinationIp = int.from_bytes(socket.inet_pton(socket.AF_INET, "10.0.0.2"), byteorder=sys.byteorder)
     match_criteria.ipv4Match.destinationIpPrefix = 32
 
     # Assigning a GENEVE ENCAPSULATION
@@ -60,37 +61,6 @@ def geneveEncapsulation(stub):
     stub.createIpTunnel(add_tunnels_iterators)
 
 
-    
-
-    
-    
-    # session.sessionId= 12345678910
-    # session.inLif= 1
-    # session.outLif= 2
-    # session.sourceIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.0.0.1"), byteorder=sys.byteorder)
-    # session.sourcePort=12345
-    # session.destinationIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.1.0.3"), byteorder=sys.byteorder)
-    # session.destinationPort=80
-    # session.protocolId=openoffload_pb2._TCP
-    # session.ipVersion=openoffload_pb2._IPV4
-    # session.action.actionType=openoffload_pb2._FORWARD
-    # session.action.actionNextHop = int.from_bytes(socket.inet_pton(socket.AF_INET,"12.2.3.4"),byteorder=sys.byteorder)
-    # sessions_value=Sessions()
-    # sessions_value.addSessionMembers(session)
-    # session_iterator=iter(sessions_value)
-    # addSessionResponse =  stub.addSession( session_iterator)
-    # print("addSessionResponse:",addSessionResponse.requestStatus)
-
-    # sessionErrors_value=addSessionResponse.responseError
-    # sessionErrors_iterator=iter(sessionErrors_value)
-
-    # for sessionError in sessionErrors_iterator:
-    #      print("addSessionErrorResponse:",sessionError.requestStatus)
-
-    # return addSessionResponse.requestStatus
-
-
-
 
 def run():
     # NOTE(gRPC Python Team): tunneloffload_pb2.close() is possible on a channel and should be
@@ -100,7 +70,8 @@ def run():
         creds = grpc.ssl_channel_credentials(f.read())
         channel = grpc.secure_channel('localhost:3443', creds)
         stub = tunneloffload_pb2_grpc.ipTunnelServiceStub(channel)
-        import pudb; pudb.set_trace()
+        # needs to be turned into a commmand line argument so that robot can run it without the inteartive debugger
+        #import pudb; pudb.set_trace()
         geneveEncapsulation(stub)
 
 if __name__ == '__main__':

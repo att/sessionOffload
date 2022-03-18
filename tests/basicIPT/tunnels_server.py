@@ -14,7 +14,7 @@
 # limitations under the License.
 #============LICENSE_END===============================================================================================================
 
-"""The Python implementation of the WB Application Offload session table server."""
+"""The Python implementation of the WB Application Offload tunnel table server."""
 
 from concurrent import futures
 import time
@@ -34,17 +34,57 @@ from google.protobuf import any_pb2
 import tunneloffload_pb2
 import tunneloffload_pb2_grpc
 
+
+class AddTunnelErrors:
+   '''
+   '''
+   def __init__(self):
+       self._addTunnelErrors= list()
+   def addTunnelErrorMembers(self, tunnelResponseError):
+       self._addTunnelErrors.append(tunnelResponseError)
+   def __iter__(self):
+       ''' Returns the Iterator object '''
+       return AddTunnelErrorsIterator(self)
+
+class AddTunnelErrorsIterator:
+   ''' Iterator class '''
+   def __init__(self, addTunnelErrors_list):
+       # AddTunnelErrors object reference
+       self._addTunnelErrors_list = addTunnelErrors_list
+       # member variable to keep track of current index
+       self._index = 0
+   def __next__(self):
+       ''''Returns the next value from team object's lists '''
+       if self._index < (len(self._addTunnelErrors_list._addTunnelErrors) ) :
+           result = (self._addTunnelErrors_list._addTunnelErrors[self._index])
+           self._index +=1
+           return result
+       # End of Iteration
+       raise StopIteration
+
+
+
 class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
-    """Provides methods that implement functionality of session table server."""
-    """ rpc addSession(sessionRequest) returns (addSessionResponse) {} """
-    """ rpc getSession(sessionId) returns (sessionResponse) {}      """
-    """ rpc deleteSession(sessionId) returns (sessionResponse) {}   """
-    """ rpc getAllSessions(sessionStatisticsArgs) returns (sessionResponse) {}   """
-    """ rpc getClosedSessions(sessionStatisticsArgs) returns (sessionResponse) {}   """
+    """Provides methods that implement functionality of tunnel table server."""
+    """ rpc createIpTunnels(ipTunnel) returns (createIpTunnelResponse) {} """
 
 
     def __init__(self):
         """do some init stuff"""
+
+    def createIpTunnel(self, request_iterator, context):
+        tunnelErrors_value=AddTunnelErrors()
+        for request in request_iterator:
+            print("############ Create Tunnel ##################")
+            print("TunnelId:", request.tunnelId)
+            # print ("sourceIp:", socket.inet_ntop(socket.AF_INET, request.sourceIp.to_bytes(4,byteorder=sys.byteorder)))
+            print("Match.ipv4Match.sourceIp", socket.inet_ntop(socket.AF_INET, request.match_criteria.ipv4Match.sourceIp.to_bytes(4,byteorder=sys.byteorder)))
+            print("Match.ipv4Match.destinationIp", socket.inet_ntop(socket.AF_INET, request.match_criteria.ipv4Match.destinationIp.to_bytes(4,byteorder=sys.byteorder)))
+            print("nextAction:" , request.nextAction)
+
+        return tunneloffload_pb2.createIpTunnelResponse(requestStatus=tunneloffload_pb2._TUNNEL_ACCEPTED)
+
+
 
 
 
