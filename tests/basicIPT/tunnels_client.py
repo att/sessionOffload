@@ -137,7 +137,8 @@ def run():
         tunnel_add_GENEVE_2_IPSEC(stub)
 
 if __name__ == '__main__':
-    import pudb; pudb.set_trace()
+    # set_trace causes robot tests to not complete
+    #import pudb; pudb.set_trace()
     logging.basicConfig()
     run()
 
