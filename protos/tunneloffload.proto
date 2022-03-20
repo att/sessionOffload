@@ -84,7 +84,9 @@ message CapabilityRequest {
 
 
 enum ENC_TYPE {
-  _AES = 0;
+  _AES256GCM8 = 0;
+  _AES256GCM12 = 1;
+  _AES256GCM16 = 2;
 }
 
 enum AUTH_TYPE {
@@ -145,7 +147,7 @@ message MatchCriteria {
     string vrf = 5; // Optional field, not indicating VRF means that
     // the match will be on default VRF
 
-    tunnelId tunnelID = 6; // Match on specific tunnel
+    uint64 tunnelId = 6; // Match on specific tunnel
 
     message IPSecMatch {
       uint32 spi = 1;
@@ -305,10 +307,6 @@ message IPSecDec {
   bytes authenticationKey = 3;
   AUTH_TYPE authenticationType = 4;
   bytes encryptionKey = 5;
-  oneof tunnelIps {
-    IPV4Pair ipv4_tunnel = 6;
-    IPV6Pair ipv6_tunnel = 7;
-  }
 
 }
 

@@ -35,6 +35,9 @@ import tunneloffload_pb2
 import tunneloffload_pb2_grpc
 
 
+class TunnelValidationExcp(Exception):
+    pass
+
 class AddTunnelErrors:
    '''
    '''
@@ -63,7 +66,56 @@ class AddTunnelErrorsIterator:
        raise StopIteration
 
 
+# In case of IPSec dec passed into the 
+# params, let's check that's it's valid
+def check_ipsec_dec_validity(ipsec_params):
+    print("Checking IPSec Dec Tunnel Validity")
+    
 
+def check_geneve_encap_validity(geneve_encap):
+    pass
+
+
+def check_geneve_validity(geneve_params):
+    pass
+
+
+def check_ipsec_tunnel_validity(ipsec_params):
+    ipsec_mode = ipsec_params.WhichOneof("ipsec")
+
+    if ipsec_mode == "ipsecDec":
+        ipsec_params = ipsec_params.ipsecDec
+    else:
+        ipsec_params = ipsec_params.ipsecEnc 
+
+    if ipsec_params.encryptionType not in [tunneloffload_pb2._AES256GCM8, tunneloffload_pb2._AES256GCM12, tunneloffload_pb2._AES256GCM16]:
+        raise TunnelValidationExcp("Not encryption type set on tunnel")
+
+    if len(ipsec_params.encryptionKey) != 64: # Checking the key length
+        raise TunnelValidationExcp("Key used for IPSec isnt in right size of 256-bit")
+
+    # Enc specific checks
+    if ipsec_mode == "ipsecEnc":
+        if ipsec_params.SPI == 0:
+            raise TunnelValidationExcp("SPI isn't set on IPSec Enc Request")
+
+
+TUNNEL_TO_VALIDITY_DICT = {
+    'geneve': check_geneve_encap_validity,
+    'ipsecTunnel': check_ipsec_tunnel_validity,   
+}
+
+def check_tunnel_validity(tunnel):
+    tunnel_type = tunnel.WhichOneof("tunnel") 
+    if tunnel_type is None:
+        raise TunnelValidationExcp("No tunnel type passed to tunnel")
+
+    if tunnel_type not in TUNNEL_TO_VALIDITY_DICT:
+        raise TunnelValidationExcp("Internel problem in server, no validation to tunnel")
+
+    TUNNEL_TO_VALIDITY_DICT[tunnel_type](getattr(tunnel, tunnel_type))
+
+    
 class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
     """Provides methods that implement functionality of tunnel table server."""
     """ rpc createIpTunnels(ipTunnel) returns (createIpTunnelResponse) {} """
@@ -73,14 +125,17 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
         """do some init stuff"""
 
     def createIpTunnel(self, request_iterator, context):
+        import pudb; pudb.set_trace()
         tunnelErrors_value=AddTunnelErrors()
         for request in request_iterator:
             print("############ Create Tunnel ##################")
             print("TunnelId:", request.tunnelId)
-            # print ("sourceIp:", socket.inet_ntop(socket.AF_INET, request.sourceIp.to_bytes(4,byteorder=sys.byteorder)))
             print("Match.ipv4Match.sourceIp", socket.inet_ntop(socket.AF_INET, request.match_criteria.ipv4Match.sourceIp.to_bytes(4,byteorder=sys.byteorder)))
             print("Match.ipv4Match.destinationIp", socket.inet_ntop(socket.AF_INET, request.match_criteria.ipv4Match.destinationIp.to_bytes(4,byteorder=sys.byteorder)))
             print("nextAction:" , request.nextAction)
+            print("Checking validity of the request")
+            check_tunnel_validity(request)
+            
 
         return tunneloffload_pb2.createIpTunnelResponse(requestStatus=tunneloffload_pb2._TUNNEL_ACCEPTED)
 
