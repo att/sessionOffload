@@ -33,12 +33,13 @@ def ipv4_to_int(ipv4):
     return int.from_bytes(socket.inet_pton(socket.AF_INET, ipv4), byteorder=sys.byteorder)
 
 
-def tunnel_add_IPSEC_2_GENEVE(stub):
+def tunnel_add_IPSEC_GENEVE(stub):
     ####
-    ## IPSec Tunnel
+    ## IPSec Dec Tunnel
     ### 
     ipsec_dec_tunnel = tunneloffload_pb2.ipTunnelRequest()
     ipsec_dec_tunnel.tunnelId = 10000
+    ipsec_dec_tunnel.nextAction = tunneloffload_pb2.RECIRCULATE
     # Assigning match critiera to IPSec
     match_criteria = ipsec_dec_tunnel.match_criteria
     match_criteria.ipsecMatch.spi = 780
@@ -54,10 +55,11 @@ def tunnel_add_IPSEC_2_GENEVE(stub):
 
 
     ###
-    ## GENEVE Tunnel
+    ## GENEVE Encap Tunnel
     ###
     geneve_encap_tunnel=tunneloffload_pb2.ipTunnelRequest()
     geneve_encap_tunnel.tunnelId=10001
+    geneve_encap_tunnel.nextAction = tunneloffload_pb2.FORWARD
     # Assigning the match criteria
     match_criteria = geneve_encap_tunnel.match_criteria
     match_criteria.tunnelId = ipsec_dec_tunnel.tunnelId
@@ -71,20 +73,12 @@ def tunnel_add_IPSEC_2_GENEVE(stub):
     geneve_encap.innerMacPair.destinationMac = b'605040302010'
     geneve_encap.vni = 500
 
-    # Making iterator of one in order to send via gNMI
-    add_tunnels_iterators = iter([ipsec_dec_tunnel, geneve_encap_tunnel])
-
-    print("Sending the request!")
-    stub.createIpTunnel(add_tunnels_iterators)
-
-
-
-def tunnel_add_GENEVE_2_IPSEC(stub):
     ###
-    ## GENEVE Tunnel
+    ## GENEVE Decap Tunnel
     ###
     geneve_decap_tunnel=tunneloffload_pb2.ipTunnelRequest()
     geneve_decap_tunnel.tunnelId=10002
+    geneve_decap_tunnel.nextAction = tunneloffload_pb2.RECIRCULATE
     # Assigning the match criteria
     match_criteria = geneve_decap_tunnel.match_criteria
     match_criteria.ipv4Match.sourceIp = ipv4_to_int("11.0.0.1")
@@ -99,10 +93,11 @@ def tunnel_add_GENEVE_2_IPSEC(stub):
 
 
     ####
-    ## IPSec Tunnel
+    ## IPSec Enc Tunnel
     ### 
     ipsec_enc_tunnel = tunneloffload_pb2.ipTunnelRequest()
     ipsec_enc_tunnel.tunnelId = 10003
+    ipsec_enc_tunnel.nextAction = tunneloffload_pb2.FORWARD
     # Assigning match critiera to IPSec
     match_criteria = ipsec_enc_tunnel.match_criteria
     match_criteria.tunnelId = geneve_decap_tunnel.tunnelId
@@ -122,6 +117,11 @@ def tunnel_add_GENEVE_2_IPSEC(stub):
     print("Sending the request!")
     stub.createIpTunnel(add_tunnels_iterators)
 
+    # Making iterator of one in order to send via gNMI
+    add_tunnels_iterators = iter([ipsec_dec_tunnel, geneve_encap_tunnel, geneve_decap_tunnel, ipsec_enc_tunnel])
+
+    print("Sending the request!")
+    stub.createIpTunnel(add_tunnels_iterators)
 
 def run():
     # NOTE(gRPC Python Team): tunneloffload_pb2.close() is possible on a channel and should be
@@ -133,8 +133,7 @@ def run():
         stub = tunneloffload_pb2_grpc.ipTunnelServiceStub(channel)
         # needs to be turned into a commmand line argument so that robot can run it without the inteartive debugger
         #import pudb; pudb.set_trace()
-        tunnel_add_IPSEC_2_GENEVE(stub)
-        tunnel_add_GENEVE_2_IPSEC(stub)
+        tunnel_add_IPSEC_GENEVE(stub)
 
 if __name__ == '__main__':
     # set_trace causes robot tests to not complete
