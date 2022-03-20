@@ -68,7 +68,7 @@ def tunnel_add_IPSEC_2_GENEVE(stub):
     geneve_encap.outerIpv4Pair.sourceIp = ipv4_to_int("5.5.5.5")
     geneve_encap.outerIpv4Pair.destinationIp = ipv4_to_int("6.6.6.6")
     geneve_encap.innerMacPair.sourceMac = b'102030405060'
-    geneve_encap.innerMacPair.destinationMac = b'60504302010'
+    geneve_encap.innerMacPair.destinationMac = b'605040302010'
     geneve_encap.vni = 500
 
     # Making iterator of one in order to send via gNMI
