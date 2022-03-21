@@ -17,6 +17,7 @@
 """The Python implementation of the WB Application Offload tunnel table server."""
 
 from concurrent import futures
+from re import match
 import time
 import logging
 import socket
@@ -34,6 +35,13 @@ from google.protobuf import any_pb2
 import tunneloffload_pb2
 import tunneloffload_pb2_grpc
 
+
+TUNNEL_FORMATTED = """**********
+Tunnel ID: {tunnel_id}
+Tunnel Type: {tunnel_type}
+**********"""
+
+TUNNEL_CHAIN_SEPERATOR = "     ▼"
 
 class TunnelValidationExcp(Exception):
     pass
@@ -66,10 +74,11 @@ class AddTunnelErrorsIterator:
        raise StopIteration
 
 
-class TunnelValidators(object):
+class Tunnel(object):
     def __init__(self, tunnel):
-        self.tunnel = tunnel
-        self.match_criteria = self.tunnel.match_criteria
+        self.tunnel_proto = tunnel
+        self.match_criteria = self.tunnel_proto.match_criteria
+        self.tunnel_type = None
 
     @staticmethod
     def validate_ipv6_pair(ipv6_pair):
@@ -110,16 +119,20 @@ class TunnelValidators(object):
         geneve_encap_decap = geneve_params.WhichOneof('encap_decap')
 
         if geneve_encap_decap == 'geneveEncap':
+            self.tunnel_type = 'GENEVE Encap'
             self.check_geneve_encap_validity(getattr(geneve_params, geneve_encap_decap))
         else:
+            self.tunnel_type = 'GENEVE Decap'
             self.check_geneve_decap_validity(getattr(geneve_params, geneve_encap_decap))
 
     def check_ipsec_tunnel_validity(self, ipsec_params):
         ipsec_mode = ipsec_params.WhichOneof("ipsec")
 
         if ipsec_mode == "ipsecDec":
+            self.tunnel_type = 'IPSec Decryption'
             ipsec_params = ipsec_params.ipsecDec
         else:
+            self.tunnel_type = 'IPSEC Encryption'
             ipsec_params = ipsec_params.ipsecEnc 
 
         if ipsec_params.encryptionType not in [tunneloffload_pb2._AES256GCM8, tunneloffload_pb2._AES256GCM12, tunneloffload_pb2._AES256GCM16]:
@@ -140,14 +153,68 @@ class TunnelValidators(object):
         'ipsecTunnel': self.check_ipsec_tunnel_validity,   
         }
 
-        tunnel_type = self.tunnel.WhichOneof("tunnel") 
+        tunnel_type = self.tunnel_proto.WhichOneof("tunnel") 
         if tunnel_type is None:
             raise TunnelValidationExcp("No tunnel type passed to tunnel")
 
         if tunnel_type not in TUNNEL_TO_VALIDITY_DICT:
             raise TunnelValidationExcp("Internel problem in server, no validation to tunnel")
 
-        TUNNEL_TO_VALIDITY_DICT[tunnel_type](getattr(self.tunnel, tunnel_type))
+        TUNNEL_TO_VALIDITY_DICT[tunnel_type](getattr(self.tunnel_proto, tunnel_type))
+
+
+
+def print_tunnel_summary(tunnels):
+    sa_tunnels = []
+    tunnels_chaining = []
+    scanned_tunnels = []
+
+    for tunnel_id, tunnel in tunnels.items():
+        if tunnel_id in scanned_tunnels:
+            continue
+
+        scanned_tunnels.append(tunnel_id)
+
+        if not tunnel.match_criteria.tunnelId:
+            sa_tunnels.append(tunnel_id)
+            continue
+
+        matched_tunnel_id = tunnel.match_criteria.tunnelId
+        if matched_tunnel_id not in tunnels:
+            raise TunnelValidationExcp(f"Tunnel id {tunnel_id} is matched traffic from " \
+                                       f"tunnel id {matched_tunnel_id} which not exists")
+                    
+        if matched_tunnel_id in sa_tunnels:
+            sa_tunnels.remove(matched_tunnel_id)
+
+        for chain in tunnels_chaining:
+            if matched_tunnel_id in chain:
+                chain.append(tunnel_id)
+                break
+        else:
+            tunnels_chaining.append([matched_tunnel_id, tunnel_id])
+            scanned_tunnels.append(matched_tunnel_id)
+
+    print("The following tunnels are 'stand-alone' tunnels, "
+          "and not chained to any other tunnel")
+
+    for tunnel_id in sa_tunnels:
+        print(TUNNEL_FORMATTED.format(tunnel_id=tunnel_id, tunnel_type=tunnels[tunnel_id].tunnel_type))
+
+    print("\n")
+
+    for chain in tunnels_chaining:
+        print("----------------------------------------------")
+        print("Following tunnels are chained to each other:")
+        print("----------------------------------------------")
+        for i, tunnel in enumerate(chain):
+            print(TUNNEL_FORMATTED.format(tunnel_id=tunnel, tunnel_type=tunnels[tunnel].tunnel_type))
+            if i != len(chain) - 1:
+                print(TUNNEL_CHAIN_SEPERATOR)
+            else:
+                print("\n")
+    # print(tunnels_chaining)
+                
 
     
 class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
@@ -157,25 +224,25 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
 
     def __init__(self):
         """do some init stuff"""
+        self.tunnels = {} # List of tunnels according to ID's
 
     def createIpTunnel(self, request_iterator, context):
         tunnelErrors_value=AddTunnelErrors()
         for request in request_iterator:
             print("############ Create Tunnel ##################")
-            print("TunnelId:", request.tunnelId)
-            print("Match.ipv4Match.sourceIp", socket.inet_ntop(socket.AF_INET, request.match_criteria.ipv4Match.sourceIp.to_bytes(4,byteorder=sys.byteorder)))
-            print("Match.ipv4Match.destinationIp", socket.inet_ntop(socket.AF_INET, request.match_criteria.ipv4Match.destinationIp.to_bytes(4,byteorder=sys.byteorder)))
-            print("nextAction:" , request.nextAction)
+            print(request)
+
             print("Checking validity of the request")
-            tunnel_validator = TunnelValidators(request)
-            tunnel_validator.check_tunnel_validity()
+            tunnel = Tunnel(request)
+            tunnel.check_tunnel_validity()
+
+            # Adding tunnel to be part of tunnels
+            self.tunnels[request.tunnelId] = tunnel
             
+        print("Printing tunnels summary")
+        print_tunnel_summary(self.tunnels)
 
         return tunneloffload_pb2.createIpTunnelResponse(requestStatus=tunneloffload_pb2._TUNNEL_ACCEPTED)
-
-
-
-
 
 
 def tunnelServe():

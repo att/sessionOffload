@@ -112,12 +112,6 @@ def tunnel_add_IPSEC_GENEVE(stub):
     ipsec_params.ipv4_tunnel.destinationIp = ipv4_to_int("12.0.0.2")
 
     # Making iterator of one in order to send via gNMI
-    add_tunnels_iterators = iter([geneve_decap_tunnel, ipsec_enc_tunnel])
-
-    print("Sending the request!")
-    stub.createIpTunnel(add_tunnels_iterators)
-
-    # Making iterator of one in order to send via gNMI
     add_tunnels_iterators = iter([ipsec_dec_tunnel, geneve_encap_tunnel, geneve_decap_tunnel, ipsec_enc_tunnel])
 
     print("Sending the request!")
