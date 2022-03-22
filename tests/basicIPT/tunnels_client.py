@@ -108,8 +108,8 @@ def tunnel_add_IPSEC_GENEVE(stub):
     ipsec_params.tunnelType = tunneloffload_pb2.TUNNEL_NAT_TRAVERSAL
     ipsec_params.encryptionType = 2
     ipsec_params.encryptionKey = b'f9cb6358b98ebdd029142048bdee473ac72bc1fad0325d61f68f85bcb06bb602' # 256 bit 
-    ipsec_params.ipv4_tunnel.sourceIp = ipv4_to_int("12.0.0.1")
-    ipsec_params.ipv4_tunnel.destinationIp = ipv4_to_int("12.0.0.2")
+    ipsec_params.ipv4_tunnel.sourceIp = ipv4_to_int("11.0.0.2")
+    ipsec_params.ipv4_tunnel.destinationIp = ipv4_to_int("11.0.0.1")
 
     # Making iterator of one in order to send via gNMI
     add_tunnels_iterators = iter([ipsec_dec_tunnel, geneve_encap_tunnel, geneve_decap_tunnel, ipsec_enc_tunnel])
