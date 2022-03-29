@@ -112,8 +112,7 @@ class Tunnel(object):
 
         
     def check_geneve_decap_validity(self, geneve_decap):
-        if self.match_criteria.WhichOneof('match') != 'geneveMatch':
-            raise TunnelValidationExcp("GENEVE Decap action without geneve match isnt valid")
+        pass
 
     def check_geneve_validity(self, geneve_params):
         geneve_encap_decap = geneve_params.WhichOneof('encap_decap')
@@ -170,6 +169,7 @@ def print_tunnel_summary(tunnels):
     scanned_tunnels = []
 
     for tunnel_id, tunnel in tunnels.items():
+        partial_chaining = False
         if tunnel_id in scanned_tunnels:
             continue
 
@@ -183,16 +183,23 @@ def print_tunnel_summary(tunnels):
         if matched_tunnel_id not in tunnels:
             raise TunnelValidationExcp(f"Tunnel id {tunnel_id} is matched traffic from " \
                                        f"tunnel id {matched_tunnel_id} which not exists")
+
+        if tunnel.match_criteria.ipv4Match.sourceIp:
+            partial_chaining = True
+        
                     
         if matched_tunnel_id in sa_tunnels:
             sa_tunnels.remove(matched_tunnel_id)
 
         for chain in tunnels_chaining:
-            if matched_tunnel_id in chain:
+            if matched_tunnel_id in chain and not partial_chaining:
                 chain.append(tunnel_id)
                 break
         else:
-            tunnels_chaining.append([matched_tunnel_id, tunnel_id])
+            if partial_chaining:
+                tunnels_chaining.append((matched_tunnel_id, tunnel_id))
+            else:
+                tunnels_chaining.append([matched_tunnel_id, tunnel_id])
             scanned_tunnels.append(matched_tunnel_id)
 
     print("The following tunnels are 'stand-alone' tunnels, "
@@ -201,12 +208,20 @@ def print_tunnel_summary(tunnels):
     for tunnel_id in sa_tunnels:
         print(TUNNEL_FORMATTED.format(tunnel_id=tunnel_id, tunnel_type=tunnels[tunnel_id].tunnel_type))
 
-    print("\n")
 
     for chain in tunnels_chaining:
-        print("----------------------------------------------")
-        print("Following tunnels are chained to each other:")
-        print("----------------------------------------------")
+        # import pudb; pudb.set_trace()
+        if not isinstance(chain, tuple):
+            print("----------------------------------------------")
+            print("Following tunnels are chained to each other:")
+            print("----------------------------------------------")
+        else:
+            print("----------------------------------------------")
+            print("Following tunnels might be chained to each other, they match via tunnel")
+            print("and shuold match via IP as well")
+            print("----------------------------------------------")
+
+
         for i, tunnel in enumerate(chain):
             print(TUNNEL_FORMATTED.format(tunnel_id=tunnel, tunnel_type=tunnels[tunnel].tunnel_type))
             if i != len(chain) - 1:
