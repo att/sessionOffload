@@ -32,3 +32,5 @@ Stop IPTOffload Server
    [Documentation]  Stop IPTOffload Server
    ${result} =    Terminate Process    tunnel 
    Log    ${result.stdout}
+   ${result2} =        Get Process Result      tunnel   stdout=TRUE
+   Log       ${result2.stdout}
