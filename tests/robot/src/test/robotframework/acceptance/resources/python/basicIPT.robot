@@ -30,6 +30,7 @@ Run IPT Client
 
 Stop IPTOffload Server
    [Documentation]  Stop IPTOffload Server
+   Sleep   15s
    ${result} =    Terminate Process    tunnel 
    Log    ${result.stdout}
    ${stdout} =        Get Process Result      tunnel   stdout=true
