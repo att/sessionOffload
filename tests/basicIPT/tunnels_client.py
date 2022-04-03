@@ -121,6 +121,15 @@ def tunnel_add_IPSEC_GENEVE(stub):
     stub.createIpTunnel(tunnels_iterators)    
 
 
+    # Checking that some of the packets received
+    tunnel_id_proto = tunneloffload_pb2.tunnelId()
+    tunnel_id_proto.tunnelId = ipsec_enc_tunnel_rekey.tunnelId
+    res = stub.getIpTunnel(tunnel_id_proto)
+    print("########## Response of get tunnel request ##############")
+    print(res)
+
+
+
 def four_tunnel_chain(stub):
 
     BASE_TUNNEL_ID = 20000
@@ -267,7 +276,12 @@ def tunnel_recursion_with_tunnel_id_and_ip(stub):
     stub.createIpTunnel(add_tunnels_iterators)
 
 
-
+def capabilities_exchange(stub):
+    print("########## Sending capabilities request ##############")
+    capability_request = tunneloffload_pb2.CapabilityRequest()
+    res = stub.Capabilities(capability_request)
+    print("########## Got capabilities response ##############")
+    print(res)
 
 
 def run():
@@ -280,12 +294,8 @@ def run():
         stub = tunneloffload_pb2_grpc.ipTunnelServiceStub(channel)
 
         # needs to be turned into a commmand line argument so that robot can run it without the inteartive debugger
-        #import pudb; pudb.set_trace()
-        tunnel_add_IPSEC_GENEVE(stub)
-        a = tunneloffload_pb2.tunnelId()
-        a.tunnelId = 10000
-        res = stub.getIpTunnel(a)
-        print(res)
+        capabilities_exchange(stub)
+        tunnel_add_IPSEC_GENEVE(stub)        
         four_tunnel_chain(stub)
         tunnel_recursion_without_tunnel_id(stub)
         tunnel_recursion_with_tunnel_id_and_ip(stub)

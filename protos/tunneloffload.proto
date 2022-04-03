@@ -18,7 +18,7 @@
 
 syntax = "proto3";
 
-package tunneloffload.v1;
+package tunneloffload.v1alpha1;
 
 //
 // Errors for adding a tunnel
@@ -101,26 +101,24 @@ message CapabilityResponse {
     bool geneveMatching = 3; // Match with geneve can happen
     bool vrfMatching = 4; // Is vrf matching possible
     bool tunnelMatching = 5; // Matching on tunnel
-    bool ipsecMatching = 6; // Can match on IPSec
+    bool spiMatching = 6; // Can match on IPSec
   }
 
   MatchCapabilities matchCapabilities = 1;
-
-  message TunnelCapabilties {
-    bool ipsecOffload = 1; // Can the device offload ipsec
-    bool geneveOffload = 2; // Can the device offload geneve
-  }
-
-  TunnelCapabilties tunnelCapabilities = 2;
 
   message IPSecCapabilities {
     repeated IPSecTunnelType tunnelTypeSupported = 1;
     repeated AUTH_TYPE authSupported = 2;
     repeated ENC_TYPE encryptionSupported = 3;
-    uint32 shuli = 4;
   }
 
-  IPSecCapabilities ipsecCapabilities = 3;
+  IPSecCapabilities ipsecCapabilities = 2;
+
+  message GENEVECapabilities {
+    uint32 geneveOptions = 1;  // Number of options geneve is supporting in encap
+  }
+  
+  GENEVECapabilities geneveCapabilities = 3;
 
 }
 

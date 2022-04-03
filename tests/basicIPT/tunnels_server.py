@@ -278,6 +278,7 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
 
         return tunneloffload_pb2.createIpTunnelResponse(requestStatus=tunneloffload_pb2._TUNNEL_ACCEPTED)
 
+    # Get request
     def getIpTunnel(self, request, context):
         
         res = tunneloffload_pb2.ipTunnelResponse()
@@ -302,7 +303,20 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
         return res
          
 
+    # Capabilities
+    def Capabilities(self, request, context):
+        res = tunneloffload_pb2.CapabilityResponse()
+        res.matchCapabilities.geneveMatching = True
+        res.matchCapabilities.ingressInterfaceMatching = True
+        res.matchCapabilities.spiMatching = True
+
+        res.ipsecCapabilities.tunnelTypeSupported.extend([tunneloffload_pb2.TRANSPORT, tunneloffload_pb2.TUNNEL, tunneloffload_pb2.TRANSPORT_NAT_TRAVERSAL, tunneloffload_pb2.TUNNEL_NAT_TRAVERSAL])
+        res.ipsecCapabilities.tunnelTypeSupported.extend([tunneloffload_pb2._SHA256])
+        res.ipsecCapabilities.encryptionSupported.extend([tunneloffload_pb2._AES256GCM8, tunneloffload_pb2._AES256GCM12, tunneloffload_pb2._AES256GCM16])
+
+        res.geneveCapabilities.geneveOptions = 5
         
+        return res
 
 def tunnelServe():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
