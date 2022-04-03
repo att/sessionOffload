@@ -49,6 +49,7 @@ def create_ipsec_enc_tunnel(tunnelid,
                             next_action=tunneloffload_pb2.RECIRCULATE):
 
     ipsec_enc_tunnel = tunneloffload_pb2.ipTunnelRequest()
+    ipsec_enc_tunnel.operation = tunneloffload_pb2._CREATE
 
     # Tunnel ID, next action adn match
     assign_match_to_object(ipsec_enc_tunnel.match_criteria, match)
@@ -73,6 +74,7 @@ def create_ipsec_dec_tunnel(tunnelid,
                             next_action=tunneloffload_pb2.RECIRCULATE):
 
     ipsec_dec_tunnel = tunneloffload_pb2.ipTunnelRequest()
+    ipsec_dec_tunnel.operation = tunneloffload_pb2._CREATE
 
     # Tunnel ID, next action adn match
     assign_match_to_object(ipsec_dec_tunnel.match_criteria, match)
@@ -98,6 +100,7 @@ def create_geneve_encap(tunnelid,
                         next_action=tunneloffload_pb2.RECIRCULATE):
 
     geneve_encap_tunnel = tunneloffload_pb2.ipTunnelRequest()
+    geneve_encap_tunnel.operation = tunneloffload_pb2._CREATE
     geneve_encap_tunnel.tunnelId=tunnelid
     geneve_encap_tunnel.nextAction = next_action
     # Assigning the match criteria
@@ -120,6 +123,8 @@ def create_geneve_decap(tunnelid,
                         next_action=tunneloffload_pb2.RECIRCULATE):
 
     geneve_decap_tunnel=tunneloffload_pb2.ipTunnelRequest()
+
+    geneve_decap_tunnel.operation = tunneloffload_pb2._CREATE
 
     # Tunnel ID, next action adn match
     assign_match_to_object(geneve_decap_tunnel.match_criteria, match)

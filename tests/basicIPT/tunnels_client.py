@@ -77,8 +77,7 @@ def tunnel_add_IPSEC_GENEVE(stub):
     ####
     ## IPSec Enc Tunnel
     ### 
-    match = Match(spi=780,
-                  tunnel_id=geneve_decap_tunnel.tunnelId)
+    match = Match(tunnel_id=geneve_decap_tunnel.tunnelId)
 
     ipsec_enc_tunnel = create_ipsec_enc_tunnel(tunnelid=10003,
                                                match=match,
@@ -94,6 +93,33 @@ def tunnel_add_IPSEC_GENEVE(stub):
 
     print("Sending IPSec Tunnel Request")
     stub.createIpTunnel(add_tunnels_iterators)
+
+    ####
+    # In this scenario we're doing rekey of the ipsec scenario
+    ####
+    
+    # Doing rekey is creating another tunnel with different tunnel ID and than removing
+    # the other tunnel
+    # We've already created the ipsec tunnel 10003, we'll perform rekey by creating another tunnel ID with
+    # different SPI and different match
+    ipsec_enc_tunnel_rekey = create_ipsec_enc_tunnel(tunnelid=10011,
+                                                     match=match,
+                                                     next_action=tunneloffload_pb2.FORWARD,
+                                                     tunnel_source_ip="11.0.0.2",
+                                                     tunnel_destination_ip="11.0.0.1",
+                                                     spi=4587,
+                                                     tunnel_type=tunneloffload_pb2.TUNNEL_NAT_TRAVERSAL,
+                                                     enc_type=tunneloffload_pb2._AES256GCM8)
+
+    # Chaning match of previous tunnel
+    ipsec_enc_disabled = tunneloffload_pb2.ipTunnelRequest()
+    ipsec_enc_disabled.tunnelId = 10003
+    ipsec_enc_disabled.operation = tunneloffload_pb2._DELETE
+
+    print("Performing REKEY!")
+    tunnels_iterators = iter([ipsec_enc_tunnel_rekey, ipsec_enc_disabled])
+    stub.createIpTunnel(tunnels_iterators)    
+
 
 def four_tunnel_chain(stub):
 
@@ -252,9 +278,14 @@ def run():
         creds = grpc.ssl_channel_credentials(f.read())
         channel = grpc.secure_channel('localhost:3443', creds)
         stub = tunneloffload_pb2_grpc.ipTunnelServiceStub(channel)
+
         # needs to be turned into a commmand line argument so that robot can run it without the inteartive debugger
         #import pudb; pudb.set_trace()
         tunnel_add_IPSEC_GENEVE(stub)
+        a = tunneloffload_pb2.tunnelId()
+        a.tunnelId = 10000
+        res = stub.getIpTunnel(a)
+        print(res)
         four_tunnel_chain(stub)
         tunnel_recursion_without_tunnel_id(stub)
         tunnel_recursion_with_tunnel_id_and_ip(stub)

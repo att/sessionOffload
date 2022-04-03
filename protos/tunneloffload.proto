@@ -54,6 +54,13 @@ enum ADD_TUNNEL_STATUS {
   _TUNNEL_ALREADY_EXISTS= 4;
 }
 
+enum OPERATION {
+  _NONE = 0;
+  _CREATE = 1;
+  _UPDATE = 2;
+  _DELETE = 3;
+}
+
 service ipTunnelService {
   // Get which capabilities are available while using the
   rpc Capabilities(CapabilityRequest) returns (CapabilityResponse);
@@ -62,16 +69,8 @@ service ipTunnelService {
   // This API should be generic and allow creations of many IP tunnels
   rpc createIpTunnel(stream ipTunnelRequest) returns (createIpTunnelResponses) {}
 
-  // Updating the tunnel,
-  // Only the tunnelId should be constant, all other parameters can be changed in the tunnel
-  //   Not clear what happens to packets in flight. I think this needs to be an Add and a Delete of the old tunnel definition
-  //rpc updateIpTunnel(stream ipTunnelRequest) returns (changeIpTunnelResponses) {}
-
   // Getting a tunnel by it's ID
   rpc getIpTunnel(tunnelId) returns (ipTunnelResponse) {}
-
-  // Deleting a session by it's ID
-  rpc deleteIpTunnel(tunnelId) returns (ipTunnelResponse) {}
 
   // Getting all the ipTunnels currently configured
   rpc getAllIpTunnels(tunnelRequestArgs) returns (ipTunnelResponses) {} // Contains the page size / etc
@@ -126,10 +125,11 @@ message CapabilityResponse {
 }
 
 enum ACTION {
+  NONE = 0;
   // In this action packet will be forwarded right away
-  FORWARD = 0;
+  FORWARD = 1;
   // In this action packet will continue processing, to other tunnel
-  RECIRCULATE = 1;
+  RECIRCULATE = 2;
 }
 
 
@@ -185,14 +185,16 @@ message ipTunnelRequest {
 
   uint64 tunnelId = 1;
 
-  MatchCriteria match_criteria = 2; // When hitting this match,
+  OPERATION operation = 2; 
 
-  ACTION nextAction = 3; // What we'll do after matching the packet, should we
+  MatchCriteria match_criteria = 3; // When hitting this match,
+
+  ACTION nextAction = 4; // What we'll do after matching the packet, should we
                          // keep process it or we'll just forward it
 
   oneof tunnel {
-      IPSecTunnel ipsecTunnel = 4;  // Tunnel that will be used for encapsulation, can be both
-      GENEVE geneve = 5;
+      IPSecTunnel ipsecTunnel = 5;  // Tunnel that will be used for encapsulation, can be both
+      GENEVE geneve = 6;
   };
 
 }
@@ -292,12 +294,12 @@ message IPSecEnc {
   AUTH_TYPE authenticationType = 4;
   bytes encryptionKey = 5;
   // SPI should be unique for every session
-  uint32 SPI = 6;
+  uint32 SPI = 7;
   // In case the ipsec tunnel is with tunnel mode,
   // one of the messages below should present
   oneof tunnelIps {
-    IPV4Pair ipv4_tunnel = 7;
-    IPV6Pair ipv6_tunnel = 8;
+    IPV4Pair ipv4_tunnel = 8;
+    IPV6Pair ipv6_tunnel = 9;
   }
 }
 
@@ -364,7 +366,7 @@ message ipTunnelResponse {
   uint64 tunnelId = 1;
 
   // Information regards the ipTunnel (including match, tunnel information)
-  ipTunnelRequest  ipTunnel = 2;
+  ipTunnelRequest ipTunnel = 2;
 
   // Counters of the session
   counters tunnelCounters = 3;

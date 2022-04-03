@@ -32,6 +32,19 @@ import google.protobuf.timestamp_pb2
 from google.protobuf import any_pb2
 #from google.rpc import code_pb2, status_pb2, error_details_pb2
 
+from dataclasses import dataclass
+
+@dataclass
+class Counters:
+    in_packets: int = 1
+    in_packets_drops: int = 1
+    in_bytes: int = 1
+    in_bytes_drops: int = 1
+    out_packets: int = 1
+    out_packets_drops: int = 1
+    out_bytes: int = 1
+    out_bytes_drops: int = 2
+
 import tunneloffload_pb2
 import tunneloffload_pb2_grpc
 
@@ -79,6 +92,7 @@ class Tunnel(object):
         self.tunnel_proto = tunnel
         self.match_criteria = self.tunnel_proto.match_criteria
         self.tunnel_type = None
+        self.counters = Counters()
 
     @staticmethod
     def validate_ipv6_pair(ipv6_pair):
@@ -231,6 +245,7 @@ def print_tunnel_summary(tunnels):
     # print(tunnels_chaining)
                 
 
+
     
 class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
     """Provides methods that implement functionality of tunnel table server."""
@@ -244,21 +259,50 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
     def createIpTunnel(self, request_iterator, context):
         tunnelErrors_value=AddTunnelErrors()
         for request in request_iterator:
-            print("############ Create Tunnel ##################")
-            print(request)
+            if request.operation == tunneloffload_pb2._CREATE:
+                print(f"############ Create Tunnel ID - {request.tunnelId} ##################")
+                print(request)
 
-            print("Checking validity of the request")
-            tunnel = Tunnel(request)
-            tunnel.check_tunnel_validity()
+                print("Checking validity of the request")
+                tunnel = Tunnel(request)
+                tunnel.check_tunnel_validity()
 
-            # Adding tunnel to be part of tunnels
-            self.tunnels[request.tunnelId] = tunnel
+                # Adding tunnel to be part of tunnels
+                self.tunnels[request.tunnelId] = tunnel
+            else:
+                print(f"############# Removing tunnel {request.tunnelId} ##############")
+                self.tunnels.pop(request.tunnelId, None)
             
         print("Printing tunnels summary")
         print_tunnel_summary(self.tunnels)
 
         return tunneloffload_pb2.createIpTunnelResponse(requestStatus=tunneloffload_pb2._TUNNEL_ACCEPTED)
 
+    def getIpTunnel(self, request, context):
+        
+        res = tunneloffload_pb2.ipTunnelResponse()
+        tunnel = self.tunnels[request.tunnelId]
+
+        # Filling tunnel id 
+        res.tunnelId = request.tunnelId
+
+        # Counters
+        res.tunnelCounters.inPackets = tunnel.counters.in_packets
+        res.tunnelCounters.outPackets = tunnel.counters.out_packets
+        res.tunnelCounters.inBytes = tunnel.counters.in_bytes
+        res.tunnelCounters.outBytes = tunnel.counters.out_bytes
+        res.tunnelCounters.inPacketsDrops = tunnel.counters.in_packets_drops
+        res.tunnelCounters.outPacketsDrops = tunnel.counters.out_packets_drops
+        res.tunnelCounters.inBytesDrops = tunnel.counters.in_bytes_drops
+        res.tunnelCounters.outBytesDrops = tunnel.counters.out_bytes_drops
+
+        # Filling the tunnel proto
+        res.ipTunnel.CopyFrom(tunnel.tunnel_proto)
+
+        return res
+         
+
+        
 
 def tunnelServe():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
