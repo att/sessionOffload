@@ -37,13 +37,13 @@ from dataclasses import dataclass
 @dataclass
 class Counters:
     in_packets: int = 1
-    in_packets_drops: int = 1
-    in_bytes: int = 1
-    in_bytes_drops: int = 1
-    out_packets: int = 1
-    out_packets_drops: int = 1
-    out_bytes: int = 1
-    out_bytes_drops: int = 2
+    in_packets_drops: int = 0
+    in_bytes: int = 0
+    in_bytes_drops: int = 0
+    out_packets: int = 0
+    out_packets_drops: int = 0
+    out_bytes: int = 0
+    out_bytes_drops: int = 0
 
 import tunneloffload_pb2
 import tunneloffload_pb2_grpc
@@ -193,7 +193,7 @@ def print_tunnel_summary(tunnels):
             sa_tunnels.append(tunnel_id)
             continue
 
-        matched_tunnel_id = tunnel.match_criteria.tunnelId
+        matched_tunnel_id = tunnel.match_criteria.tunnelId[0]
         if matched_tunnel_id not in tunnels:
             raise TunnelValidationExcp(f"Tunnel id {tunnel_id} is matched traffic from " \
                                        f"tunnel id {matched_tunnel_id} which not exists")
@@ -269,6 +269,9 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
 
                 # Adding tunnel to be part of tunnels
                 self.tunnels[request.tunnelId] = tunnel
+            elif request.operation == tunneloffload_pb2._UPDATE:
+                print(f"############ Update Tunnel ID - {request.tunnelId} ##################")
+                print(request)
             else:
                 print(f"############# Removing tunnel {request.tunnelId} ##############")
                 self.tunnels.pop(request.tunnelId, None)

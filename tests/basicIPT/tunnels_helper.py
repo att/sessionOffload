@@ -1,17 +1,26 @@
 import socket
 import sys
 from typing import NamedTuple
+from collections.abc import Iterable
 
 import tunneloffload_pb2
 
-class Match(NamedTuple):
-    source_ip: str = None
-    source_ip_mask: int = 32
-    dest_ip: str =  None
-    dest_ip_mask: int = 32
-    tunnel_id : int = None
-    spi: int = None
-    geneve_vni: int = None
+class Match():
+    def __init__(self, 
+                 source_ip=None,
+                 source_ip_mask=32,
+                 dest_ip=None,
+                 dest_ip_mask=32,
+                 tunnel_id=None,
+                 spi=None,
+                 geneve_vni=None):
+        self.source_ip = source_ip
+        self.source_ip_mask = source_ip_mask
+        self.dest_ip = dest_ip
+        self.dest_ip_mask = dest_ip_mask
+        self.tunnel_id = tunnel_id
+        self.spi = spi
+        self.geneve_vni = geneve_vni
 
 
 def ipv4_to_int(ipv4):
@@ -30,7 +39,10 @@ def assign_match_to_object(match_criteria, match: Match):
 
     
     if match.tunnel_id:
-        match_criteria.tunnelId = match.tunnel_id
+        if isinstance(match.tunnel_id, Iterable):
+            match_criteria.tunnelId.extend(match.tunnel_id)
+        else:
+            match_criteria.tunnelId.extend([match.tunnel_id])
 
     if match.spi:
         match_criteria.ipsecMatch.spi = match.spi
@@ -56,7 +68,6 @@ def create_ipsec_enc_tunnel(tunnelid,
     ipsec_enc_tunnel.tunnelId = tunnelid
     ipsec_enc_tunnel.nextAction = next_action
 
-
     # Defining IPSec Encryption
     ipsec_params = ipsec_enc_tunnel.ipsecTunnel.ipsecEnc
     ipsec_params.SPI = spi
@@ -66,6 +77,19 @@ def create_ipsec_enc_tunnel(tunnelid,
     ipsec_params.ipv4_tunnel.sourceIp = ipv4_to_int(tunnel_source_ip)
     ipsec_params.ipv4_tunnel.destinationIp = ipv4_to_int(tunnel_destination_ip)
     return ipsec_enc_tunnel
+
+def update_tunnel_match(tunnelId,
+                        match):
+
+    update_tunnel = tunneloffload_pb2.ipTunnelRequest()
+    assign_match_to_object(update_tunnel.match_criteria, match)
+    update_tunnel.tunnelId = tunnelId
+    update_tunnel.operation = tunneloffload_pb2._UPDATE
+
+    return update_tunnel
+
+
+
 
 def create_ipsec_dec_tunnel(tunnelid, 
                             match: Match,

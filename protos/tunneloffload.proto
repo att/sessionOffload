@@ -100,7 +100,7 @@ message CapabilityResponse {
     bool vxlanMatching = 2; // Match with VXLAN VNI
     bool geneveMatching = 3; // Match with geneve can happen
     bool vrfMatching = 4; // Is vrf matching possible
-    bool tunnelMatching = 5; // Matching on tunnel
+    bool tunnelMatching = 5; // Matchingp on tunnel
     bool spiMatching = 6; // Can match on IPSec
   }
 
@@ -145,7 +145,7 @@ message MatchCriteria {
     string vrf = 5; // Optional field, not indicating VRF means that
     // the match will be on default VRF
 
-    uint64 tunnelId = 6; // Match on specific tunnel
+    repeated uint64 tunnelId = 6; // Match on specific tunnel
 
     message IPSecMatch {
       uint32 spi = 1;
@@ -281,6 +281,12 @@ message IPV6Match {
 enum IPSecTunnelType {
   TRANSPORT = 0;
   TUNNEL = 1;
+  // NAT Traversal is a mechanism to overcome NAT happens between the
+  // two IPSec endpoints, by adding a UDP Header after IPSec
+  // This mode can happen both in TRANSPORT & TUNNEL Mode
+  // Fore more information please refer to the following RFC's:
+  // https://datatracker.ietf.org/doc/html/rfc3947
+  // https://datatracker.ietf.org/doc/html/rfc3715
   TRANSPORT_NAT_TRAVERSAL = 2;
   TUNNEL_NAT_TRAVERSAL = 3;
 }
