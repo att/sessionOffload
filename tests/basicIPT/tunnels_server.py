@@ -271,7 +271,8 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
                 self.tunnels[request.tunnelId] = tunnel
             elif request.operation == tunneloffload_pb2._UPDATE:
                 print(f"############ Update Tunnel ID - {request.tunnelId} ##################")
-                print(request)
+                tunnel = self.tunnels[request.tunnelId].tunnel_proto.match_criteria.CopyFrom(request.match_criteria)
+                
             else:
                 print(f"############# Removing tunnel {request.tunnelId} ##############")
                 self.tunnels.pop(request.tunnelId, None)
