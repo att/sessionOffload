@@ -23,7 +23,7 @@ import logging
 import socket
 import struct
 import sys
-
+import random
 import grpc
 import google.protobuf.timestamp_pb2
 
@@ -36,17 +36,24 @@ from dataclasses import dataclass
 
 @dataclass
 class Counters:
-    in_packets: int = 1
-    in_packets_drops: int = 0
-    in_bytes: int = 0
-    in_bytes_drops: int = 0
-    out_packets: int = 0
-    out_packets_drops: int = 0
-    out_bytes: int = 0
-    out_bytes_drops: int = 0
+    in_packets: int 
+    in_packets_drops: int 
+    in_bytes: int 
+    in_bytes_drops: int
+    out_packets: int
+    out_packets_drops: int
+    out_bytes: int
+    out_bytes_drops: int 
 
 import tunneloffload_pb2
 import tunneloffload_pb2_grpc
+
+SUPPORTED_IPSEC_ENC = [tunneloffload_pb2._aes256gcm64, tunneloffload_pb2._aes256gcm96, tunneloffload_pb2._aes256gcm128]
+
+MIN_NUMBER_PACKETS = 1
+MAX_NUMBER_PACKETS = 5000
+MIN_NUMBER_BYTES_PACKETS = 64
+MAX_NUMBER_BYTES_PACKET = 1500
 
 
 TUNNEL_FORMATTED = """**********
@@ -92,7 +99,38 @@ class Tunnel(object):
         self.tunnel_proto = tunnel
         self.match_criteria = self.tunnel_proto.match_criteria
         self.tunnel_type = None
-        self.counters = Counters()
+        self.counters = self.generate_random_counters_for_sesssion()
+
+    @staticmethod
+    def generate_random_counters_for_sesssion():
+        """
+        @dataclass
+        class Counters:
+            in_packets: int 
+            in_packets_drops: int 
+            in_bytes: int 
+            in_bytes_drops: int
+            out_packets: int
+            out_packets_drops: int
+            out_bytes: int
+            out_bytes_drops: int 
+        """
+        in_packets = random.randint(MIN_NUMBER_PACKETS, MAX_NUMBER_PACKETS)
+        in_packets_bytes = in_packets * random.randint(MIN_NUMBER_BYTES_PACKETS, MAX_NUMBER_BYTES_PACKET)
+        out_packets = random.randint(MIN_NUMBER_PACKETS, MAX_NUMBER_PACKETS)
+        out_packets_bytes = in_packets * random.randint(MIN_NUMBER_BYTES_PACKETS, MAX_NUMBER_BYTES_PACKET)
+        in_packets_drops = random.randint(MIN_NUMBER_PACKETS, MAX_NUMBER_PACKETS)
+        in_packets_bytes_drops = in_packets * random.randint(MIN_NUMBER_BYTES_PACKETS, MAX_NUMBER_BYTES_PACKET)
+        out_packets_drops = random.randint(MIN_NUMBER_PACKETS, MAX_NUMBER_PACKETS)
+        out_packets_bytes_drops = in_packets * random.randint(MIN_NUMBER_BYTES_PACKETS, MAX_NUMBER_BYTES_PACKET)
+        return Counters(in_packets=in_packets,
+                        in_packets_drops=in_packets_drops,
+                        in_bytes=in_packets_bytes,
+                        in_bytes_drops=in_packets_bytes_drops,
+                        out_packets=out_packets,
+                        out_packets_drops=out_packets_drops,
+                        out_bytes=out_packets_bytes,
+                        out_bytes_drops=out_packets_bytes_drops)
 
     @staticmethod
     def validate_ipv6_pair(ipv6_pair):
@@ -148,7 +186,7 @@ class Tunnel(object):
             self.tunnel_type = 'IPSEC Encryption'
             ipsec_params = ipsec_params.ipsecEnc 
 
-        if ipsec_params.encryptionType not in [tunneloffload_pb2._AES256GCM8, tunneloffload_pb2._AES256GCM12, tunneloffload_pb2._AES256GCM16]:
+        if ipsec_params.encryptionType not in SUPPORTED_IPSEC_ENC:
             raise TunnelValidationExcp("Not encryption type set on tunnel")
 
         if len(ipsec_params.encryptionKey) != 64: # Checking the key length
@@ -306,6 +344,25 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
 
         return res
          
+    def getIpTunnelStats(self, request, context):
+        
+        res = tunneloffload_pb2.ipTunnelStatsResponse()
+        tunnel = self.tunnels[request.tunnelId]
+
+        # Filling tunnel id 
+        res.tunnelId = request.tunnelId
+
+        # Counters
+        res.tunnelCounters.inPackets = tunnel.counters.in_packets
+        res.tunnelCounters.outPackets = tunnel.counters.out_packets
+        res.tunnelCounters.inBytes = tunnel.counters.in_bytes
+        res.tunnelCounters.outBytes = tunnel.counters.out_bytes
+        res.tunnelCounters.inPacketsDrops = tunnel.counters.in_packets_drops
+        res.tunnelCounters.outPacketsDrops = tunnel.counters.out_packets_drops
+        res.tunnelCounters.inBytesDrops = tunnel.counters.in_bytes_drops
+        res.tunnelCounters.outBytesDrops = tunnel.counters.out_bytes_drops
+
+        return res
 
     # Capabilities
     def Capabilities(self, request, context):
@@ -315,8 +372,7 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
         res.matchCapabilities.spiMatching = True
 
         res.ipsecCapabilities.tunnelTypeSupported.extend([tunneloffload_pb2.TRANSPORT, tunneloffload_pb2.TUNNEL, tunneloffload_pb2.TRANSPORT_NAT_TRAVERSAL, tunneloffload_pb2.TUNNEL_NAT_TRAVERSAL])
-        res.ipsecCapabilities.tunnelTypeSupported.extend([tunneloffload_pb2._SHA256])
-        res.ipsecCapabilities.encryptionSupported.extend([tunneloffload_pb2._AES256GCM8, tunneloffload_pb2._AES256GCM12, tunneloffload_pb2._AES256GCM16])
+        res.ipsecCapabilities.encryptionSupported.extend(SUPPORTED_IPSEC_ENC)
 
         res.geneveCapabilities.geneveOptions = 5
         

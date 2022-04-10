@@ -72,8 +72,14 @@ service ipTunnelService {
   // Getting a tunnel by it's ID
   rpc getIpTunnel(tunnelId) returns (ipTunnelResponse) {}
 
+  // Getting a tunnel by it's ID
+  rpc getIpTunnelStats(tunnelId) returns (ipTunnelStatsResponse) {}
+
   // Getting all the ipTunnels currently configured
   rpc getAllIpTunnels(tunnelRequestArgs) returns (ipTunnelResponses) {} // Contains the page size / etc
+
+  // Get all the iptunnels stats responses
+  rpc getAllIpTunnelsStats(tunnelRequestArgs) returns (ipTunnelResponses) {} // Contains the page size / etc
 }
 
 // Capabilty request is empty since no paramteres are supplied to it,
@@ -83,9 +89,19 @@ message CapabilityRequest {
 
 
 enum ENC_TYPE {
-  _AES256GCM8 = 0;
-  _AES256GCM12 = 1;
-  _AES256GCM16 = 2;
+  _aes256gcm64 = 0;
+  _aes256gcm96 = 1;
+  _aes256gcm128 = 2;
+  _aes128gcm64 = 3;
+  _aes128gcm96 = 4;
+  _aes128gcm128 = 5;
+  _aes256ccm64 = 6;
+  _aes256ccm96 = 7;
+  _aes256ccm128 = 8;
+  _aes128ccm64 = 9;
+  _aes128ccm96 = 10;
+  _aes128ccm128 = 11;
+
 }
 
 enum AUTH_TYPE {
@@ -108,8 +124,7 @@ message CapabilityResponse {
 
   message IPSecCapabilities {
     repeated IPSecTunnelType tunnelTypeSupported = 1;
-    repeated AUTH_TYPE authSupported = 2;
-    repeated ENC_TYPE encryptionSupported = 3;
+    repeated ENC_TYPE encryptionSupported = 2;
   }
 
   IPSecCapabilities ipsecCapabilities = 2;
@@ -295,15 +310,14 @@ message IPSecEnc {
   IPSecTunnelType tunnelType = 1;
   ENC_TYPE encryptionType = 2;
   bytes authenticationKey = 3;
-  AUTH_TYPE authenticationType = 4;
-  bytes encryptionKey = 5;
+  bytes encryptionKey = 4;
   // SPI should be unique for every session
-  uint32 SPI = 7;
+  uint32 SPI = 5;
   // In case the ipsec tunnel is with tunnel mode,
   // one of the messages below should present
   oneof tunnelIps {
-    IPV4Pair ipv4_tunnel = 8;
-    IPV6Pair ipv6_tunnel = 9;
+    IPV4Pair ipv4_tunnel = 6;
+    IPV6Pair ipv6_tunnel = 7;
   }
 }
 
@@ -361,7 +375,7 @@ message createIpTunnelResponse {
 
 
 message ipTunnelResponses {
-  repeated ipTunnelResponse responses = 3;
+  repeated ipTunnelResponse responses = 1;
 }
 
 
@@ -377,6 +391,18 @@ message ipTunnelResponse {
 
 }
 
+message ipTunnelStatsResponses {
+  repeated ipTunnelStatsResponse responses = 1;
+}
+
+message ipTunnelStatsResponse {
+  // Tunnel ID assigned to this tunnel
+  uint64 tunnelId = 1;
+
+  // Counters of the session
+  counters tunnelCounters = 2;
+  
+}
 
 message tunnelRequestArgs {
   //  pageSize = 0 will turn off paging

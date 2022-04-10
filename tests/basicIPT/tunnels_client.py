@@ -41,7 +41,7 @@ def tunnel_add_IPSEC_GENEVE(stub):
                   spi=780)
 
     ipsec_dec_tunnel = create_ipsec_dec_tunnel(tunnelid=10000, 
-                                               enc_type=tunneloffload_pb2._AES256GCM8,
+                                               enc_type=tunneloffload_pb2._aes256gcm64,
                                                tunnel_type=tunneloffload_pb2.TRANSPORT_NAT_TRAVERSAL,
                                                match=match)
 
@@ -86,7 +86,7 @@ def tunnel_add_IPSEC_GENEVE(stub):
                                                tunnel_destination_ip="11.0.0.1",
                                                spi=4587,
                                                tunnel_type=tunneloffload_pb2.TUNNEL_NAT_TRAVERSAL,
-                                               enc_type=tunneloffload_pb2._AES256GCM8)
+                                               enc_type=tunneloffload_pb2._aes256gcm64)
 
     # Making iterator of one in order to send via gNMI
     add_tunnels_iterators = iter([ipsec_dec_tunnel, geneve_encap_tunnel, geneve_decap_tunnel, ipsec_enc_tunnel])
@@ -109,7 +109,7 @@ def tunnel_add_IPSEC_GENEVE(stub):
                                                      tunnel_destination_ip="11.0.0.1",
                                                      spi=4587,
                                                      tunnel_type=tunneloffload_pb2.TUNNEL_NAT_TRAVERSAL,
-                                                     enc_type=tunneloffload_pb2._AES256GCM8)
+                                                     enc_type=tunneloffload_pb2._aes256gcm64)
 
     # Chaning match of previous tunnel
     ipsec_enc_disabled = tunneloffload_pb2.ipTunnelRequest()
@@ -127,7 +127,7 @@ def tunnel_add_IPSEC_GENEVE(stub):
                   spi=890)
 
     ipsec_dec_tunnel_rekey = create_ipsec_dec_tunnel(tunnelid=10007, 
-                                                    enc_type=tunneloffload_pb2._AES256GCM8,
+                                                    enc_type=tunneloffload_pb2._aes256gcm64,
                                                     tunnel_type=tunneloffload_pb2.TRANSPORT_NAT_TRAVERSAL,
                                                     match=match)
 
@@ -145,7 +145,7 @@ def tunnel_add_IPSEC_GENEVE(stub):
     # Checking that some of the packets received
     tunnel_id_proto = tunneloffload_pb2.tunnelId()
     tunnel_id_proto.tunnelId = ipsec_dec_tunnel_rekey.tunnelId
-    res = stub.getIpTunnel(tunnel_id_proto)
+    res = stub.getIpTunnelStats(tunnel_id_proto)
     print("########## Response of get tunnel request ##############")
     print(res)
 
@@ -177,7 +177,7 @@ def four_tunnel_chain(stub):
                   spi=980)
 
     ipsec_dec_tunnel = create_ipsec_dec_tunnel(tunnelid=BASE_TUNNEL_ID, 
-                                               enc_type=tunneloffload_pb2._AES256GCM8,
+                                               enc_type=tunneloffload_pb2._aes256gcm64,
                                                tunnel_type=tunneloffload_pb2.TUNNEL,
                                                match=match)
 
@@ -219,7 +219,7 @@ def four_tunnel_chain(stub):
                                                tunnel_destination_ip="13.0.0.1",
                                                spi=45888,
                                                tunnel_type=tunneloffload_pb2.TRANSPORT,
-                                               enc_type=tunneloffload_pb2._AES256GCM8)
+                                               enc_type=tunneloffload_pb2._aes256gcm64)
 
     # Making iterator of one in order to send via gNMI
     add_tunnels_iterators = iter([ipsec_dec_tunnel, geneve_decap_tunnel,  geneve_encap_tunnel, ipsec_enc_tunnel])
@@ -241,7 +241,7 @@ def tunnel_recursion_without_tunnel_id(stub):
                                                tunnel_destination_ip="14.0.0.1",
                                                spi=50000,
                                                tunnel_type=tunneloffload_pb2.TUNNEL,
-                                               enc_type=tunneloffload_pb2._AES256GCM8)
+                                               enc_type=tunneloffload_pb2._aes256gcm64)
 
     match = Match(source_ip="14.0.0.2",
                   dest_ip="14.0.0.1")
@@ -280,7 +280,7 @@ def tunnel_recursion_with_tunnel_id_and_ip(stub):
     ipsec_enc_tunnel = create_ipsec_dec_tunnel(tunnelid=40000,
                                                match=match,
                                                tunnel_type=tunneloffload_pb2.TUNNEL_NAT_TRAVERSAL,
-                                               enc_type=tunneloffload_pb2._AES256GCM8)
+                                               enc_type=tunneloffload_pb2._aes256gcm64)
 
     match = Match(tunnel_id=40000,
                   source_ip="15.0.0.2",

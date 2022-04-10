@@ -57,7 +57,7 @@ def create_ipsec_enc_tunnel(tunnelid,
                             tunnel_type,
                             tunnel_source_ip, 
                             tunnel_destination_ip, 
-                            enc_type=tunneloffload_pb2._AES256GCM8, 
+                            enc_type=tunneloffload_pb2._aes256gcm64, 
                             next_action=tunneloffload_pb2.RECIRCULATE):
 
     ipsec_enc_tunnel = tunneloffload_pb2.ipTunnelRequest()
@@ -94,7 +94,7 @@ def update_tunnel_match(tunnelId,
 def create_ipsec_dec_tunnel(tunnelid, 
                             match: Match,
                             tunnel_type,
-                            enc_type=tunneloffload_pb2._AES256GCM8,
+                            enc_type=tunneloffload_pb2._aes256gcm64,
                             next_action=tunneloffload_pb2.RECIRCULATE):
 
     ipsec_dec_tunnel = tunneloffload_pb2.ipTunnelRequest()
