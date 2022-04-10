@@ -29,7 +29,7 @@ import grpc
 import tunneloffload_pb2
 import tunneloffload_pb2_grpc
 
-from tunnels_helper import create_geneve_decap, create_geneve_encap, create_ipsec_dec_tunnel, create_ipsec_enc_tunnel, Match, update_tunnel_match
+from tunnels_helper import *
 
 
 def tunnel_add_IPSEC_GENEVE(stub):
@@ -37,11 +37,11 @@ def tunnel_add_IPSEC_GENEVE(stub):
     ## IPSec Dec Tunnel
     ### 
     match = Match(source_ip="11.0.0.1",
-                  dest_ip="11.0.0.2",
-                  spi=780)
+                  dest_ip="11.0.0.2")
 
     ipsec_dec_tunnel = create_ipsec_dec_tunnel(tunnelid=10000, 
                                                enc_type=tunneloffload_pb2._aes256gcm64,
+                                               spi=780,
                                                tunnel_type=tunneloffload_pb2.TRANSPORT_NAT_TRAVERSAL,
                                                match=match)
 
@@ -102,70 +102,35 @@ def tunnel_add_IPSEC_GENEVE(stub):
     # the other tunnel
     # We've already created the ipsec tunnel 10003, we'll perform rekey by creating another tunnel ID with
     # different SPI and different match
-    ipsec_enc_tunnel_rekey = create_ipsec_enc_tunnel(tunnelid=10011,
-                                                     match=match,
-                                                     next_action=tunneloffload_pb2.FORWARD,
-                                                     tunnel_source_ip="11.0.0.2",
-                                                     tunnel_destination_ip="11.0.0.1",
-                                                     spi=4587,
-                                                     tunnel_type=tunneloffload_pb2.TUNNEL_NAT_TRAVERSAL,
-                                                     enc_type=tunneloffload_pb2._aes256gcm64)
+    ipsec_enc_tunnel_update = update_ipsec_enc_tunnel(tunnelId=ipsec_enc_tunnel.tunnelId,
+                                                      spi=4590)
 
-    # Chaning match of previous tunnel
-    ipsec_enc_disabled = tunneloffload_pb2.ipTunnelRequest()
-    ipsec_enc_disabled.tunnelId = 10003
-    ipsec_enc_disabled.operation = tunneloffload_pb2._DELETE
-
-    print("Performing rekey - encryption")
-    tunnels_iterators = iter([ipsec_enc_tunnel_rekey, ipsec_enc_disabled])
-    stub.createIpTunnel(tunnels_iterators)    
-
-    print("Performing rekey - decryption")
-    ## Rekey of decryption is done by creating another tunnel with a different SPI 
-    match = Match(source_ip="11.0.0.1",
-                  dest_ip="11.0.0.2",
-                  spi=890)
-
-    ipsec_dec_tunnel_rekey = create_ipsec_dec_tunnel(tunnelid=10007, 
-                                                    enc_type=tunneloffload_pb2._aes256gcm64,
-                                                    tunnel_type=tunneloffload_pb2.TRANSPORT_NAT_TRAVERSAL,
-                                                    match=match)
-
-    # And updating the next tunnel to use both of the tunnel to use the same tunnel ID
-    match = Match(tunnel_id=[ipsec_dec_tunnel.tunnelId, ipsec_dec_tunnel_rekey.tunnelId])
-
-    geneve_update_tunnel = update_tunnel_match(tunnelId=geneve_encap_tunnel.tunnelId,
-                                               match=match)
+    print("Updating IPSec Enc Tunnel")
+    add_tunnels_iterators = iter([ipsec_enc_tunnel_update])
+    stub.createIpTunnel(add_tunnels_iterators)
 
 
     print("Performing rekey - decryption")
-    tunnels_iterators = iter([ipsec_dec_tunnel_rekey, geneve_update_tunnel])
+    # Rekey of decryption is done by creating another tunnel with a different SPI 
+    ipsec_dec_tunnel_update = update_ipsec_dec_tunnel(ipsec_dec_tunnel.tunnelId,
+                                                      first_tunnel_spi=780,
+                                                      second_tunnel_spi=1030)
+
+
+
+
+    print("Performing rekey - decryption")
+    tunnels_iterators = iter([ipsec_dec_tunnel_update])
     stub.createIpTunnel(tunnels_iterators)    
 
-    # Checking that some of the packets received
-    tunnel_id_proto = tunneloffload_pb2.tunnelId()
-    tunnel_id_proto.tunnelId = ipsec_dec_tunnel_rekey.tunnelId
-    res = stub.getIpTunnelStats(tunnel_id_proto)
-    print("########## Response of get tunnel request ##############")
-    print(res)
-
-    # Checking that we have some packets in the decryption tunnel and reomving it
-    if res.tunnelCounters.inPackets > 0:
-        ipsec_enc_disabled = tunneloffload_pb2.ipTunnelRequest()
-        ipsec_enc_disabled.tunnelId = ipsec_dec_tunnel.tunnelId
-        ipsec_enc_disabled.operation = tunneloffload_pb2._DELETE
+    # Waiting sometime before removing the old spi
+    ipsec_dec_tunnel_update = update_ipsec_dec_tunnel(ipsec_dec_tunnel.tunnelId,
+                                                      second_tunnel_spi=1030)
 
 
-        match = Match(tunnel_id=ipsec_dec_tunnel_rekey.tunnelId)
-
-        geneve_update_tunnel = update_tunnel_match(tunnelId=geneve_encap_tunnel.tunnelId,
-                                                match=match)
-
-        print("Removing old rekey tunnel")
-        tunnels_iterators = iter([ipsec_enc_disabled, geneve_update_tunnel])
-        stub.createIpTunnel(tunnels_iterators)    
-
-
+    print("Removing old rekey tunnel")
+    tunnels_iterators = iter([ipsec_dec_tunnel_update])
+    stub.createIpTunnel(tunnels_iterators)    
 
 
 def four_tunnel_chain(stub):
@@ -173,12 +138,12 @@ def four_tunnel_chain(stub):
     BASE_TUNNEL_ID = 20000
 
     match = Match(source_ip="12.0.0.1",
-                  dest_ip="12.0.0.2",
-                  spi=980)
+                  dest_ip="12.0.0.2")
 
     ipsec_dec_tunnel = create_ipsec_dec_tunnel(tunnelid=BASE_TUNNEL_ID, 
                                                enc_type=tunneloffload_pb2._aes256gcm64,
                                                tunnel_type=tunneloffload_pb2.TUNNEL,
+                                               spi=980,
                                                match=match)
 
     ###
@@ -274,11 +239,11 @@ def tunnel_recursion_with_tunnel_id_and_ip(stub):
     """
 
     match = Match(source_ip="2.2.2.2",
-                  dest_ip="3.3.3.3",
-                  spi=80000)
+                  dest_ip="3.3.3.3")
 
     ipsec_enc_tunnel = create_ipsec_dec_tunnel(tunnelid=40000,
                                                match=match,
+                                               spi=80000,
                                                tunnel_type=tunneloffload_pb2.TUNNEL_NAT_TRAVERSAL,
                                                enc_type=tunneloffload_pb2._aes256gcm64)
 

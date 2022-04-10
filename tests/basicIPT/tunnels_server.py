@@ -26,11 +26,9 @@ import sys
 import random
 import grpc
 import google.protobuf.timestamp_pb2
-
-#from grpc_status import rpc_status
+from collections.abc import Iterable
 
 from google.protobuf import any_pb2
-#from google.rpc import code_pb2, status_pb2, error_details_pb2
 
 from dataclasses import dataclass
 
@@ -189,13 +187,21 @@ class Tunnel(object):
         if ipsec_params.encryptionType not in SUPPORTED_IPSEC_ENC:
             raise TunnelValidationExcp("Not encryption type set on tunnel")
 
-        if len(ipsec_params.encryptionKey) != 64: # Checking the key length
-            raise TunnelValidationExcp("Key used for IPSec isnt in right size of 256-bit")
-
-        # Enc specific checks
         if ipsec_mode == "ipsecEnc":
-            if ipsec_params.SPI == 0:
-                raise TunnelValidationExcp("SPI isn't set on IPSec Enc Request")
+            ipsec_sa_params_array = [ipsec_params.ipsecSaParams]
+        else:
+            ipsec_sa_params_array = [ipsec_params.firstIPSecSA, ipsec_params.secondIPSecSA]
+
+        spi_found = False
+
+        for ipsec_sa_params in ipsec_sa_params_array:
+            if ipsec_sa_params.spi != 0:
+                spi_found = True
+                if len(ipsec_sa_params.encryptionKey) != 64: # Checking the key length
+                    raise TunnelValidationExcp("Key used for IPSec isnt in right size of 256-bit")
+
+            if not spi_found:
+                raise TunnelValidationExcp("No SPI found on tunnel")
 
     def check_tunnel_validity(self):
 
@@ -231,7 +237,7 @@ def print_tunnel_summary(tunnels):
             sa_tunnels.append(tunnel_id)
             continue
 
-        matched_tunnel_id = tunnel.match_criteria.tunnelId[0]
+        matched_tunnel_id = tunnel.match_criteria.tunnelId
         if matched_tunnel_id not in tunnels:
             raise TunnelValidationExcp(f"Tunnel id {tunnel_id} is matched traffic from " \
                                        f"tunnel id {matched_tunnel_id} which not exists")
@@ -309,10 +315,12 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
                 self.tunnels[request.tunnelId] = tunnel
             elif request.operation == tunneloffload_pb2._UPDATE:
                 print(f"############ Update Tunnel ID - {request.tunnelId} ##################")
-                tunnel = self.tunnels[request.tunnelId].tunnel_proto.match_criteria.CopyFrom(request.match_criteria)
-                
+                print(request)
+                # This is just an example of how an update can work, and be enhanced
+                self.tunnels[request.tunnelId].tunnel_proto.ipsecTunnel.CopyFrom(request.ipsecTunnel)
             else:
                 print(f"############# Removing tunnel {request.tunnelId} ##############")
+                print(request)
                 self.tunnels.pop(request.tunnelId, None)
             
         print("Printing tunnels summary")
