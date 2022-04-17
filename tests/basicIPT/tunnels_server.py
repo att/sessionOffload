@@ -50,8 +50,6 @@ SUPPORTED_IPSEC_ENC = [tunneloffload_pb2._aes256gcm64, tunneloffload_pb2._aes256
 
 MIN_NUMBER_PACKETS = 1
 MAX_NUMBER_PACKETS = 5000
-MIN_NUMBER_BYTES_PACKETS = 64
-MAX_NUMBER_BYTES_PACKET = 1500
 
 
 TUNNEL_FORMATTED = """**********
@@ -114,13 +112,13 @@ class Tunnel(object):
             out_bytes_drops: int 
         """
         in_packets = random.randint(MIN_NUMBER_PACKETS, MAX_NUMBER_PACKETS)
-        in_packets_bytes = in_packets * random.randint(MIN_NUMBER_BYTES_PACKETS, MAX_NUMBER_BYTES_PACKET)
+        in_packets_bytes = in_packets * 8
         out_packets = random.randint(MIN_NUMBER_PACKETS, MAX_NUMBER_PACKETS)
-        out_packets_bytes = in_packets * random.randint(MIN_NUMBER_BYTES_PACKETS, MAX_NUMBER_BYTES_PACKET)
+        out_packets_bytes = out_packets * 8
         in_packets_drops = random.randint(MIN_NUMBER_PACKETS, MAX_NUMBER_PACKETS)
-        in_packets_bytes_drops = in_packets * random.randint(MIN_NUMBER_BYTES_PACKETS, MAX_NUMBER_BYTES_PACKET)
+        in_packets_bytes_drops = in_packets_drops * 8
         out_packets_drops = random.randint(MIN_NUMBER_PACKETS, MAX_NUMBER_PACKETS)
-        out_packets_bytes_drops = in_packets * random.randint(MIN_NUMBER_BYTES_PACKETS, MAX_NUMBER_BYTES_PACKET)
+        out_packets_bytes_drops = out_packets_drops * 8
         return Counters(in_packets=in_packets,
                         in_packets_drops=in_packets_drops,
                         in_bytes=in_packets_bytes,
@@ -333,6 +331,7 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
         
         res = tunneloffload_pb2.ipTunnelResponse()
         tunnel = self.tunnels[request.tunnelId]
+        print(f"Getting IP Tunnel {request.tunnelId}")
 
         # Filling tunnel id 
         res.tunnelId = request.tunnelId
@@ -349,6 +348,7 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
 
         # Filling the tunnel proto
         res.ipTunnel.CopyFrom(tunnel.tunnel_proto)
+        print(res)
 
         return res
          
@@ -356,6 +356,7 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
         
         res = tunneloffload_pb2.ipTunnelStatsResponse()
         tunnel = self.tunnels[request.tunnelId]
+        print(f"Getting IP Tunnel stats {request.tunnelId}")
 
         # Filling tunnel id 
         res.tunnelId = request.tunnelId
@@ -369,6 +370,7 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
         res.tunnelCounters.outPacketsDrops = tunnel.counters.out_packets_drops
         res.tunnelCounters.inBytesDrops = tunnel.counters.in_bytes_drops
         res.tunnelCounters.outBytesDrops = tunnel.counters.out_bytes_drops
+        print(res)
 
         return res
 

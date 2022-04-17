@@ -25,7 +25,7 @@ class Match():
 
 
 def random_key():
-    val =  "%064x" % random.randrange(32**32)
+    val =  "%064x" % random.randrange(2**256)
     return val.encode()
 
 def ipv4_to_int(ipv4):

@@ -119,13 +119,28 @@ def tunnel_add_IPSEC_GENEVE(stub):
 
 
 
-    print("Performing rekey - decryption")
+    print("\nPerforming rekey - decryption\n")
     tunnels_iterators = iter([ipsec_dec_tunnel_update])
     stub.createIpTunnel(tunnels_iterators)    
 
     # Waiting sometime before removing the old spi
     ipsec_dec_tunnel_update = update_ipsec_dec_tunnel(ipsec_dec_tunnel.tunnelId,
                                                       second_tunnel_spi=1030)
+
+
+    # Getting the ip tunnel stats
+    print("\nGetting IP Tunnel stats\n")
+    tunnel_id = tunneloffload_pb2.tunnelId()
+    tunnel_id.tunnelId = ipsec_dec_tunnel_update.tunnelId
+    res = stub.getIpTunnelStats(tunnel_id)
+    print(res)
+
+    # Getting the entire ip tunnel
+    print("\nGetting IP Tunnel\n")
+    tunnel_id = tunneloffload_pb2.tunnelId()
+    tunnel_id.tunnelId = ipsec_dec_tunnel_update.tunnelId
+    res = stub.getIpTunnel(tunnel_id)
+    print(res)
 
 
     print("Removing old rekey tunnel")

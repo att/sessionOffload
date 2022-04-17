@@ -79,7 +79,7 @@ service ipTunnelService {
   rpc getAllIpTunnels(tunnelRequestArgs) returns (ipTunnelResponses) {} // Contains the page size / etc
 
   // Get all the iptunnels stats responses
-  rpc getAllIpTunnelsStats(tunnelRequestArgs) returns (ipTunnelResponses) {} // Contains the page size / etc
+  rpc getAllIpTunnelsStats(tunnelRequestArgs) returns (ipTunnelStatsResponses) {} // Contains the page size / etc
 }
 
 // Capabilty request is empty since no paramteres are supplied to it,
