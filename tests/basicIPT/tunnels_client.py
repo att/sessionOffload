@@ -147,6 +147,15 @@ def tunnel_add_IPSEC_GENEVE(stub):
     tunnels_iterators = iter([ipsec_dec_tunnel_update])
     stub.createIpTunnel(tunnels_iterators)    
 
+    print("Getting all tunnel stats")
+    tunnelRequestArgs = tunneloffload_pb2.tunnelRequestArgs()
+    tunnelRequestArgs.tunnelsPerRequest = 2
+    iterable = stub.getAllIpTunnelsStats(tunnelRequestArgs)    
+    for response in iterable:
+        print(response)
+
+
+
 
 def four_tunnel_chain(stub):
 

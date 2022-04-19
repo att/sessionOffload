@@ -76,10 +76,10 @@ service ipTunnelService {
   rpc getIpTunnelStats(tunnelId) returns (ipTunnelStatsResponse) {}
 
   // Getting all the ipTunnels currently configured
-  rpc getAllIpTunnels(tunnelRequestArgs) returns (ipTunnelResponses) {} // Contains the page size / etc
+  rpc getAllIpTunnels(tunnelRequestArgs) returns (stream ipTunnelResponses) {} // Contains the page size / etc
 
   // Get all the iptunnels stats responses
-  rpc getAllIpTunnelsStats(tunnelRequestArgs) returns (ipTunnelStatsResponses) {} // Contains the page size / etc
+  rpc getAllIpTunnelsStats(tunnelRequestArgs) returns (stream ipTunnelStatsResponses) {} // Contains the page size / etc
 }
 
 // Capabilty request is empty since no paramteres are supplied to it,
@@ -401,11 +401,6 @@ message ipTunnelStatsResponse {
 }
 
 message tunnelRequestArgs {
-  //  pageSize = 0 will turn off paging
-  //  does paging make sense for a stream ?
-  //  the client should read/process each event on the stream anyway.
-  uint32  pageSize= 1;
-  uint32  page= 2;
-  uint32  firstTunnelId= 3;
-  //  what other arguments make sense for retrieving or filtering streams
+  uint32 tunnelsPerRequest = 1; // How many tunnels will be returned per request
+                                // 0 means to return all tunnels in same request
 }

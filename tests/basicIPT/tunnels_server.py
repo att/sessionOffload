@@ -93,6 +93,7 @@ class AddTunnelErrorsIterator:
 class Tunnel(object):
     def __init__(self, tunnel):
         self.tunnel_proto = tunnel
+        self.tunnel_id = self.tunnel_proto.tunnelId
         self.match_criteria = self.tunnel_proto.match_criteria
         self.tunnel_type = None
         self.counters = self.generate_random_counters_for_sesssion()
@@ -387,6 +388,38 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
         res.geneveCapabilities.geneveOptions = 5
         
         return res
+
+    def getAllIpTunnelsStats(self, request, context):
+
+        print("Got getAllIpTunnelsStats request!")
+        print(f"Number of stats per response: {request.tunnelsPerRequest}")
+        iteration_count = request.tunnelsPerRequest
+        tunnels_to_iterate = list(self.tunnels.values())
+        num_tunnels = len(tunnels_to_iterate)
+
+        tunnels_to_send = []
+        for i, tunnel in enumerate(tunnels_to_iterate):
+            
+            specific_tunnel = tunneloffload_pb2.ipTunnelStatsResponse()
+            specific_tunnel.tunnelId = tunnel.tunnel_id
+            specific_tunnel.tunnelCounters.inPackets = tunnel.counters.in_packets
+            specific_tunnel.tunnelCounters.outPackets = tunnel.counters.out_packets
+            specific_tunnel.tunnelCounters.inBytes = tunnel.counters.in_bytes
+            specific_tunnel.tunnelCounters.outBytes = tunnel.counters.out_bytes
+            specific_tunnel.tunnelCounters.inPacketsDrops = tunnel.counters.in_packets_drops
+            specific_tunnel.tunnelCounters.outPacketsDrops = tunnel.counters.out_packets_drops
+            specific_tunnel.tunnelCounters.inBytesDrops = tunnel.counters.in_bytes_drops
+            specific_tunnel.tunnelCounters.outBytesDrops = tunnel.counters.out_bytes_drops
+            tunnels_to_send.append(specific_tunnel)
+
+            if len(tunnels_to_send) == iteration_count or i == num_tunnels - 1:
+                msg = tunneloffload_pb2.ipTunnelStatsResponses()
+                msg.responses.extend(tunnels_to_send)
+                tunnels_to_send = []
+                print("Sending response in stream!")
+                print(msg)
+                yield msg
+                
 
 def tunnelServe():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
