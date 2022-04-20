@@ -126,7 +126,7 @@ message CapabilityResponse {
   IPSecCapabilities ipsecCapabilities = 2;
 
   message GENEVECapabilities {
-    uint32 geneveOptions = 1;  // Number of options geneve is supporting in encap
+    uint32 numberGeneveOptionsSupported = 1;  // Number of options geneve is supporting in encap
   }
   
   GENEVECapabilities geneveCapabilities = 3;
@@ -216,11 +216,12 @@ message GENEVE {
 }
 
 message GENEVEOption {
-  uint32 optionClass = 1;
-  uint32 type = 2;
+  uint32 optionClass = 1; // 16 bits
+  uint32 type = 2; // 8 bits
   uint32 length = 3; // Only 5 bits used
-  // Length is multiple of 4 bit (see https://datatracker.ietf.org/doc/html/rfc8926#section-3.5)
-  bytes data = 4; // Only 4-128 bytes are acceptable
+  // Length is multiple of 4 bytes (see https://datatracker.ietf.org/doc/html/rfc8926#section-3.5)
+  bytes data = 4; // Only 4-128 bytes are acceptable,
+  // Number of bytes that's not multiple of 4 will be rejected, and option won't be accepted
 }
 
 
@@ -244,7 +245,7 @@ message GENEVEEncap {
   // Source & Dest mac of inner GENEVE packet
   MacPair innerMacPair = 3;
 
-  uint32 optionLength = 4; // 6 bits
+  uint32 optionLength = 4; // 6 bits - Multiply of 4 bytes 
   bool controlPacket = 5; // O bit at rfc. True is '1', False is '0'. Default is False.
   bool criticalOptionPresent = 6; // C bit at rfc. True is '1', False is '0'. Default is False.
   uint32 vni = 7; // Virtual Network Identifier - 24 bits

@@ -159,6 +159,35 @@ class Tunnel(object):
         if outer_ip == 'outerIpv6Pair':
             self.validate_ipv6_pair(geneve_encap.outerIpv6Pair)
 
+        for option in geneve_encap.geneveOption:
+            self.validate_geneve_option(option)
+
+    @staticmethod
+    def validate_geneve_option(option):
+        print(f"Validating option {option}")
+
+        if option.optionClass >= 2**16:
+            raise TunnelValidationExcp("Optionclass is only 16 bits!")
+
+        if option.type >= 2**8:
+            raise TunnelValidationExcp("Type is only 8 bits!")
+
+        if option.length >= 2**5:
+            raise TunnelValidationExcp("Length of option is only 5 bits!")
+
+        num_bytes_option_data = len(option.data)
+
+        if (num_bytes_option_data % 4) != 0:
+            raise TunnelValidationExcp("Data of an option must be multiply of 4")
+
+        if num_bytes_option_data / 4 != option.length:
+            raise TunnelValidationExcp("Option data and length field aren't matched!") 
+
+            
+            
+
+
+
         
     def check_geneve_decap_validity(self, geneve_decap):
         pass
@@ -267,7 +296,6 @@ def print_tunnel_summary(tunnels):
 
 
     for chain in tunnels_chaining:
-        # import pudb; pudb.set_trace()
         if not isinstance(chain, tuple):
             print("----------------------------------------------")
             print("Following tunnels are chained to each other:")
@@ -385,7 +413,7 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
         res.ipsecCapabilities.tunnelTypeSupported.extend([tunneloffload_pb2.TRANSPORT, tunneloffload_pb2.TUNNEL, tunneloffload_pb2.TRANSPORT_NAT_TRAVERSAL, tunneloffload_pb2.TUNNEL_NAT_TRAVERSAL])
         res.ipsecCapabilities.encryptionSupported.extend(SUPPORTED_IPSEC_ENC)
 
-        res.geneveCapabilities.geneveOptions = 5
+        res.geneveCapabilities.numberGeneveOptionsSupported = 5
         
         return res
 

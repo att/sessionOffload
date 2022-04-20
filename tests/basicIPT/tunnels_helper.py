@@ -173,6 +173,17 @@ def create_geneve_encap(tunnelid,
     geneve_encap.innerMacPair.destinationMac = geneve_dest_mac.encode()
     geneve_encap.vni = geneve_vni
 
+    # Example option
+    geneve_option = tunneloffload_pb2.GENEVEOption()
+    geneve_option.optionClass = int("0104", 16)
+    geneve_option.type = int('11', 16)
+    geneve_option.data = bytes.fromhex('10203040')
+    geneve_option.length = int(len(geneve_option.data) / 4)
+    geneve_encap.geneveOption.extend([geneve_option])
+    geneve_encap.optionLength = 4 #  8 bytes fixed tunnel header, 
+    # 4 bytes option header, 4 bytes option data
+    # optionlength is multiple of 4
+
     return geneve_encap_tunnel
 
 def create_geneve_decap(tunnelid,
