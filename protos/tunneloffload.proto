@@ -144,7 +144,7 @@ enum ACTION {
 
 message MatchCriteria {
     // In case it's not present, untagged traffic will be matched
-    string ingressInterface = 1; // Optional field, in which interface this tunnel will be encapsulated
+    string ingressInterface = 1; 
 
     MacPair macMatch = 2; // MAC of the packet itself
 
@@ -262,8 +262,8 @@ message NATAction {
 }
 
 message MacPair {
-  bytes sourceMac = 1;
-  bytes destinationMac = 2;
+  bytes destinationMac = 1;
+  bytes sourceMac = 2;
 }
 
 message IPV4Pair {

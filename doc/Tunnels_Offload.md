@@ -27,7 +27,6 @@ message ipTunnelRule {
   oneof tunnel { 
       IPSecTunnel ipsecTunnel = 3;  
       GENEVE geneve = 4;
-      VCMPNat NAT = 5;
   };
 
 }
@@ -36,7 +35,7 @@ message ipTunnelRule {
 Each ipTunnelRule inserted will include *match* determines rule matching. Upon match tunnel provided by the *tunnel* 
 field will be applied to the packet.
 
-`nextActinon` field will determine what will happen to the packet after applying the tunnel, with two possibilities: *recirculate* indicates packet will overgo again the tunneling subsytem, and another tunnel rule may be applied. *forward* indicates that the packet will be forwarded directly from the device, without the  process of any other tunnel.
+`nextActinon` field will determine what will happen to the packet after applying the tunnel, with two possibilities: *recirculate* indicates the packet will overgo again the tunneling subsystem, and another tunnel rule may be applied. *forward* indicates that the packet will be forwarded directly from the device, without the process of any other tunnel.
 
 To summarize the flow, see the following diagram:
 
@@ -124,7 +123,7 @@ VXLAN Packet {
 
 ## Packet Encapsulation / Decapsulation
 
-After packet matched, it should be encapsulated / decapsulated according to the offloaded tunnel.
+After the packet is matched, it should be encapsulated / decapsulated according to the offloaded tunnel.
 
 Tunnel configuration can be unidirectional or bidirectional, depending on the tunnel characteristics.
 
@@ -140,11 +139,11 @@ This is the tunnel part in the ipTunnelRule:
 
 Each tunnel type is introduced by message.  
 
-In case of bi-directional tunnel, the tunnel encapsulation will determine the match on the reverse side (e.g. NAT).
+In the case of a bi-directional tunnel, the tunnel encapsulation will determine the match on the reverse side (e.g. NAT).
 
-In case of uni-directional tunnel, tunnel definition will be for only ecnapsulation / decapsulatio nof tunnel.
+In the case of a uni-directional tunnel, tunnel definition will be for only encapsulation / decapsulation of tunnel.
 
-GENEVE is a classic example of bi-directional user - where the offloaded device can device to just encapsulate / decapsulate geneve.
+GENEVE is a classic example of a bi-directional user - where the offloaded device can device to just encapsulate / decapsulate GENEVE.
 
 ```
 message GENEVE {
@@ -154,7 +153,7 @@ message GENEVE {
   }
 ```
 
-*Upon a match, user decide to perform encapsulation / decapsulation, GENEVE is comprised of two distinct messages, 
+*Upon a match, the user decides to perform encapsulation / decapsulation, GENEVE is comprised of two distinct messages, 
 choosing one of them decide about the tunnel operation*
 
 NAT is an example where the device is both encapsulating / decapsulating the tunnels.
@@ -172,7 +171,7 @@ message NAT {
 
 
 **Match** is the only indicator for going into tunnel encapsulation / decapsulation.
-While wanting to perform decapsulation of packet in uni-directional tunnel (e.g. the GENEVE Decapsulation in the example above), a GENEVE match **MUST** be on MATCH criteria (the same applies for IPSec, VXLan, etc)
+While wanting to perform decapsulation of the packet in a uni-directional tunnel (e.g. the GENEVE Decapsulation in the example above), a GENEVE match **MUST** be on MATCH criteria (the same applies for IPSec, VXLan, etc)
 
 ### Tunnel Chaining
 
@@ -182,19 +181,19 @@ According to the following chart:
 
 ![Matching](images/tunnelOffload/deviceDiagram.png)
 
-Upon receipt of packet into the offloading device, it will be matched and tunnel will be applied. 
+Upon receipt of the packet into the offloading device, it will be matched and a tunnel will be applied. 
 
-If the `nextAction` equals to `RECIRCULATE`, the packet will be process via the matching logic again, and if match will be found - another tunnel will be appliwed ot hte packet.
+If the `nextAction` equals `RECIRCULATE`, the packet will be processed via the matching logic again, and if a match will be found - another tunnel will be applied to the packet.
 
-This iterative process will occur until: one; packet isn't matched via the matching logic. 2; the next action equals to `FORWARD`. That will yield to immediate forwarding of the data. 
+This iterative process will occur until one; the packet isn't matched via the matching logic. 2; the next action equals  `FORWARD`. That will yield immediate forwarding of the data. 
 
 Consider the following example:
 
 ![Matching](images/tunnelOffload/tunnel_chain_ip.png)
 
-While first match of packet **MUST** be based on IP's, there's a possibility to use "TunnelID" as the match critieria.
+While the first match of packet **MUST** be based on IP's, there's a possibility to use "TunnelID" as the match criteria.
 
-Rules having "TunnelID" in their match criteria can only be part of tunnel chaining, and will applied on packet from the second tunnel and afterwards.
+Rules having "TunnelID" in their match criteria can only be part of tunnel chaining and will be applied on the packet from the second tunnel and afterward.
 
 Consider the following example:
 
@@ -207,9 +206,9 @@ The advantage of using the "TunnelID" as a match, is the ability to know for sur
 ## Capabilities
 
 Capabilities are needed so the user can detect which features are available with tunnel offload,
-user can detect which features are available with tunnel offload, both the tunnel capabilities & matching capabilities of the devic
+user can detect which features are available with tunnel offload, both the tunnel capabilities & matching capabilities of the device.
 
-That's the response the user will get in order to know which capabilities available for it:
+That's the response the user will get to know which capabilities are available for it:
 
 ```
 message CapabilityResponse {
@@ -243,7 +242,7 @@ message CapabilityResponse {
 
 In the following example, IPSec tunnel processing is offloaded into the device. 
 
-IPSec is a special example where two offloads should be performed to the device, one for egress and one for ingress - since there's different SA (Security Association) per direction.
+IPSec is a special example where two offloads should be performed to the device, one for egress and one for ingress - since there's a different SA (Security Association) per direction.
 
 **Ingress Tunnel**
 
