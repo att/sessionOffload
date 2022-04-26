@@ -72,8 +72,8 @@ def create_ipsec_enc_tunnel(tunnelid,
 
     # Defining IPSec Encryption
     ipsec_params = ipsec_enc_tunnel.ipsecTunnel.ipsecEnc
-    ipsec_params.ipsecSaParams.spi = spi
-    ipsec_params.ipsecSaParams.encryptionKey = random_key()
+    ipsec_params.ipsecSA.spi = spi
+    ipsec_params.ipsecSA.encryptionKey = random_key()
     ipsec_params.tunnelType = tunnel_type
     ipsec_params.encryptionType = enc_type
     
@@ -88,14 +88,18 @@ def update_ipsec_enc_tunnel(tunnelId,
     ipsec_enc_tunnel.tunnelId = tunnelId
     ipsec_enc_tunnel.operation = tunneloffload_pb2._UPDATE
     ipsec_params = ipsec_enc_tunnel.ipsecTunnel.ipsecEnc
-    ipsec_params.ipsecSaParams.spi = spi
-    ipsec_params.ipsecSaParams.encryptionKey = random_key()
+    ipsec_params.ipsecSA.spi = spi
+    ipsec_params.ipsecSA.encryptionKey = random_key()
 
     return ipsec_enc_tunnel
 
 def update_ipsec_dec_tunnel(tunnelId,
                             first_tunnel_spi=None,
-                            second_tunnel_spi=None):
+                            first_tunnel_key=None,
+                            second_tunnel_spi=None,
+                            second_tunnel_key=None,
+                            third_tunnel_spi=None,
+                            third_tunnel_key=None):
 
     ipsec_dec_tunnel = tunneloffload_pb2.ipTunnelRequest()
     ipsec_dec_tunnel.tunnelId = tunnelId
@@ -103,20 +107,18 @@ def update_ipsec_dec_tunnel(tunnelId,
 
     ipsec_params = ipsec_dec_tunnel.ipsecTunnel.ipsecDec
 
+    security_associations = []
 
-    if first_tunnel_spi:
-        ipsec_params.firstIPSecSA.spi = first_tunnel_spi
-        ipsec_params.firstIPSecSA.encryptionKey = random_key()
-    else:
-        # Indicating that the IPSec should be removed
-        ipsec_params.firstIPSecSA.SetInParent()
-
-    if second_tunnel_spi:
-        ipsec_params.secondIPSecSA.spi = second_tunnel_spi
-        ipsec_params.secondIPSecSA.encryptionKey = random_key()
-    else:
-        # Indicating that the IPSec should be removed
-        ipsec_params.secondIPSecSA.SetInParent()
+    for spi, key in [(first_tunnel_spi, first_tunnel_key), (second_tunnel_spi, second_tunnel_key), (third_tunnel_spi, third_tunnel_key)]:
+        if spi is None:
+            continue
+        
+        security_association = tunneloffload_pb2.IPSecSAParams()
+        security_association.spi = spi
+        security_association.encryptionKey = key
+        security_associations.append(security_association)
+        
+    ipsec_params.ipsecSAs.extend(security_associations)
 
     return ipsec_dec_tunnel
 
@@ -124,6 +126,7 @@ def update_ipsec_dec_tunnel(tunnelId,
 def create_ipsec_dec_tunnel(tunnelid, 
                             match: Match,
                             spi,
+                            key, 
                             tunnel_type,
                             enc_type=tunneloffload_pb2._aes256gcm64,
                             next_action=tunneloffload_pb2.RECIRCULATE):
@@ -142,8 +145,10 @@ def create_ipsec_dec_tunnel(tunnelid,
     ipsec_params.tunnelType = tunnel_type
     ipsec_params.encryptionType = enc_type
 
-    ipsec_params.firstIPSecSA.encryptionKey = random_key()
-    ipsec_params.firstIPSecSA.spi = spi
+    security_association = tunneloffload_pb2.IPSecSAParams()
+    security_association.spi = spi
+    security_association.encryptionKey = key
+    ipsec_params.ipsecSAs.extend([security_association])
 
     return ipsec_dec_tunnel
 

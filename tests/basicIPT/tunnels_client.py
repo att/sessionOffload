@@ -39,9 +39,15 @@ def tunnel_add_IPSEC_GENEVE(stub):
     match = Match(source_ip="11.0.0.1",
                   dest_ip="11.0.0.2")
 
+    FIRST_DEC_SPI = 780
+    FIRST_DEC_KEY = random_key()
+    SECOND_DEC_SPI = 1030
+    SECOND_DEC_KEY = random_key()
+
     ipsec_dec_tunnel = create_ipsec_dec_tunnel(tunnelid=10000, 
                                                enc_type=tunneloffload_pb2._aes256gcm64,
-                                               spi=780,
+                                               spi=FIRST_DEC_SPI,
+                                               key=FIRST_DEC_KEY,
                                                tunnel_type=tunneloffload_pb2.TRANSPORT_NAT_TRAVERSAL,
                                                match=match)
 
@@ -113,8 +119,10 @@ def tunnel_add_IPSEC_GENEVE(stub):
     print("Performing rekey - decryption")
     # Rekey of decryption is done by creating another tunnel with a different SPI 
     ipsec_dec_tunnel_update = update_ipsec_dec_tunnel(ipsec_dec_tunnel.tunnelId,
-                                                      first_tunnel_spi=780,
-                                                      second_tunnel_spi=1030)
+                                                      first_tunnel_spi=FIRST_DEC_SPI,
+                                                      first_tunnel_key=FIRST_DEC_KEY,
+                                                      second_tunnel_spi=SECOND_DEC_SPI,
+                                                      second_tunnel_key=SECOND_DEC_KEY)
 
 
 
@@ -125,7 +133,8 @@ def tunnel_add_IPSEC_GENEVE(stub):
 
     # Waiting sometime before removing the old spi
     ipsec_dec_tunnel_update = update_ipsec_dec_tunnel(ipsec_dec_tunnel.tunnelId,
-                                                      second_tunnel_spi=1030)
+                                                      second_tunnel_spi=SECOND_DEC_SPI,
+                                                      second_tunnel_key=SECOND_DEC_KEY)
 
 
     # Getting the ip tunnel stats
@@ -168,6 +177,7 @@ def four_tunnel_chain(stub):
                                                enc_type=tunneloffload_pb2._aes256gcm64,
                                                tunnel_type=tunneloffload_pb2.TUNNEL,
                                                spi=980,
+                                               key=random_key(),
                                                match=match)
 
     ###
@@ -268,6 +278,7 @@ def tunnel_recursion_with_tunnel_id_and_ip(stub):
     ipsec_enc_tunnel = create_ipsec_dec_tunnel(tunnelid=40000,
                                                match=match,
                                                spi=80000,
+                                               key=random_key(),
                                                tunnel_type=tunneloffload_pb2.TUNNEL_NAT_TRAVERSAL,
                                                enc_type=tunneloffload_pb2._aes256gcm64)
 

@@ -306,7 +306,7 @@ enum IPSecTunnelType {
 message IPSecEnc {
   IPSecTunnelType tunnelType = 1;
   ENC_TYPE encryptionType = 2;
-  IPSecSAParams ipsecSaParams = 3;
+  IPSecSAParams ipsecSA = 3;
   // In case the ipsec tunnel is with tunnel mode,
   // one of the messages below should present
   oneof tunnelIps {
@@ -318,8 +318,7 @@ message IPSecEnc {
 message IPSecDec {
   IPSecTunnelType tunnelType = 1; // Transport / Tunnel...
   ENC_TYPE encryptionType = 2; // AES-256GCM
-  IPSecSAParams firstIPSecSA = 3;
-  IPSecSAParams secondIPSecSA = 4;
+  repeated IPSecSAParams ipsecSAs= 3;
 }
 
 message IPSecSAParams {

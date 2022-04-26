@@ -216,9 +216,9 @@ class Tunnel(object):
             raise TunnelValidationExcp("Not encryption type set on tunnel")
 
         if ipsec_mode == "ipsecEnc":
-            ipsec_sa_params_array = [ipsec_params.ipsecSaParams]
+            ipsec_sa_params_array = [ipsec_params.ipsecSA]
         else:
-            ipsec_sa_params_array = [ipsec_params.firstIPSecSA, ipsec_params.secondIPSecSA]
+            ipsec_sa_params_array = ipsec_params.ipsecSAs
 
         spi_found = False
 
