@@ -16,22 +16,6 @@ The API will also allow the definition of switching between tunnels with decapsu
 
 With openOffload, the user can request to match the packet encapsulate it on a tunnel, this will be done by providing matching criteria, tunnel properties and the next action to perform.
 
-```
-message ipTunnelRule { 
-
-  MatchCriteria match_criteria = 1; // When hitting this match, 
-
-  ACTION nextAction = 2; // What we'll do after matching the packet, shuold we 
-                         // keep process it or we'll just forward it 
-
-  oneof tunnel { 
-      IPSecTunnel ipsecTunnel = 3;  
-      GENEVE geneve = 4;
-  };
-
-}
-```
-
 Each ipTunnelRule inserted will include *match* determines rule matching. Upon match tunnel provided by the *tunnel* 
 field will be applied to the packet.
 
@@ -56,34 +40,6 @@ The matching criteria are comprised of three parts:
 1. IP packet fields  - MAC, IP's, etc
 2. Specific header matching: GENVE / VXLan / IPSec, etc.
 3. Tunnel Matching: Matching packets according to their *last* match. More information on it in *Tunnel Chaining* section.
-
-```
-message MatchCriteria {
-    // In case it's not present, untagged traffic will be matched
-    string ingress_interface = 1; // Optional field, in which interface this tunnel will be encapsulated
-
-    MacPair macMatch = 2; // MAC of the packet itself
-
-    oneof ip_match {
-      IPV4Match ipv4Match = 3;
-      IPV6Match ipv6Match = 4;
-    }
-
-    string vrf = 5; // Optional field, not indicating VRF means that 
-    // the match will be on default VRF 
-
-    tunnelId tunnelID = 6; // Match on specific tunnel
-    
-    // Tunnel Matching
-    oneof match {
-      IPSecMatch ipsecMatch = 7;
-      GeneveMatch geneveMatch = 8;
-      VXLanMatch vxlanMatch = 9;
-      GRE greMatch = 10;
-    }
-
-}
-```
 
 This matching structure is intended to provide maximum flexibility to the user, that, for example - can match on specific VXLan VNI & Inner Mac, and only then perform IPSec encryption (or any other action).
 
@@ -126,18 +82,6 @@ VXLAN Packet {
 After the packet is matched, it should be encapsulated / decapsulated according to the offloaded tunnel.
 
 Tunnel configuration can be unidirectional or bidirectional, depending on the tunnel characteristics.
-
-This is the tunnel part in the ipTunnelRule:
-
-```
-  oneof tunnel { 
-      IPSecTunnel ipsecTunnel = 3; 
-      GENEVE geneve = 4;
-      VCMPNat NAT = 5;
-  };
-```
-
-Each tunnel type is introduced by message.  
 
 In the case of a bi-directional tunnel, the tunnel encapsulation will determine the match on the reverse side (e.g. NAT).
 
@@ -208,51 +152,5 @@ The advantage of using the "TunnelID" as a match, is the ability to know for sur
 Capabilities are needed so the user can detect which features are available with tunnel offload,
 user can detect which features are available with tunnel offload, both the tunnel capabilities & matching capabilities of the device.
 
-That's the response the user will get to know which capabilities are available for it:
-
-```
-message CapabilityResponse {
-  // We'll have capability for matching, and for every tunnel
-
-  message MatchCapabilities {
-    bool ingressInterfaceMatching = 1; // Is interface can be matched for encapsulation / decapsulation
-    bool vxlanMatching = 2; // Match with VXLAN VNI
-    bool geneveMatching = 3; // Match with geneve can happen
-    bool vrfMatching = 4; // Is vrf matching possible
-  }
-
-  MatchCapabilities matchCapabilities = 1;
-  
-  message IPSecCapabilities {
-    repeated IPSecTunnelType tunnelTypeSupported = 1;
-    repeated AUTH_TYPE authSupported = 2;
-    repeated ENC_TYPE encryptionSupported = 3;
-  }
-  
-  IPSecCapabilities ipsecCapabilities = 2;
-  
-}
-```
-
-
-
-## Examples
-
-#### Offloading IPsec Tunnel
-
-In the following example, IPSec tunnel processing is offloaded into the device. 
-
-IPSec is a special example where two offloads should be performed to the device, one for egress and one for ingress - since there's a different SA (Security Association) per direction.
-
-**Ingress Tunnel**
-
-For egress flow, the following example can is offloaded into the device
-
-![Matching](images/tunnelOffload/examples/ipsec_transport_egress.png)
-
-**Egress Tunnel**
-
-For egress flow, the following example can is offloaded into the device
-
-![Matching](images/tunnelOffload/examples/ipsec_transport_ingress.png)
+Please see the capabilities rpc; in the tunnels offload proto for more detailed information about it.
 

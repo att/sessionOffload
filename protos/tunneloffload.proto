@@ -112,7 +112,7 @@ message CapabilityResponse {
     bool vxlanMatching = 2; // Match with VXLAN VNI
     bool geneveMatching = 3; // Match with geneve can happen
     bool vrfMatching = 4; // Is vrf matching possible
-    bool tunnelMatching = 5; // Matchingp on tunnel
+    bool tunnelMatching = 5; // Matching on tunnel ID
     bool spiMatching = 6; // Can match on IPSec
   }
 
@@ -257,9 +257,6 @@ message GENEVEDecap {
   // is on the match of the tunnel
 }
 
-message NATAction {
-  fixed32 sourceIp = 1;
-}
 
 message MacPair {
   bytes destinationMac = 1;
