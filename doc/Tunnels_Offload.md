@@ -100,7 +100,7 @@ message GENEVE {
 *Upon a match, the user decides to perform encapsulation / decapsulation, GENEVE is comprised of two distinct messages, 
 choosing one of them decide about the tunnel operation*
 
-NAT is an example where the device is both encapsulating / decapsulating the tunnels.
+NAT is an example where the device is both encapsulating / decapsulating the tunnels and this is a bidirectional tunnel.
 
 ```
 message NAT {
@@ -109,6 +109,10 @@ message NAT {
 ```
 
 *In NAT example, ipTunnelRule will be used for both encapsulation / decapsulation*
+
+In a NAT example (of bidirectional tunnel), the match will be used for egress traffic only, and a packet that will be matched on it will perform NAT.
+
+After maching on egress, the NAT will write the rule for ingress matching, and this will yield on matching of ingress tunnel (see example below).
 
 ![Matching](images/tunnelOffload/uni_bi_directional_tunnel.png)
 

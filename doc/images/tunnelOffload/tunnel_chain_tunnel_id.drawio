@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="V7hC7Ia_DJyM14xFZ34Q" name="Page-1">
-        <mxGraphModel dx="2892" dy="640" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="2338" dy="1302" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -69,16 +69,16 @@
                 <mxCell id="47" value="&lt;font style=&quot;font-size: 21px&quot;&gt;ipTunnelRule&lt;br&gt;(Tunnel ID 3)&lt;br&gt;&lt;br&gt;&lt;u&gt;Match:&lt;br&gt;&lt;/u&gt;Tunnel ID 3&lt;br&gt;&lt;br&gt;&lt;u&gt;Tunnel:&lt;/u&gt;&lt;br&gt;IPSec Decryption&lt;br&gt;Transport&lt;br&gt;AuthKey&lt;br&gt;EncKey&lt;br&gt;&lt;br&gt;&lt;u&gt;nextAction&lt;br&gt;&lt;/u&gt;RECIRCULATE&lt;br&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="310" y="230" width="299" height="390" as="geometry"/>
                 </mxCell>
-                <mxCell id="49" value="Inner Source&lt;br style=&quot;font-size: 18px;&quot;&gt;Mac" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" parent="1" vertex="1">
+                <mxCell id="49" value="Source&lt;br style=&quot;font-size: 18px&quot;&gt;Mac" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" parent="1" vertex="1">
                     <mxGeometry x="362.5" y="130" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="50" value="Inner Dest&amp;nbsp;&lt;br style=&quot;font-size: 18px;&quot;&gt;MAC" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" parent="1" vertex="1">
+                <mxCell id="50" value="Destination MAC" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" parent="1" vertex="1">
                     <mxGeometry x="242.5" y="130" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="54" value="&lt;font style=&quot;font-size: 23px&quot;&gt;Tunnel ID 3 &lt;br&gt;Match&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="758" y="380" width="130" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="55" value="&lt;font style=&quot;font-size: 21px&quot;&gt;ipTunnelRule&lt;br&gt;(Tunnel ID 4)&lt;br&gt;&lt;br&gt;&lt;u&gt;Match:&lt;br&gt;&lt;/u&gt;Tunnel ID 3&lt;br&gt;&lt;br&gt;&lt;u&gt;Tunnel:&lt;/u&gt;&lt;br&gt;GENEVE Encap&lt;br&gt;Inner SMAC 0x102030405060&lt;br&gt;Inner DMAC 0x605040302010&lt;br&gt;Outer SIP: 1.1.1.1&lt;br&gt;Outer DIP: 2.2.2.2&lt;br&gt;VNI: 250&lt;br&gt;&lt;br&gt;&lt;u&gt;nextAction&lt;br&gt;&lt;/u&gt;RECIRCULATE&lt;br&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="55" value="&lt;font style=&quot;font-size: 21px&quot;&gt;ipTunnelRule&lt;br&gt;(Tunnel ID 4)&lt;br&gt;&lt;br&gt;&lt;u&gt;Match:&lt;br&gt;&lt;/u&gt;Tunnel ID 3&lt;br&gt;&lt;br&gt;&lt;u&gt;Tunnel:&lt;/u&gt;&lt;br&gt;GENEVE Encap&lt;br&gt;Inner SMAC 0x102030405060&lt;br&gt;Inner DMAC 0x605040302010&lt;br&gt;Outer SIP: 1.1.1.1&lt;br&gt;Outer DIP: 2.2.2.2&lt;br&gt;VNI: 250&lt;br&gt;&lt;br&gt;&lt;u&gt;nextAction&lt;br&gt;&lt;/u&gt;FORWARD&lt;br&gt;&lt;/font&gt;" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="250" y="740" width="359" height="440" as="geometry"/>
                 </mxCell>
                 <mxCell id="56" value="&lt;font style=&quot;font-size: 23px&quot;&gt;Tunnel ID 4 Match&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;strokeWidth=5;" parent="1" vertex="1">
@@ -93,13 +93,13 @@
                 <mxCell id="59" value="UDP Header&lt;br style=&quot;font-size: 17px;&quot;&gt;Source &amp;amp; Dest Port:&lt;br style=&quot;font-size: 17px;&quot;&gt;6081" style="rounded=0;whiteSpace=wrap;html=1;fontSize=17;" parent="1" vertex="1">
                     <mxGeometry x="360" y="1230" width="170" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="60" value="Source MAC&lt;br&gt;0x102030405060" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" parent="1" vertex="1">
+                <mxCell id="60" value="Inner Destination MAC&lt;br&gt;0x605040302010" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" parent="1" vertex="1">
                     <mxGeometry x="680" y="1230" width="170" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="61" value="GENEVE&lt;br&gt;VNI 250" style="rounded=0;whiteSpace=wrap;html=1;fontSize=17;" parent="1" vertex="1">
                     <mxGeometry x="530" y="1230" width="150" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="62" value="Destinatino MAC&lt;br&gt;0x605040302010" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" parent="1" vertex="1">
+                <mxCell id="62" value="Inner Source MAC 0x102030405060" style="rounded=0;whiteSpace=wrap;html=1;fontSize=18;" parent="1" vertex="1">
                     <mxGeometry x="850" y="1230" width="170" height="60" as="geometry"/>
                 </mxCell>
             </root>

@@ -111,9 +111,8 @@ message CapabilityResponse {
     bool ingressInterfaceMatching = 1; // Is interface can be matched for encapsulation / decapsulation
     bool vxlanMatching = 2; // Match with VXLAN VNI
     bool geneveMatching = 3; // Match with geneve can happen
-    bool vrfMatching = 4; // Is vrf matching possible
-    bool tunnelMatching = 5; // Matching on tunnel ID
-    bool spiMatching = 6; // Can match on IPSec
+    bool tunnelMatching = 4; // Matching on tunnel ID
+    bool spiMatching = 5; // Can match on IPSec
   }
 
   MatchCapabilities matchCapabilities = 1;
@@ -153,10 +152,7 @@ message MatchCriteria {
       IPV6Match ipv6Match = 4;
     }
 
-    string vrf = 5; // Optional field, not indicating VRF means that
-    // the match will be on default VRF
-
-    uint64 tunnelId = 6; // Match on specific tunnel
+    uint64 tunnelId = 5; // Match on specific tunnel
 
     message IPSecMatch {
       uint32 spi = 1;
@@ -166,9 +162,10 @@ message MatchCriteria {
     message GeneveMatch {
       uint32 vni = 1;
       MacPair macMatch = 2; // Inner Match of GENEVE Packet
+      uint32 protocolType = 3; // Currently only "Trans Ether Bridging" is supported (0x6558)
       oneof ip_match {
-        IPV4Match ipv4Match = 3;
-        IPV6Match ipv6Match = 4;
+        IPV4Match ipv4Match = 4;
+        IPV6Match ipv6Match = 5;
       }
    }
 
@@ -183,9 +180,9 @@ message MatchCriteria {
 
     // Tunnel Matching
     oneof match {
-      IPSecMatch ipsecMatch = 7;
-      GeneveMatch geneveMatch = 8;
-      VXLanMatch vxlanMatch = 9;
+      IPSecMatch ipsecMatch = 6;
+      GeneveMatch geneveMatch = 7;
+      VXLanMatch vxlanMatch = 8;
     }
 
 }
@@ -204,6 +201,7 @@ message ipTunnelRequest {
   oneof tunnel {
       IPSecTunnel ipsecTunnel = 5;  // Tunnel that will be used for encapsulation, can be both
       GENEVE geneve = 6;
+      NAT nat = 7;
   };
 
 }
@@ -248,8 +246,9 @@ message GENEVEEncap {
   uint32 optionLength = 4; // 6 bits - Multiply of 4 bytes 
   bool controlPacket = 5; // O bit at rfc. True is '1', False is '0'. Default is False.
   bool criticalOptionPresent = 6; // C bit at rfc. True is '1', False is '0'. Default is False.
-  uint32 vni = 7; // Virtual Network Identifier - 24 bits
-  repeated GENEVEOption geneveOption = 8;
+  uint32 vni = 7; // Virtual Network Identifier - 24 bits\
+  uint32 protocolType = 8; // Currently only "Trans Ether Bridging" is supported (0x6558)
+  repeated GENEVEOption geneveOption = 9;
 }
 
 message GENEVEDecap {
@@ -260,7 +259,7 @@ message GENEVEDecap {
 
 message MacPair {
   bytes destinationMac = 1;
-  bytes sourceMac = 2;
+  bytes sourceMac = 2;  
 }
 
 message IPV4Pair {
@@ -285,6 +284,10 @@ message IPV6Match {
   uint32 sourceIpPrefix = 2;
   bytes destinationIp = 3;
   uint32 destinationIpPrefix = 4;
+}
+
+message NAT {
+  uint32 sourceIp = 1;
 }
 
 enum IPSecTunnelType {
@@ -315,12 +318,13 @@ message IPSecEnc {
 message IPSecDec {
   IPSecTunnelType tunnelType = 1; // Transport / Tunnel...
   ENC_TYPE encryptionType = 2; // AES-256GCM
-  repeated IPSecSAParams ipsecSAs= 3;
+  repeated IPSecSAParams ipsecSAs = 3;
 }
 
 message IPSecSAParams {
   uint32 spi = 1;
   bytes encryptionKey = 2;
+  OPERATION operation = 3; // Indicates if removing / updating / creating SA
 }
 
 message IPSecTunnel {
