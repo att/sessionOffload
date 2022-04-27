@@ -1,12 +1,12 @@
 
 # TunnelOffload
 
-gRPC API to offload tunnel packet processing for security applications like IPSEC from an application to a hardware switch
+gRPC API to offload tunnel packet processing for VPN Gateway applications that use IPSEC encryption from an application to a hardware switch
 
 
 # Installation and build for tests
 
-The TunnelOffload only has Python bindings of a reference implemeentation to help demonstrate the API and to show scenarios like Rekeying for IPSEC.  To just run the tests only Python is required.
+The TunnelOffload has a Python based reference implemeentation to help demonstrate the API and to show scenarios like Rekeying for IPSEC. To just run the tests Python and a few libraries are required.
 
 ## Requisites
 
@@ -14,7 +14,7 @@ The TunnelOffload only has Python bindings of a reference implemeentation to hel
 * Install gRPC for Python (see References)
 * Install python pudb (debugger)
 
-See the github workflow main.yaml for details on the require library installations (.github/workflows/main.yaml)
+See the github workflow main.yaml for details on the required library installations (.github/workflows/main.yaml)
 
 ## Build
 
@@ -1035,7 +1035,8 @@ MAINTAINERS
 Developed by Omri Peri and Brian Freeman , April 2022
 
 Current maintainers:
- * Omri Peri (drivenets)John McDowall (palo alto networks)
+
+ * Omri Peri (drivenets)
  * Brian Freeman (at&t)
 
 # References
