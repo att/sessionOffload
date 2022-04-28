@@ -353,7 +353,7 @@ message counters {
 
 message createIpTunnelResponses {
   ADD_TUNNEL_STATUS requestStatus = 1;
-  uint64 errorStatus = 2;
+  uint64 errorStatus = 2; // bitmask of errors for each of the sesssions sent in a stream (max 64).
   repeated createIpTunnelResponse responses = 3;
 }
 
@@ -362,19 +362,20 @@ message createIpTunnelResponse {
   // Tunnel ID assigned to this tunnel
   uint64 tunnelId = 1;
 
-  // The status of adding the request / response
-  ADD_TUNNEL_STATUS requestStatus = 2;
-
-  // Error code describing the error with the request
-  uint64 errorStatus = 3;
-
+  // Message appears only if there's error in the response
+  Error error = 2;
 }
 
+message Error {
+  // Error code describing the error with the request
+  uint64 errorStatus = 2;
+  // Error string indicating the error
+  string errorString = 3;
+}
 
 message ipTunnelResponses {
   repeated ipTunnelResponse responses = 1;
 }
-
 
 message ipTunnelResponse {
   // Tunnel ID assigned to this tunnel
@@ -385,6 +386,9 @@ message ipTunnelResponse {
 
   // Counters of the session
   counters tunnelCounters = 3;
+
+  // Message that appears only if there's a problem in the request
+  Error error = 4;
 
 }
 
@@ -398,6 +402,9 @@ message ipTunnelStatsResponse {
 
   // Counters of the session
   counters tunnelCounters = 2;
+
+  // Message that appears only if there's a problem in the request
+  Error error = 3;
   
 }
 
