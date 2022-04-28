@@ -225,7 +225,7 @@ class Tunnel(object):
         for ipsec_sa_params in ipsec_sa_params_array:
             if ipsec_sa_params.spi != 0:
                 spi_found = True
-                if len(ipsec_sa_params.encryptionKey) != 64: # Checking the key length
+                if ipsec_sa_params.operation !=  tunneloffload_pb2._DELETE and len(ipsec_sa_params.encryptionKey) != 64: # Checking the key length
                     raise TunnelValidationExcp("Key used for IPSec isnt in right size of 256-bit")
 
             if not spi_found:

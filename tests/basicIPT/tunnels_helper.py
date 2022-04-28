@@ -96,10 +96,13 @@ def update_ipsec_enc_tunnel(tunnelId,
 def update_ipsec_dec_tunnel(tunnelId,
                             first_tunnel_spi=None,
                             first_tunnel_key=None,
+                            first_tunnel_operation=None,
                             second_tunnel_spi=None,
                             second_tunnel_key=None,
+                            second_tunnel_operation=None,
                             third_tunnel_spi=None,
-                            third_tunnel_key=None):
+                            third_tunnel_key=None,
+                            third_tunnel_operation=None):
 
     ipsec_dec_tunnel = tunneloffload_pb2.ipTunnelRequest()
     ipsec_dec_tunnel.tunnelId = tunnelId
@@ -109,13 +112,17 @@ def update_ipsec_dec_tunnel(tunnelId,
 
     security_associations = []
 
-    for spi, key in [(first_tunnel_spi, first_tunnel_key), (second_tunnel_spi, second_tunnel_key), (third_tunnel_spi, third_tunnel_key)]:
+    for spi, key, operation in [(first_tunnel_spi, first_tunnel_key, first_tunnel_operation), 
+                                (second_tunnel_spi, second_tunnel_key, second_tunnel_operation), 
+                                 (third_tunnel_spi, third_tunnel_key, third_tunnel_operation)]:
         if spi is None:
             continue
         
         security_association = tunneloffload_pb2.IPSecSAParams()
         security_association.spi = spi
-        security_association.encryptionKey = key
+        if key is not None:
+            security_association.encryptionKey = key
+        security_association.operation = operation
         security_associations.append(security_association)
         
     ipsec_params.ipsecSAs.extend(security_associations)
@@ -148,6 +155,7 @@ def create_ipsec_dec_tunnel(tunnelid,
     security_association = tunneloffload_pb2.IPSecSAParams()
     security_association.spi = spi
     security_association.encryptionKey = key
+    security_association.operation = tunneloffload_pb2._CREATE
     ipsec_params.ipsecSAs.extend([security_association])
 
     return ipsec_dec_tunnel

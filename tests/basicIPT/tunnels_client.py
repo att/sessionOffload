@@ -119,10 +119,9 @@ def tunnel_add_IPSEC_GENEVE(stub):
     print("Performing rekey - decryption")
     # Rekey of decryption is done by creating another tunnel with a different SPI 
     ipsec_dec_tunnel_update = update_ipsec_dec_tunnel(ipsec_dec_tunnel.tunnelId,
-                                                      first_tunnel_spi=FIRST_DEC_SPI,
-                                                      first_tunnel_key=FIRST_DEC_KEY,
                                                       second_tunnel_spi=SECOND_DEC_SPI,
-                                                      second_tunnel_key=SECOND_DEC_KEY)
+                                                      second_tunnel_key=SECOND_DEC_KEY,
+                                                      second_tunnel_operation=tunneloffload_pb2._CREATE)
 
 
 
@@ -133,8 +132,8 @@ def tunnel_add_IPSEC_GENEVE(stub):
 
     # Waiting sometime before removing the old spi
     ipsec_dec_tunnel_update = update_ipsec_dec_tunnel(ipsec_dec_tunnel.tunnelId,
-                                                      second_tunnel_spi=SECOND_DEC_SPI,
-                                                      second_tunnel_key=SECOND_DEC_KEY)
+                                                      first_tunnel_spi=FIRST_DEC_SPI,
+                                                      first_tunnel_operation=tunneloffload_pb2._DELETE)
 
 
     # Getting the ip tunnel stats
