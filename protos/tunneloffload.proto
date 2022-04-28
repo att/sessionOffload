@@ -140,6 +140,38 @@ enum ACTION {
   RECIRCULATE = 2;
 }
 
+enum MatchError {
+  missingFields = 0; // Some missing fields are misisng in the match statment
+  invalidTunnelId = 1; // Tunnel ID match isn't valid or doesn't exist
+  invalidCapabilities = 2; // The match isn't suitable with tunnel capabilities
+  invalidField = 3; // Invalid field found in the match (e.g. invalid mac)
+}
+
+enum TunnelError {
+  notSupportedTunnel = 0; // Tunnel offload requested to non supported tunnel
+}
+
+enum IPSecError {
+  invalidKey = 0; // Key got into IPSec is not matching the requested size
+  nonSupportedEncryption = 1;  // Encrypted type requested from IPSec is not supported 
+  nonSupportedTunnelType = 2; // Tunnel type requested by IPSec is not valid (TUNNEL mode requested but not valid)
+  IPSecmissingFields = 3; // Some missing fields in IPSec, e.g. TUNNEL MODE without tunnel IP's provided
+}
+
+enum GeneveError {
+  invalidOption = 0; // One of the options supported isn't valid
+  tooManyOptions = 1; // Too many options provided with the geneve tunnel
+  invalidGeneveField = 2; // One of the fields provided in GENVE isn't valid (e.g. too big VNI)
+}
+
+
+message tunnelAdditionError {
+  // Message will only present if there's error in tunnel
+  MatchError matchError = 1; // Error in match of tunnel
+  TunnelError tunnelError = 2; // General problem in tunnel definition
+  IPSecError ipsecError = 3; // IPSec Error
+  GeneveError geneveError = 4; // Error in geneve
+}
 
 message MatchCriteria {
     // In case it's not present, untagged traffic will be matched
@@ -368,9 +400,9 @@ message createIpTunnelResponse {
 
 message Error {
   // Error code describing the error with the request
-  uint64 errorStatus = 2;
+  tunnelAdditionError errorMessage = 1;
   // Error string indicating the error
-  string errorString = 3;
+  string errorString = 2;
 }
 
 message ipTunnelResponses {

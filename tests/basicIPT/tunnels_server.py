@@ -353,7 +353,7 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
         print("Printing tunnels summary")
         print_tunnel_summary(self.tunnels)
 
-        return tunneloffload_pb2.createIpTunnelResponse(requestStatus=tunneloffload_pb2._TUNNEL_ACCEPTED)
+        return tunneloffload_pb2.createIpTunnelResponse()
 
     # Get request
     def getIpTunnel(self, request, context):
