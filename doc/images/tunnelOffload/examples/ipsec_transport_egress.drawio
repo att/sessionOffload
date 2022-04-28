@@ -1,0 +1,76 @@
+<mxfile host="65bd71144e">
+    <diagram id="V7hC7Ia_DJyM14xFZ34Q" name="Page-1">
+        <mxGraphModel dx="1031" dy="565" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="10.0.0.2" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="423" y="340" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="&lt;font style=&quot;font-size: 26px&quot;&gt;Matching&amp;nbsp;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="70" width="130" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="Source MAC" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="340" width="170" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="Destination MAC" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="251" y="340" width="170" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="11.0.0.3" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="573" y="340" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="" style="endArrow=classic;html=1;fontSize=26;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" parent="1" target="5" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="379" y="190" as="sourcePoint"/>
+                        <mxPoint x="340" y="200" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="10" value="&lt;div style=&quot;color: rgb(212 , 212 , 212) ; background-color: rgb(30 , 30 , 30) ; font-family: &amp;#34;menlo&amp;#34; , &amp;#34;menlo&amp;#34; , &amp;#34;monaco&amp;#34; , &amp;#34;courier new&amp;#34; , monospace ; font-weight: normal ; font-size: 12px ; line-height: 18px&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: #569cd6&quot;&gt;message&lt;/span&gt;&lt;span style=&quot;color: #d4d4d4&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #4ec9b0&quot;&gt;MatchCriteria&lt;/span&gt;&lt;span style=&quot;color: #d4d4d4&quot;&gt; {  &lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: #d4d4d4&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color: #6a9955&quot;&gt;// One of the match messages should present&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: #d4d4d4&quot;&gt;      &lt;span style=&quot;white-space: pre&quot;&gt;&#9;&lt;/span&gt;IPV4Match {&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: #d4d4d4&quot;&gt;       &lt;span style=&quot;white-space: pre&quot;&gt;&#9;&lt;span style=&quot;white-space: pre&quot;&gt;&#9;&lt;/span&gt;&lt;/span&gt;sourceSubnet = 10.0.0.0&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: #d4d4d4&quot;&gt;       &lt;span style=&quot;white-space: pre&quot;&gt;&#9;&lt;span style=&quot;white-space: pre&quot;&gt;&#9;&lt;/span&gt;&lt;/span&gt;sourceSubnetPrefix = 24&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: #d4d4d4&quot;&gt;       &lt;span style=&quot;white-space: pre&quot;&gt;&#9;&lt;span style=&quot;white-space: pre&quot;&gt;&#9;&lt;/span&gt;&lt;/span&gt;destinatinoSubnet = 11.0.0.0&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: #d4d4d4&quot;&gt;       &lt;span style=&quot;white-space: pre&quot;&gt;&#9;&lt;span style=&quot;white-space: pre&quot;&gt;&#9;&lt;/span&gt;&lt;/span&gt;destinationSubnetPrefix = 24 &lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: #d4d4d4&quot;&gt;      &lt;span style=&quot;white-space: pre&quot;&gt;&#9;&lt;/span&gt;}&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: #d4d4d4&quot;&gt;}&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="text;whiteSpace=wrap;html=1;fontSize=26;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="130" width="320" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="&lt;font style=&quot;font-size: 15px&quot;&gt;Getting packet &lt;br&gt;from any IP&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=26;" parent="1" vertex="1">
+                    <mxGeometry x="180" y="230" width="110" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="&lt;div style=&quot;background-color: rgb(30 , 30 , 30) ; line-height: 18px ; font-weight: normal ; font-size: 12px ; font-family: &amp;#34;menlo&amp;#34; , &amp;#34;menlo&amp;#34; , &amp;#34;monaco&amp;#34; , &amp;#34;courier new&amp;#34; , monospace&quot;&gt;&lt;div style=&quot;color: rgb(212 , 212 , 212)&quot;&gt;&lt;span style=&quot;color: #569cd6&quot;&gt;message&lt;/span&gt;&lt;span style=&quot;color: #d4d4d4&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color: #4ec9b0&quot;&gt;IPSecTunneEnc&lt;/span&gt;&lt;span style=&quot;color: #d4d4d4&quot;&gt;{&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(212 , 212 , 212)&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color: rgb(86 , 156 , 214)&quot;&gt;&lt;span&gt;&#9;&lt;/span&gt;&lt;/span&gt;&lt;span style=&quot;color: rgb(156 , 220 , 254)&quot;&gt;tunnelType&lt;/span&gt;&lt;span style=&quot;color: rgb(212 , 212 , 212)&quot;&gt; =&lt;/span&gt;&lt;font color=&quot;#b5cea8&quot;&gt;&amp;nbsp;TRANSPORT&lt;/font&gt;&lt;span style=&quot;color: rgb(212 , 212 , 212)&quot;&gt;;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(212 , 212 , 212)&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color: rgb(86 , 156 , 214)&quot;&gt;&lt;span&gt;&#9;&lt;/span&gt;&lt;/span&gt;&lt;span style=&quot;color: rgb(156 , 220 , 254)&quot;&gt;tunnelDirection&lt;/span&gt;&lt;span style=&quot;color: rgb(212 , 212 , 212)&quot;&gt; = &lt;/span&gt;&lt;font color=&quot;#b5cea8&quot;&gt;OUT&lt;/font&gt;&lt;span style=&quot;color: rgb(212 , 212 , 212)&quot;&gt;;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(156 , 220 , 254)&quot;&gt;&lt;span&gt;&#9;&lt;/span&gt;encryptionType&lt;/span&gt;&lt;span style=&quot;color: rgb(212 , 212 , 212)&quot;&gt; = AES256&lt;/span&gt;&lt;span style=&quot;color: rgb(212 , 212 , 212)&quot;&gt;;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(156 , 220 , 254)&quot;&gt;&lt;span&gt;&#9;&lt;/span&gt;encryptionKey&lt;/span&gt;&lt;span style=&quot;color: rgb(212 , 212 , 212)&quot;&gt; =&amp;nbsp;&lt;/span&gt;&lt;font color=&quot;#ffffff&quot;&gt;0x71b92b0b3ebd0fccf00fe497818d5325ddfbc60d&lt;/font&gt;&lt;span style=&quot;color: rgb(212 , 212 , 212)&quot;&gt;;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;color: rgb(212 , 212 , 212)&quot;&gt;&lt;span style=&quot;color: #9cdcfe&quot;&gt;&lt;span&gt;&#9;&lt;/span&gt;SPI&lt;/span&gt;&lt;span style=&quot;color: #d4d4d4&quot;&gt; =&amp;nbsp;&lt;/span&gt;0xc3bb6fb0&lt;span style=&quot;color: #d4d4d4&quot;&gt;;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;color: rgb(212 , 212 , 212)&quot;&gt;}&lt;br&gt;&lt;/div&gt;&lt;/div&gt;" style="text;whiteSpace=wrap;html=1;fontSize=15;" parent="1" vertex="1">
+                    <mxGeometry x="490" y="530" width="450" height="480" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="L4 Header" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="723" y="340" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="" style="endArrow=classic;html=1;fontSize=26;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" parent="1" target="19" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="380.5" y="399.9999999999999" as="sourcePoint"/>
+                        <mxPoint x="380" y="680" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="17" value="10.0.0.2" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="423" y="690" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="Source MAC" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="690" width="170" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="Destination MAC" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="251" y="690" width="170" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="11.0.0.3" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="573" y="690" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="L4 Header&lt;br&gt;(Encrypted)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="880" y="690" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="ESP Header&lt;br&gt;(SPI=&lt;span style=&quot;color: rgb(212 , 212 , 212) ; font-family: &amp;#34;menlo&amp;#34; , &amp;#34;menlo&amp;#34; , &amp;#34;monaco&amp;#34; , &amp;#34;courier new&amp;#34; , monospace ; text-align: left ; background-color: rgb(30 , 30 , 30)&quot;&gt;0xc3bb6fb0)&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="723" y="690" width="157" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="L4 Header" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="873" y="340" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="Payload&lt;br&gt;(Encrypted)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="1030" y="690" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="&lt;span style=&quot;font-size: 15px&quot;&gt;&lt;font color=&quot;#000000&quot;&gt;Performing the action on the packet&lt;/font&gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=26;" parent="1" vertex="1">
+                    <mxGeometry x="120" y="550" width="250" height="40" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
