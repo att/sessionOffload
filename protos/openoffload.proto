@@ -1,5 +1,6 @@
 // Copyright (C) 2020 AT&T Intellectual Property. All rights reserved.
 // Copyright (C) 2020 Palo Alto Networks Intellectual Property. All rights reserved.
+// Copyright (C) 2022 Intel Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +15,6 @@
 // limitations under the License.
 //
 
-
 syntax = "proto3";
 
 // will move to v1 at release 
@@ -26,32 +26,32 @@ option go_package = ".;openoffload_v1beta1";
 
 import "google/protobuf/timestamp.proto";
 
-enum IP_VERSION{
-   _IPV4 = 0;
-   _IPV6 = 1;
+enum IpVersion {
+	_IPV4 = 0;
+	_IPV6 = 1;
 }
 
-enum PROTOCOL_ID {
-  _HOPOPT = 0;
-  _TCP = 6;
-  _UDP = 17;
+enum ProtocolId {
+	_HOPOPT = 0;
+	_TCP    = 6;
+	_UDP    = 17;
   reserved 1 to 5, 7 to 16, 18 to 255 ;
 }
 
-enum SESSION_STATE {
-  _ESTABLISHED = 0;
-  _CLOSING_1   = 1;
-  _CLOSING_2   = 2;
-  _CLOSED      = 3;
-  _UNKNOWN_STATE     = 4;
+enum SessionState {
+	_ESTABLISHED   = 0;
+	_CLOSING_1     = 1;
+	_CLOSING_2     = 2;
+	_CLOSED        = 3;
+	_UNKNOWN_STATE = 4;
 }
  
-enum SESSION_CLOSE_CODE {
-  _NOT_CLOSED = 0;
-  _FINACK     = 1;
-  _RST        = 2;
-  _TIMEOUT    = 3;
-  _UNKNOWN_CLOSE_CODE    = 4;
+enum SessionCloseCode {
+	_NOT_CLOSED         = 0;
+	_FINACK             = 1;
+	_RST                = 2;
+	_TIMEOUT            = 3;
+	_UNKNOWN_CLOSE_CODE = 4;
 }
 //
 // Errors for adding a session
@@ -67,7 +67,7 @@ enum SESSION_CLOSE_CODE {
 // All other errors will return _REJECTED with a buit mask of the failed sessions and it is the responsibility
 // of the client to address the issues
 //
-// ADD_SESSION_STATUS Codes Description
+// AddSessionStatus Codes Description
 //
 // _SESSION_ACCEPTED: Session is accepted by the server and the client performs normal operation
 // _SESSION_REJECTED: Session is rejected by the server as the message 
@@ -79,15 +79,15 @@ enum SESSION_CLOSE_CODE {
 // _SESSION_ALREADY_EXISTS: Session is rejected by the the server as it already exists 
 //    in the server session table, the client will take corrective action to ensure state is consistent.
 //
-enum ADD_SESSION_STATUS{
-  _SESSION_ACCEPTED = 0;
-  _SESSION_REJECTED = 1;
-  _SESSION_TABLE_FULL = 2;
-  _SESSION_TABLE_UNAVAILABLE =3;
-  _SESSION_ALREADY_EXISTS=4;
+enum AddSessionStatus {
+	_SESSION_ACCEPTED          = 0;
+	_SESSION_REJECTED          = 1;
+	_SESSION_TABLE_FULL        = 2;
+	_SESSION_TABLE_UNAVAILABLE = 3;
+	_SESSION_ALREADY_EXISTS    = 4;
 }
 //
-// REQUEST_STATUS Codes Description
+// RequestStatus Codes Description
 //
 // _ACCEPTED: Normal operation
 // _REJECTED: Unknown error in the format of the REQUEST message
@@ -100,21 +100,21 @@ enum ADD_SESSION_STATUS{
 // _REJECTED_INTERNAL_ERROR: The server has an internal error and cannot serivce the request.
 //    The client must log the error and optionally retry or skip the request.
 //
-enum REQUEST_STATUS{
-   _ACCEPTED = 0;
-   _REJECTED = 1;
-   _REJECTED_SESSION_NONEXISTENT = 2;
-   _REJECTED_SESSION_TABLE_FULL = 3 ;
-   _REJECTED_SESSION_ALREADY_EXISTS = 4 ;
-   _NO_CLOSED_SESSIONS = 5 ;
-   _REJECTED_INTERNAL_ERROR =6;
+enum RequestStatus {
+	_ACCEPTED                        = 0;
+	_REJECTED                        = 1;
+	_REJECTED_SESSION_NONEXISTENT    = 2;
+	_REJECTED_SESSION_TABLE_FULL     = 3;
+	_REJECTED_SESSION_ALREADY_EXISTS = 4;
+	_NO_CLOSED_SESSIONS              = 5;
+	_REJECTED_INTERNAL_ERROR         = 6;
 }
 
-enum ACTION_TYPE{
-   _DROP = 0;
-   _FORWARD = 1;
-   _MIRROR = 2;
-   _SNOOP = 3;
+enum ActionType {
+	_DROP    = 0;
+	_FORWARD = 1;
+	_MIRROR  = 2;
+	_SNOOP   = 3;
 }
 
 //
@@ -122,105 +122,102 @@ enum ACTION_TYPE{
 // in v1alpha4 to simplfy the code.
 //
 service SessionTable {
-//
-// Adds a session
-// This was changed in v1alpha4 to be a streaming API, for performance
-// reasons.
-rpc addSession(stream sessionRequest) returns (addSessionResponse) {}
-//
-// Obtains the session 
-rpc getSession(sessionId) returns (sessionResponse) {}
-//
-// Delete a session
-rpc deleteSession(sessionId) returns (sessionResponse) {}
-//
-// Stream back all current sessions
-//rpc getAllSessions(statisticsRequestArgs) returns (stream sessionResponse) {}
-rpc getAllSessions(sessionRequestArgs) returns (sessionResponses) {}
-//
-// statistics as a outgoing session from the WB to Applications ?
-// grpc seems to need a request input streamId is a placeholder
-rpc getClosedSessions(sessionRequestArgs) returns (stream sessionResponse) {}
-
-
+	//
+	// Adds a session
+	// This was changed in v1alpha4 to be a streaming API, for performance
+	// reasons.
+	rpc AddSession(stream SessionRequest) returns (AddSessionResponse) {}
+	//
+	// Obtains the session
+	rpc GetSession(SessionId) returns (SessionResponse) {}
+	//
+	// Delete a session
+	rpc DeleteSession(SessionId) returns (SessionResponse) {}
+	//
+	// Stream back a specific session or all current sessions
+	// To stream a single session, pass SessionId as zero
+	rpc GetAllSession(SessionRequestArgs) returns (SessionResponses) {}
 }
+
+// Uuid for Session IDs
+message Uuid {
+	string value = 1;
+}
+
 
 // should the Application assign the sessionID on AddSession and avoid conflicts
 // or have the applications have a mechanism to avoid duplicate sessionIDs across 
 // applications since there will be many applications instances to 1 switch
-message sessionId{
-  uint64 sessionId = 1;
+message SessionId {
+	uint64 session_id = 1;
 }
 
 // MIRROR and SNOOP require an actionNextHop
 // DROP and FORWARD do not have an actionNextHop
-// The IPV4 nextHop definition maps to the V4 struct returned by inet_pton whcih is a uint32_t.
+// The IPV4 nextHop definition maps to the V4 struct returned by inet_pton which is a uint32_t.
 // The IPV6 nextHop definition maps to the V6 struct returned by inet_ptoN which is a uint8_t s6_addr[16]
-message actionParameters{
-     ACTION_TYPE  actionType = 1;
-     uint32 actionNextHop = 2;
-     bytes actionNextHopV6 = 3;
+message ActionParameters {
+	ActionType actiontype   = 1;
+	uint32 actionnexthop    = 2;
+	bytes actionnexthopv6   = 3;
 }
 
-// sessionId is returned by server side upon successful addSession
-// The IPV4 definition maps to the V4 struct returned by inet_pton whcih is a uint32_t.
+// SessionId is generated by client and passed in via gRPC call
+// The IPV4 definition maps to the V4 struct returned by inet_pton which is a uint32_t.
 // The IPV6 definition maps to the V6 struct returned by inet_ptoN which is a uint8_t s6_addr[16]
-message sessionRequest{
-  uint64  sessionId = 1 ;
-  int32  inLif = 2;
-  int32  outLif = 3;
-  IP_VERSION ipVersion = 4;
-  uint32 sourceIp = 5;
-  bytes sourceIpV6 =6;
-  uint32 sourcePort = 7;
-  uint32 destinationIp = 8;
-  bytes destinationIpV6 =9;
-  uint32 destinationPort = 10;
-  PROTOCOL_ID protocolId = 11;
-  actionParameters action = 12;
-  uint32 cacheTimeout = 13;
+message SessionRequest {
+	Uuid session_id         = 1;
+	int32 inlif             = 2;
+	int32 outlif            = 3;
+	IpVersion ipversion     = 4;
+	uint32 sourceip         = 5;
+	bytes sourceipv6        = 6;
+	uint32 sourceport       = 7;
+	uint32 destinationip    = 8;
+	bytes destinationipv6   = 9;
+	uint32 destinationport  = 10;
+	ProtocolId protocolid   = 11;
+	ActionParameters action = 12;
+	uint32 cachetimeout     = 13;
 }
 
-message sessionResponseError {
-  uint64 sessionId = 1;
-  int32 errorStatus = 2;
+message SessionResponseError {
+	Uuid sessionid    = 1;
+	int32 errorstatus = 2;
 }
 
-
-message sessionResponses {
-  repeated sessionResponse sessionInfo = 1;
-  uint64 nextkey =2;
+message SessionResponses {
+	repeated SessionResponse sessioninfo = 1;
+	uint64 nextkey                       = 2;
 }
+
 //
 // In v1apha4 the errorstatus was added to act as a bitmask
 // of errors for each of the sesssions sent in a stream (max 64).
 //
-message addSessionResponse{
-  ADD_SESSION_STATUS requestStatus = 1;
-  uint64 errorStatus = 2 ;
-  google.protobuf.Timestamp startTime = 3;
-  repeated sessionResponseError responseError = 4;
+message AddSessionResponse {
+	AddSessionStatus requeststatus              = 1;
+	uint64 errorstatus                          = 2;
+	google.protobuf.Timestamp starttime         = 3;
+	repeated SessionResponseError responseerror = 4;
 }
 
-message sessionResponse{
-  uint64  sessionId = 1 ;
-  uint64  inPackets = 2 ;
-  uint64  outPackets = 3 ;
-  uint64  inBytes  = 4 ;
-  uint64  outBytes = 5;
-  SESSION_STATE sessionState = 6 ;
-  SESSION_CLOSE_CODE sessionCloseCode = 7 ;
-  REQUEST_STATUS requestStatus = 8;
-  google.protobuf.Timestamp startTime = 9;
-  google.protobuf.Timestamp endTime = 10;
+message SessionResponse {
+	Uuid sessionid                      = 1;
+	uint64 inpackets                    = 2;
+	uint64 outpackets                   = 3;
+	uint64 inbytes                      = 4;
+	uint64 outbytes                     = 5;
+	SessionState sessionstate           = 6;
+	SessionCloseCode sessionclosecode   = 7;
+	RequestStatus requeststatus         = 8;
+	google.protobuf.Timestamp starttime = 9;
+	google.protobuf.Timestamp endtime   = 10;
 }
 
-message sessionRequestArgs{
-  //  pageSize = 0 will turn off paging
-  //  does paging make sense for a stream ?
-  //  the client should read/process each event on the stream anyway.
-  uint32  pageSize=1;
-  uint32  page=2;
-  uint64  startSession=3;
-  //  what other arguments make sense for retrieving or filtering streams 
+message SessionRequestArgs {
+	// If SessionId is zero, return all sessions
+	Uuid sessionid            = 1;
+	// Filter argument to only return sessions of a given state
+	SessionState sessionstate = 2;
 }

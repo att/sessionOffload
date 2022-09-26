@@ -22,4 +22,7 @@ openoffload/cpp/tests/openoffload.grpc.pb.h
 openoffload/cpp/tests/openoffload.pb.cc
 openoffload/cpp/tests/openoffload.pb.h
 openoffload/cpp/framework/doc/html/**
+protos/protos/cpp
+protos/protos/golang
+protos/protos/python
 **/.DS_Store

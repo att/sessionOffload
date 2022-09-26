@@ -20,38 +20,29 @@ PROTOC:=protoc
 PYTHONOUT := python
 PROTOS_PATH = ../protos
 vpath %.proto $(PROTOS_PATH)
-GRPC_CPP_PLUGIN = grpc_cpp_plugin
-GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 GOOUT := golang
 
 $(PROTO_NAME).pb.go: $(PROTO_NAME).proto
-	mkdir -p golang
-	protoc -I $(PROTOS_PATH)/ $(PROTO_NAME).proto  --go-grpc_out=$(GOOUT) --go_out=$(GOOUT)  $(PROTO_NAME).proto
+	docker run -v "${PWD}/${PROTOS_PATH}":/defs namely/protoc-all --lint -d . -l go -o ./golang  --go-source-relative
 
 $(PROTO_NAME).pb.py: $(PROTO_NAME).proto
-	mkdir -p python
-	$(PYTHONCMD) -m grpc_tools.protoc -I $(PROTOS_PATH) --python_out=$(PYTHONOUT) --grpc_python_out=$(PYTHONOUT) $(PROTO_NAME).proto
+	docker run -v "${PWD}/${PROTOS_PATH}":/defs namely/protoc-all --lint -d . -l python -o ./python  --go-source-relative
 
 $(PROTO_NAME).pb.cc: $(PROTO_NAME).proto
-	mkdir -p cpp
-	$(PROTOC) -I $(PROTOS_PATH) --cpp_out=cpp $(PROTO_NAME).proto
-
-$(PROTO_NAME).grpc.pb.cc: $(PROTO_NAME).proto
-	$(PROTOC) -I $(PROTOS_PATH) --grpc_out=cpp --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN_PATH) $<
+	docker run -v "${PWD}/${PROTOS_PATH}":/defs namely/protoc-all --lint -d . -l cpp -o ./cpp  --go-source-relative
 
 all-go:  $(PROTO_NAME).pb.go
 
 all-py:  $(PROTO_NAME).pb.py
 
-all-cpp:  $(PROTO_NAME).grpc.pb.cc $(PROTO_NAME).pb.cc
+all-cpp:  $(PROTO_NAME).pb.cc
 
-all: $(PROTO_NAME).pb.go $(PROTO_NAME).pb.py $(PROTO_NAME).pb.cc $(PROTO_NAME).grpc.pb.cc
+all: $(PROTO_NAME).pb.go $(PROTO_NAME).pb.py $(PROTO_NAME).pb.cc
 
 
 .PHONY: clean
 #
 clean:
-	rm -f python/*.py
-	rm -f golang/*.go
-	rm -f cpp/*.cc
-	rm -f cpp/*.h
+	rm -rf ../protos/python
+	rm -rf ../protos/golang
+	rm -rf ../protos/cpp
