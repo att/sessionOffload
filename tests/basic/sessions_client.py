@@ -85,150 +85,150 @@ class AddSessionErrorsIterator:
        raise StopIteration
 
 def session_addSession(stub):
-    session=openoffload_pb2.sessionRequest()
-    session.sessionId= 12345678910
-    session.inLif= 1
-    session.outLif= 2
-    session.sourceIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.0.0.1"), byteorder=sys.byteorder)
-    session.sourcePort=12345
-    session.destinationIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.1.0.3"), byteorder=sys.byteorder)
-    session.destinationPort=80
-    session.protocolId=openoffload_pb2._TCP
-    session.ipVersion=openoffload_pb2._IPV4
-    session.action.actionType=openoffload_pb2._FORWARD
-    session.action.actionNextHop = int.from_bytes(socket.inet_pton(socket.AF_INET,"12.2.3.4"),byteorder=sys.byteorder)
+    session=openoffload_pb2.SessionRequest()
+    session.sessionid= 12345678910
+    session.inlif= 1
+    session.outlif= 2
+    session.sourceip=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.0.0.1"), byteorder=sys.byteorder)
+    session.sourceport=12345
+    session.destinationip=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.1.0.3"), byteorder=sys.byteorder)
+    session.destinationport=80
+    session.protocolid=openoffload_pb2._TCP
+    session.ipversion=openoffload_pb2._IPV4
+    session.action.actiontype=openoffload_pb2._FORWARD
+    session.action.actionnexthop = int.from_bytes(socket.inet_pton(socket.AF_INET,"12.2.3.4"),byteorder=sys.byteorder)
     sessions_value=Sessions()
     sessions_value.addSessionMembers(session)
     session_iterator=iter(sessions_value)
-    addSessionResponse =  stub.addSession( session_iterator)
-    print("addSessionResponse:",addSessionResponse.requestStatus)
+    addSessionResponse =  stub.AddSession( session_iterator)
+    print("addSessionResponse:",addSessionResponse.requeststatus)
 
-    sessionErrors_value=addSessionResponse.responseError
+    sessionErrors_value=addSessionResponse.responseerror
     sessionErrors_iterator=iter(sessionErrors_value)
 
     for sessionError in sessionErrors_iterator:
-         print("addSessionErrorResponse:",sessionError.requestStatus)
+         print("addSessionErrorResponse:",sessionError.requeststatus)
 
-    return addSessionResponse.requestStatus
+    return addSessionResponse.requeststatus
 
 def session_addSession_error(stub):
-    # use specific sessionId to test error response
-    session=openoffload_pb2.sessionRequest()
-    session.sessionId= 99999999999
-    session.inLif= 1
-    session.outLif= 2
-    session.sourceIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.9.0.1"), byteorder=sys.byteorder)
-    session.sourcePort=12345
-    session.destinationIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.99.0.3"), byteorder=sys.byteorder)
-    session.destinationPort=80
-    session.protocolId=openoffload_pb2._TCP
-    session.ipVersion=openoffload_pb2._IPV4
-    session.action.actionType=openoffload_pb2._FORWARD
-    session.action.actionNextHop = int.from_bytes(socket.inet_pton(socket.AF_INET,"12.2.3.4"),byteorder=sys.byteorder)
+    # use specific sessionid to test error response
+    session=openoffload_pb2.SessionRequest()
+    session.sessionid= 99999999999
+    session.inlif= 1
+    session.outlif= 2
+    session.sourceip=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.9.0.1"), byteorder=sys.byteorder)
+    session.sourceport=12345
+    session.destinationip=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.99.0.3"), byteorder=sys.byteorder)
+    session.destinationport=80
+    session.protocolid=openoffload_pb2._TCP
+    session.ipversion=openoffload_pb2._IPV4
+    session.action.actiontype=openoffload_pb2._FORWARD
+    session.action.actionnexthop = int.from_bytes(socket.inet_pton(socket.AF_INET,"12.2.3.4"),byteorder=sys.byteorder)
     sessions_value=Sessions()
     sessions_value.addSessionMembers(session)
     session_iterator=iter(sessions_value)
-    addSessionResponse =  stub.addSession( session_iterator)
-    print("addSessionResponse:",addSessionResponse.requestStatus)
+    addSessionResponse =  stub.AddSession( session_iterator)
+    print("addSessionResponse:",addSessionResponse.requeststatus)
 
-    sessionErrors_value=addSessionResponse.responseError
+    sessionErrors_value=addSessionResponse.responseerror
     sessionErrors_iterator=iter(sessionErrors_value)
 
     for sessionError in sessionErrors_iterator:
-         print("addSessionErrorResponse.sessionId:",sessionError.sessionId)
-         print("addSessionErrorResponse.errorStatus:",sessionError.errorStatus)
+         print("addSessionErrorResponse.sessionid:",sessionError.sessionid)
+         print("addSessionErrorResponse.errorstatus:",sessionError.errorstatus)
 
 def session_addSession_ipv6(stub):
-    session=openoffload_pb2.sessionRequest()
-    session.sessionId= 12345678910
-    session.inLif= 1
-    session.outLif= 2
-    session.sourceIpV6=socket.inet_pton(socket.AF_INET6, "2001:0db8:85a3:0000:0000:8a2e:0370:7332")
-    session.sourcePort=4430
-    session.destinationIpV6=socket.inet_pton(socket.AF_INET6, "2001:0db8:85a3:0000:0000:8a03:0370:234F")
-    session.destinationPort=80
-    session.protocolId=openoffload_pb2._TCP
-    session.ipVersion=openoffload_pb2._IPV6
-    session.action.actionType=openoffload_pb2._FORWARD
-    session.action.actionNextHop =int.from_bytes(socket.inet_pton(socket.AF_INET, "12.2.3.4"), byteorder=sys.byteorder)
+    session=openoffload_pb2.SessionRequest()
+    session.sessionid= 12345678910
+    session.inlif= 1
+    session.outlif= 2
+    session.sourceipv6=socket.inet_pton(socket.AF_INET6, "2001:0db8:85a3:0000:0000:8a2e:0370:7332")
+    session.sourceport=4430
+    session.destinationipv6=socket.inet_pton(socket.AF_INET6, "2001:0db8:85a3:0000:0000:8a03:0370:234F")
+    session.destinationport=80
+    session.protocolid=openoffload_pb2._TCP
+    session.ipversion=openoffload_pb2._IPV6
+    session.action.actiontype=openoffload_pb2._FORWARD
+    session.action.actionnexthop =int.from_bytes(socket.inet_pton(socket.AF_INET, "12.2.3.4"), byteorder=sys.byteorder)
     sessions_value=Sessions()
     sessions_value.addSessionMembers(session)
     session_iterator=iter(sessions_value)
-    addSessionResponse =  stub.addSession( session_iterator)
-    print("addSessionResponse:",addSessionResponse.requestStatus)
-    return addSessionResponse.requestStatus
+    addSessionResponse =  stub.AddSession( session_iterator)
+    print("addSessionResponse:",addSessionResponse.requeststatus)
+    return addSessionResponse.requeststatus
 
 def session_getSession(stub):
-    sessionResponse =  stub.getSession( openoffload_pb2.sessionId(sessionId=1001))
+    sessionResponse =  stub.GetSession( openoffload_pb2.SessionId(sessionid=1001))
     print("Getting Session")
-    print("SessionId:", sessionResponse.sessionId)
-    print("Session State:", openoffload_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name)
-    print("Session RequestStatus:",sessionResponse.requestStatus)
-    print("Session SessionCloseCode:",sessionResponse.sessionCloseCode)
-    print("Session InPackets",sessionResponse.inPackets)
-    print("Session OutPackets",sessionResponse.outPackets)
-    print("Session startTime",sessionResponse.startTime)
-    print("Session endTime",sessionResponse.endTime)
+    print("SessionId:", sessionResponse.sessionid)
+    print("Session State:", openoffload_pb2._SESSIONSTATE.values_by_number[sessionResponse.sessionstate].name)
+    print("Session RequestStatus:",sessionResponse.requeststatus)
+    print("Session SessionCloseCode:",sessionResponse.sessionclosecode)
+    print("Session InPackets",sessionResponse.inpackets)
+    print("Session OutPackets",sessionResponse.outpackets)
+    print("Session startTime",sessionResponse.starttime)
+    print("Session endTime",sessionResponse.endtime)
 
 def session_deleteSession(stub):
-    sessionResponse =  stub.deleteSession( openoffload_pb2.sessionId(sessionId=1001))
+    sessionResponse =  stub.DeleteSession( openoffload_pb2.SessionId(sessionid=1001))
     print("Getting Session")
-    print("SessionId:", sessionResponse.sessionId)
-    print("Session RequestStatus:",sessionResponse.requestStatus)
-    print("Session State:", openoffload_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name)
-    print("Session RequestStatus:",sessionResponse.requestStatus)
-    print("Session SessionCloseCode:",sessionResponse.sessionCloseCode)
-    print("Session InPackets",sessionResponse.inPackets)
-    print("Session OutPackets",sessionResponse.outPackets)
-    print("Session startTime",sessionResponse.startTime)
-    print("Session endTime",sessionResponse.endTime)
+    print("SessionId:", sessionResponse.sessionid)
+    print("Session RequestStatus:",sessionResponse.requeststatus)
+    print("Session State:", openoffload_pb2._SESSIONSTATE.values_by_number[sessionResponse.sessionstate].name)
+    print("Session RequestStatus:",sessionResponse.requeststatus)
+    print("Session SessionCloseCode:",sessionResponse.sessionclosecode)
+    print("Session InPackets",sessionResponse.inpackets)
+    print("Session OutPackets",sessionResponse.outpackets)
+    print("Session startTime",sessionResponse.starttime)
+    print("Session endTime",sessionResponse.endtime)
 
 def session_addMirrorSession(stub):
-    session=openoffload_pb2.sessionRequest()
-    session.sessionId= 12345678910
-    session.inLif= 1
-    session.outLif= 2
-    session.sourceIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.0.0.1"), byteorder=sys.byteorder)
-    session.sourcePort=12345
-    session.destinationIp=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.1.0.4"), byteorder=sys.byteorder)
-    session.destinationPort=80
-    session.protocolId=openoffload_pb2._UDP
-    session.action.actionType=openoffload_pb2._MIRROR
-    session.action.actionNextHop=int.from_bytes(socket.inet_pton(socket.AF_INET, "12.2.3.4"), byteorder=sys.byteorder)
+    session=openoffload_pb2.SessionRequest()
+    session.sessionid= 12345678910
+    session.inlif= 1
+    session.outlif= 2
+    session.sourceip=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.0.0.1"), byteorder=sys.byteorder)
+    session.sourceport=12345
+    session.destinationip=int.from_bytes(socket.inet_pton(socket.AF_INET, "10.1.0.4"), byteorder=sys.byteorder)
+    session.destinationport=80
+    session.protocolid=openoffload_pb2._UDP
+    session.action.actiontype=openoffload_pb2._MIRROR
+    session.action.actionnexthop=int.from_bytes(socket.inet_pton(socket.AF_INET, "12.2.3.4"), byteorder=sys.byteorder)
     sessions_value=Sessions()
     sessions_value.addSessionMembers(session)
     session_iterator=iter(sessions_value)
-    sessionResponse =  stub.addSession( session_iterator)
-    print("SessionResponse:",sessionResponse.requestStatus)
-    return sessionResponse.requestStatus
+    sessionResponse =  stub.AddSession( session_iterator)
+    print("SessionResponse:",sessionResponse.requeststatus)
+    return sessionResponse.requeststatus
 
 
 def session_getClosedSessions(stub):
-    for sessionResponse in stub.getClosedSessions(openoffload_pb2.sessionRequestArgs(pageSize=0)):
+    for sessionResponse in stub.GetClosedSessions(openoffload_pb2.SessionRequestArgs(pageSize=0)):
         print("### RECEIVED SESSION #####")
-        print("SessionId:", sessionResponse.sessionId)
-        print("Session State:", openoffload_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name)
-        print("Session RequestStatus:",sessionResponse.requestStatus)
-        print("Session SessionCloseCode:",sessionResponse.sessionCloseCode)
-        print("Session InPackets",sessionResponse.inPackets)
-        print("Session OutPackets",sessionResponse.outPackets)
-        print("Session startTime",sessionResponse.startTime)
-        print("Session endTime",sessionResponse.endTime)
+        print("SessionId:", sessionResponse.sessionid)
+        print("Session State:", openoffload_pb2._SESSIONSTATE.values_by_number[sessionResponse.sessionstate].name)
+        print("Session RequestStatus:",sessionResponse.requeststatus)
+        print("Session SessionCloseCode:",sessionResponse.sessionclosecode)
+        print("Session InPackets",sessionResponse.inpackets)
+        print("Session OutPackets",sessionResponse.outpackets)
+        print("Session startTime",sessionResponse.starttime)
+        print("Session endTime",sessionResponse.endtime)
         print("##########################")
 
 
 def session_getAllSessions(stub):
-    sessionResponses = stub.getAllSessions(openoffload_pb2.sessionRequestArgs(pageSize=0))
-    for sessionResponse in sessionResponses.sessionInfo: 
+    sessionResponses = stub.GetAllSessions(openoffload_pb2.SessionRequestArgs(pageSize=0))
+    for sessionResponse in sessionResponses.sessioninfo: 
         print("### RECEIVED SESSION #####")
-        print("SessionId:", sessionResponse.sessionId)
-        print("Session State:", openoffload_pb2._SESSION_STATE.values_by_number[sessionResponse.sessionState].name)
-        print("Session RequestStatus:",sessionResponse.requestStatus)
-        print("Session SessionCloseCode:",sessionResponse.sessionCloseCode)
-        print("Session InPackets",sessionResponse.inPackets)
-        print("Session OutPackets",sessionResponse.outPackets)
-        print("Session startTime",sessionResponse.startTime)
-        print("Session endTime",sessionResponse.endTime)
+        print("SessionId:", sessionResponse.sessionid)
+        print("Session State:", openoffload_pb2._SESSIONSTATE.values_by_number[sessionResponse.sessionstate].name)
+        print("Session RequestStatus:",sessionResponse.requeststatus)
+        print("Session SessionCloseCode:",sessionResponse.sessionclosecode)
+        print("Session InPackets",sessionResponse.inpackets)
+        print("Session OutPackets",sessionResponse.outpackets)
+        print("Session startTime",sessionResponse.starttime)
+        print("Session endTime",sessionResponse.endtime)
         print("##########################")
 
 def run_add_session_ipv4():

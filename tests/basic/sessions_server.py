@@ -76,80 +76,80 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
     def __init__(self):
         """do some init stuff"""
 
-    def addSession(self, request_iterator, context):
+    def AddSession(self, request_iterator, context):
         sessionErrors_value=AddSessionErrors()
         for request in request_iterator:
             print("############ ADD SESSION ##################")
             #print("sessionID:",request.sessionId)
             #print("protocolID 6=TCP,17=UDP:",request.protocolId)
-            print("protocolID :",openoffload_pb2._PROTOCOL_ID.values_by_number[request.protocolId].name)
-            print("IP Version:", openoffload_pb2._IP_VERSION.values_by_number[request.ipVersion].name)
+            print("IP Version:", openoffload_pb2._IPVERSION.values_by_number[request.ipversion].name)
+            print("protocolID :",openoffload_pb2._PROTOCOLID.values_by_number[request.protocolid].name)
             
 
-            if request.ipVersion == openoffload_pb2._IPV4:
-              print ("sourceIp:", socket.inet_ntop(socket.AF_INET, request.sourceIp.to_bytes(4,byteorder=sys.byteorder)))
+            if request.ipversion == openoffload_pb2._IPV4:
+              print ("sourceip:", socket.inet_ntop(socket.AF_INET, request.sourceip.to_bytes(4,byteorder=sys.byteorder)))
             else:
-              print ("sourceIpV6:", socket.inet_ntop(socket.AF_INET6, request.sourceIpV6))
-            print("sourcePort:", int(request.sourcePort))
-            if request.ipVersion == openoffload_pb2._IPV4:
-              print ("destinationIp:", socket.inet_ntop(socket.AF_INET, request.destinationIp.to_bytes(4,byteorder=sys.byteorder)))
+              print ("sourceipv6:", socket.inet_ntop(socket.AF_INET6, request.sourceipv6))
+            print("sourcePort:", int(request.sourceport))
+            if request.ipversion == openoffload_pb2._IPV4:
+              print ("destinationip:", socket.inet_ntop(socket.AF_INET, request.destinationip.to_bytes(4,byteorder=sys.byteorder)))
             else:
-              print ("destinationIpV6:", socket.inet_ntop(socket.AF_INET6, request.destinationIpV6))
-            print("destinationPort:", int(request.destinationPort))
+              print ("destinationipv6:", socket.inet_ntop(socket.AF_INET6, request.destinationipv6))
+            print("destinationport:", int(request.destinationport))
             #print("ActionType 0=DROP,1=FORWARD,2=MIRROR,3=SNOOP:" , request.action.actionType)
-            print("ActionType:" , openoffload_pb2._ACTION_TYPE.values_by_number[request.action.actionType].name)
-            print("ActionNextHop:" , request.action.actionNextHop)
-            if  request.sessionId == 99999999999:
+            print("ActionType:" , openoffload_pb2._ACTIONTYPE.values_by_number[request.action.actiontype].name)
+            print("ActionNextHop:" , request.action.actionnexthop)
+            if  request.sessionid == 99999999999:
                 print("Error test case")
                 #sessionError=openoffload_pb2.addSessionResponse.responseError()
-                sessionError=openoffload_pb2.sessionResponseError()
-                sessionError.sessionId=request.sessionId
-                sessionError.errorStatus=openoffload_pb2._SESSION_TABLE_FULL
+                sessionError=openoffload_pb2.SessionResponseError()
+                sessionError.sessionid=request.sessionid
+                sessionError.errorstatus=openoffload_pb2._SESSION_TABLE_FULL
                 sessionErrors_value.addSessionErrorMembers( sessionError)
 
-        return openoffload_pb2.addSessionResponse(requestStatus=openoffload_pb2._ACCEPTED, responseError=sessionErrors_value)
+        return openoffload_pb2.AddSessionResponse(requeststatus=openoffload_pb2._ACCEPTED, responseerror=sessionErrors_value)
 
-    def getSession(self, request, context):
+    def GetSession(self, request, context):
             print("############ GET SESSION ##################")
-            print("sessionId:",request.sessionId)
+            print("sessionid:",request.sessionid)
             timestamp = google.protobuf.timestamp_pb2.Timestamp()
             timestamp.GetCurrentTime()
-            return openoffload_pb2.sessionResponse(sessionId=1001,sessionState=openoffload_pb2._ESTABLISHED,
-              requestStatus=openoffload_pb2._ACCEPTED, inPackets=1000, outPackets=200000,
-              startTime=timestamp)
-    def deleteSession(self, request, context):
+            return openoffload_pb2.SessionResponse(sessionid=1001,sessionstate=openoffload_pb2._ESTABLISHED,
+              requeststatus=openoffload_pb2._ACCEPTED, inpackets=1000, outpackets=200000,
+              starttime=timestamp)
+    def DeleteSession(self, request, context):
             print("############ DELETE SESSION ##################")
-            print("sessionId:",request.sessionId)
+            print("sessionid:",request.sessionid)
             timestamp = google.protobuf.timestamp_pb2.Timestamp()
             timestamp.GetCurrentTime()
-            return openoffload_pb2.sessionResponse(sessionId=1001, sessionState=openoffload_pb2._CLOSING_1,
-              requestStatus=openoffload_pb2._ACCEPTED, inPackets=2000, outPackets=400000,
-              startTime=timestamp, endTime=timestamp)
+            return openoffload_pb2.SessionResponse(sessionid=1001, sessionstate=openoffload_pb2._CLOSING_1,
+              requeststatus=openoffload_pb2._ACCEPTED, inpackets=2000, outpackets=400000,
+              starttime=timestamp, endtime=timestamp)
 
-    def getClosedSessions(self, request, context):
+    def GetClosedSessions(self, request, context):
             print("############ GET CLOSED SESSIONS ##################")
             timestamp = google.protobuf.timestamp_pb2.Timestamp()
             timestamp.GetCurrentTime()
-            session1 = openoffload_pb2.sessionResponse(sessionId=1001, sessionState=openoffload_pb2._CLOSED,
-              requestStatus=openoffload_pb2._ACCEPTED, inPackets=1000, outPackets=200000, startTime=timestamp)
-            session2 = openoffload_pb2.sessionResponse(sessionId=1002, sessionState=openoffload_pb2._CLOSED,
-              requestStatus=openoffload_pb2._ACCEPTED, inPackets=2000, outPackets=400000, startTime=timestamp)
+            session1 = openoffload_pb2.SessionResponse(sessionid=1001, sessionstate=openoffload_pb2._CLOSED,
+              requeststatus=openoffload_pb2._ACCEPTED, inpackets=1000, outpackets=200000, starttime=timestamp)
+            session2 = openoffload_pb2.SessionResponse(sessionid=1002, sessionstate=openoffload_pb2._CLOSED,
+              requeststatus=openoffload_pb2._ACCEPTED, inpackets=2000, outpackets=400000, starttime=timestamp)
             yield session1
             yield session2
 
-    def getAllSessions(self, request, context):
+    def GetAllSessions(self, request, context):
             print("############ GET ALL SESSIONS ##################")
-            sessionResponses = openoffload_pb2.sessionResponses()
+            sessionResponses = openoffload_pb2.SessionResponses()
             timestamp = google.protobuf.timestamp_pb2.Timestamp()
             timestamp.GetCurrentTime()
 
-            session1 = openoffload_pb2.sessionResponse(sessionId=1001, sessionState=openoffload_pb2._CLOSED,
-              requestStatus=openoffload_pb2._ACCEPTED, inPackets=1000, outPackets=200000, startTime=timestamp)
-            sessionResponses.sessionInfo.append(session1)
+            session1 = openoffload_pb2.SessionResponse(sessionid=1001, sessionstate=openoffload_pb2._CLOSED,
+              requeststatus=openoffload_pb2._ACCEPTED, inpackets=1000, outpackets=200000, starttime=timestamp)
+            sessionResponses.sessioninfo.append(session1)
 
-            session2 = openoffload_pb2.sessionResponse(sessionId=1002, sessionState=openoffload_pb2._CLOSED,
-              requestStatus=openoffload_pb2._ACCEPTED, inPackets=2000, outPackets=400000, startTime=timestamp)
-            sessionResponses.sessionInfo.append(session2)
+            session2 = openoffload_pb2.SessionResponse(sessionid=1002, sessionstate=openoffload_pb2._CLOSED,
+              requeststatus=openoffload_pb2._ACCEPTED, inpackets=2000, outpackets=400000, starttime=timestamp)
+            sessionResponses.sessioninfo.append(session2)
 
             return sessionResponses
 

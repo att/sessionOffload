@@ -136,7 +136,11 @@ service SessionTable {
 	//
 	// Stream back a specific session or all current sessions
 	// To stream a single session, pass SessionId as zero
-	rpc GetAllSession(SessionRequestArgs) returns (SessionResponses) {}
+	rpc GetAllSessions(SessionRequestArgs) returns (SessionResponses) {}
+	//
+	// statistics as a outgoing session from the WB to Applications ?
+	// grpc seems to need a request input streamId is a placeholder
+	rpc GetClosedSessions(SessionRequestArgs) returns (stream SessionResponse) {}
 }
 
 // Uuid for Session IDs
@@ -149,7 +153,7 @@ message Uuid {
 // or have the applications have a mechanism to avoid duplicate sessionIDs across 
 // applications since there will be many applications instances to 1 switch
 message SessionId {
-	uint64 session_id = 1;
+	uint64 sessionid = 1;
 }
 
 // MIRROR and SNOOP require an actionNextHop
@@ -166,7 +170,7 @@ message ActionParameters {
 // The IPV4 definition maps to the V4 struct returned by inet_pton which is a uint32_t.
 // The IPV6 definition maps to the V6 struct returned by inet_ptoN which is a uint8_t s6_addr[16]
 message SessionRequest {
-	Uuid session_id         = 1;
+	uint64 sessionid        = 1;
 	int32 inlif             = 2;
 	int32 outlif            = 3;
 	IpVersion ipversion     = 4;
@@ -182,7 +186,7 @@ message SessionRequest {
 }
 
 message SessionResponseError {
-	Uuid sessionid    = 1;
+	uint64 sessionid  = 1;
 	int32 errorstatus = 2;
 }
 
@@ -203,7 +207,7 @@ message AddSessionResponse {
 }
 
 message SessionResponse {
-	Uuid sessionid                      = 1;
+	uint64 sessionid                    = 1;
 	uint64 inpackets                    = 2;
 	uint64 outpackets                   = 3;
 	uint64 inbytes                      = 4;
@@ -215,9 +219,12 @@ message SessionResponse {
 	google.protobuf.Timestamp endtime   = 10;
 }
 
-message SessionRequestArgs {
-	// If SessionId is zero, return all sessions
-	Uuid sessionid            = 1;
-	// Filter argument to only return sessions of a given state
-	SessionState sessionstate = 2;
+message SessionRequestArgs{
+	//  pageSize = 0 will turn off paging
+	//  does paging make sense for a stream ?
+	//  the client should read/process each event on the stream anyway.
+	uint32  pageSize     = 1;
+	uint32  page         = 2;
+	uint64  startSession = 3;
+	//  what other arguments make sense for retrieving or filtering streams
 }

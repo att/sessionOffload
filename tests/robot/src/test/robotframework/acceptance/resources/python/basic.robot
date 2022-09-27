@@ -42,7 +42,7 @@ Run Add Session Ipv4 Error Session
      ${result} =	Get Process Result	client
      Log       ${result.stderr}
      Log       ${result.stdout}
-     Should Contain   ${result.stdout}    addSessionErrorResponse.errorStatus: 2
+     Should Contain   ${result.stdout}    addSessionErrorResponse.errorstatus: 2
 
 Run Add Session Ipv6
      [Documentation]    Add IPv6 Session
