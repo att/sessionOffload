@@ -1,4 +1,5 @@
 tests/buildBasic/
+tests/buildIPTBasic/
 tests/buildPythonSimulator/
 openoffload/cpp/tests/bin/**
 openoffload/cpp/tests/obj/**
@@ -22,7 +23,6 @@ openoffload/cpp/tests/openoffload.grpc.pb.h
 openoffload/cpp/tests/openoffload.pb.cc
 openoffload/cpp/tests/openoffload.pb.h
 openoffload/cpp/framework/doc/html/**
-protos/protos/cpp
-protos/protos/golang
-protos/protos/python
+openoffload/golang
+openoffload/python
 **/.DS_Store
