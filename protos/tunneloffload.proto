@@ -126,7 +126,7 @@ message CapabilityResponse {
   IPSecCapabilities ipsec_capabilities = 2;
 
   message GeneveCapabilities {
-    uint32 number_geneve_ptions_supported = 1;  // Number of options geneve is supporting in encap
+    uint32 number_geneve_options_supported = 1;  // Number of options geneve is supporting in encap
   }
   
   GeneveCapabilities geneve_capabilities = 3;

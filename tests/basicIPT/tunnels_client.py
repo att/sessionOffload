@@ -45,7 +45,7 @@ def tunnel_add_IPSEC_GENEVE(stub):
     SECOND_DEC_KEY = random_key()
 
     ipsec_dec_tunnel = create_ipsec_dec_tunnel(tunnelid=10000, 
-                                               enc_type=tunneloffload_pb2._aes256gcm64,
+                                               enc_type=tunneloffload_pb2._AES256GCM64,
                                                spi=FIRST_DEC_SPI,
                                                key=FIRST_DEC_KEY,
                                                tunnel_type=tunneloffload_pb2.TRANSPORT_NAT_TRAVERSAL,
@@ -55,7 +55,7 @@ def tunnel_add_IPSEC_GENEVE(stub):
     ###
     ## GENEVE Encap Tunnel
     ###
-    match = Match(tunnel_id=ipsec_dec_tunnel.tunnelId)
+    match = Match(tunnel_id=ipsec_dec_tunnel.tunnel_id)
 
     geneve_encap_tunnel = create_geneve_encap(match=match,
                                               tunnelid=10001,
@@ -83,7 +83,7 @@ def tunnel_add_IPSEC_GENEVE(stub):
     ####
     ## IPSec Enc Tunnel
     ### 
-    match = Match(tunnel_id=geneve_decap_tunnel.tunnelId)
+    match = Match(tunnel_id=geneve_decap_tunnel.tunnel_id)
 
     ipsec_enc_tunnel = create_ipsec_enc_tunnel(tunnelid=10003,
                                                match=match,
@@ -92,13 +92,13 @@ def tunnel_add_IPSEC_GENEVE(stub):
                                                tunnel_destination_ip="11.0.0.1",
                                                spi=4587,
                                                tunnel_type=tunneloffload_pb2.TUNNEL_NAT_TRAVERSAL,
-                                               enc_type=tunneloffload_pb2._aes256gcm64)
+                                               enc_type=tunneloffload_pb2._AES256GCM64)
 
     # Making iterator of one in order to send via gNMI
     add_tunnels_iterators = iter([ipsec_dec_tunnel, geneve_encap_tunnel, geneve_decap_tunnel, ipsec_enc_tunnel])
 
     print("Sending IPSec Tunnel Request")
-    stub.createIpTunnel(add_tunnels_iterators)
+    stub.CreateIpTunnel(add_tunnels_iterators)
 
     ####
     # In this scenario we're doing rekey of the ipsec scenario
@@ -108,17 +108,17 @@ def tunnel_add_IPSEC_GENEVE(stub):
     # the other tunnel
     # We've already created the ipsec tunnel 10003, we'll perform rekey by creating another tunnel ID with
     # different SPI and different match
-    ipsec_enc_tunnel_update = update_ipsec_enc_tunnel(tunnelId=ipsec_enc_tunnel.tunnelId,
+    ipsec_enc_tunnel_update = update_ipsec_enc_tunnel(tunnel_id=ipsec_enc_tunnel.tunnel_id,
                                                       spi=4590)
 
     print("Updating IPSec Enc Tunnel")
     add_tunnels_iterators = iter([ipsec_enc_tunnel_update])
-    stub.createIpTunnel(add_tunnels_iterators)
+    stub.CreateIpTunnel(add_tunnels_iterators)
 
 
     print("Performing rekey - decryption")
     # Rekey of decryption is done by creating another tunnel with a different SPI 
-    ipsec_dec_tunnel_update = update_ipsec_dec_tunnel(ipsec_dec_tunnel.tunnelId,
+    ipsec_dec_tunnel_update = update_ipsec_dec_tunnel(ipsec_dec_tunnel.tunnel_id,
                                                       second_tunnel_spi=SECOND_DEC_SPI,
                                                       second_tunnel_key=SECOND_DEC_KEY,
                                                       second_tunnel_operation=tunneloffload_pb2._CREATE)
@@ -128,37 +128,37 @@ def tunnel_add_IPSEC_GENEVE(stub):
 
     print("\nPerforming rekey - decryption\n")
     tunnels_iterators = iter([ipsec_dec_tunnel_update])
-    stub.createIpTunnel(tunnels_iterators)    
+    stub.CreateIpTunnel(tunnels_iterators)    
 
     # Waiting sometime before removing the old spi
-    ipsec_dec_tunnel_update = update_ipsec_dec_tunnel(ipsec_dec_tunnel.tunnelId,
+    ipsec_dec_tunnel_update = update_ipsec_dec_tunnel(ipsec_dec_tunnel.tunnel_id,
                                                       first_tunnel_spi=FIRST_DEC_SPI,
                                                       first_tunnel_operation=tunneloffload_pb2._DELETE)
 
 
     # Getting the ip tunnel stats
     print("\nGetting IP Tunnel stats\n")
-    tunnel_id = tunneloffload_pb2.tunnelId()
-    tunnel_id.tunnelId = ipsec_dec_tunnel_update.tunnelId
-    res = stub.getIpTunnelStats(tunnel_id)
+    tunnel_id = tunneloffload_pb2.TunnelId()
+    tunnel_id.tunnel_id = ipsec_dec_tunnel_update.tunnel_id
+    res = stub.GetIpTunnelStats(tunnel_id)
     print(res)
 
     # Getting the entire ip tunnel
     print("\nGetting IP Tunnel\n")
-    tunnel_id = tunneloffload_pb2.tunnelId()
-    tunnel_id.tunnelId = ipsec_dec_tunnel_update.tunnelId
-    res = stub.getIpTunnel(tunnel_id)
+    tunnel_id = tunneloffload_pb2.TunnelId()
+    tunnel_id.tunnel_id = ipsec_dec_tunnel_update.tunnel_id
+    res = stub.GetIpTunnel(tunnel_id)
     print(res)
 
 
     print("Removing old rekey tunnel")
     tunnels_iterators = iter([ipsec_dec_tunnel_update])
-    stub.createIpTunnel(tunnels_iterators)    
+    stub.CreateIpTunnel(tunnels_iterators)    
 
     print("Getting all tunnel stats")
-    tunnelRequestArgs = tunneloffload_pb2.tunnelRequestArgs()
-    tunnelRequestArgs.tunnelsPerRequest = 2
-    iterable = stub.getAllIpTunnelsStats(tunnelRequestArgs)    
+    tunnelRequestArgs = tunneloffload_pb2.TunnelRequestArgs()
+    tunnelRequestArgs.tunnels_per_request = 2
+    iterable = stub.GetAllIpTunnelsStats(tunnelRequestArgs)    
     for response in iterable:
         print(response)
 
@@ -173,7 +173,7 @@ def four_tunnel_chain(stub):
                   dest_ip="12.0.0.2")
 
     ipsec_dec_tunnel = create_ipsec_dec_tunnel(tunnelid=BASE_TUNNEL_ID, 
-                                               enc_type=tunneloffload_pb2._aes256gcm64,
+                                               enc_type=tunneloffload_pb2._AES256GCM64,
                                                tunnel_type=tunneloffload_pb2.TUNNEL,
                                                spi=980,
                                                key=random_key(),
@@ -182,7 +182,7 @@ def four_tunnel_chain(stub):
     ###
     ## GENEVE Decap Tunnel
     ###
-    match = Match(tunnel_id=ipsec_dec_tunnel.tunnelId)
+    match = Match(tunnel_id=ipsec_dec_tunnel.tunnel_id)
                   
 
     geneve_decap_tunnel = create_geneve_decap(tunnelid=BASE_TUNNEL_ID+1,
@@ -192,7 +192,7 @@ def four_tunnel_chain(stub):
     ###
     ## GENEVE Encap Tunnel
     ###
-    match = Match(tunnel_id=geneve_decap_tunnel.tunnelId)
+    match = Match(tunnel_id=geneve_decap_tunnel.tunnel_id)
 
     geneve_encap_tunnel = create_geneve_encap(match=match,
                                               tunnelid=BASE_TUNNEL_ID+2,
@@ -208,7 +208,7 @@ def four_tunnel_chain(stub):
     ## IPSec Enc Tunnel
     ### 
     match = Match(spi=920,
-                  tunnel_id=geneve_encap_tunnel.tunnelId)
+                  tunnel_id=geneve_encap_tunnel.tunnel_id)
 
     ipsec_enc_tunnel = create_ipsec_enc_tunnel(tunnelid=BASE_TUNNEL_ID+3,
                                                match=match,
@@ -217,13 +217,13 @@ def four_tunnel_chain(stub):
                                                tunnel_destination_ip="13.0.0.1",
                                                spi=45888,
                                                tunnel_type=tunneloffload_pb2.TRANSPORT,
-                                               enc_type=tunneloffload_pb2._aes256gcm64)
+                                               enc_type=tunneloffload_pb2._AES256GCM64)
 
     # Making iterator of one in order to send via gNMI
     add_tunnels_iterators = iter([ipsec_dec_tunnel, geneve_decap_tunnel,  geneve_encap_tunnel, ipsec_enc_tunnel])
 
     print("Sending IPSec Tunnel Request")
-    stub.createIpTunnel(add_tunnels_iterators)
+    stub.CreateIpTunnel(add_tunnels_iterators)
 
 
 def tunnel_recursion_without_tunnel_id(stub):
@@ -239,7 +239,7 @@ def tunnel_recursion_without_tunnel_id(stub):
                                                tunnel_destination_ip="14.0.0.1",
                                                spi=50000,
                                                tunnel_type=tunneloffload_pb2.TUNNEL,
-                                               enc_type=tunneloffload_pb2._aes256gcm64)
+                                               enc_type=tunneloffload_pb2._AES256GCM64)
 
     match = Match(source_ip="14.0.0.2",
                   dest_ip="14.0.0.1")
@@ -258,7 +258,7 @@ def tunnel_recursion_without_tunnel_id(stub):
     add_tunnels_iterators = iter([ipsec_enc_tunnel, geneve_encap_tunnel])
 
     print("Sending IPSec Tunnel Request")
-    stub.createIpTunnel(add_tunnels_iterators)
+    stub.CreateIpTunnel(add_tunnels_iterators)
 
 
 def tunnel_recursion_with_tunnel_id_and_ip(stub):
@@ -279,7 +279,7 @@ def tunnel_recursion_with_tunnel_id_and_ip(stub):
                                                spi=80000,
                                                key=random_key(),
                                                tunnel_type=tunneloffload_pb2.TUNNEL_NAT_TRAVERSAL,
-                                               enc_type=tunneloffload_pb2._aes256gcm64)
+                                               enc_type=tunneloffload_pb2._AES256GCM64)
 
     match = Match(tunnel_id=40000,
                   source_ip="15.0.0.2",
@@ -310,7 +310,7 @@ def tunnel_recursion_with_tunnel_id_and_ip(stub):
     add_tunnels_iterators = iter([ipsec_enc_tunnel, geneve_encap_tunnel_1, geneve_encap_tunnel_2])
 
     print("Sending IPSec Tunnel Request")
-    stub.createIpTunnel(add_tunnels_iterators)
+    stub.CreateIpTunnel(add_tunnels_iterators)
 
 
 def capabilities_exchange(stub):
@@ -328,7 +328,7 @@ def run():
     with open('ssl/server.crt', 'rb') as f:
         creds = grpc.ssl_channel_credentials(f.read())
         channel = grpc.secure_channel('localhost:3443', creds)
-        stub = tunneloffload_pb2_grpc.ipTunnelServiceStub(channel)
+        stub = tunneloffload_pb2_grpc.IpTunnelServiceStub(channel)
 
         # needs to be turned into a commmand line argument so that robot can run it without the inteartive debugger
         capabilities_exchange(stub)

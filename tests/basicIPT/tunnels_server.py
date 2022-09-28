@@ -46,7 +46,7 @@ class Counters:
 import tunneloffload_pb2
 import tunneloffload_pb2_grpc
 
-SUPPORTED_IPSEC_ENC = [tunneloffload_pb2._aes256gcm64, tunneloffload_pb2._aes256gcm96, tunneloffload_pb2._aes256gcm128]
+SUPPORTED_IPSEC_ENC = [tunneloffload_pb2._AES256GCM64, tunneloffload_pb2._AES256GCM96, tunneloffload_pb2._AES256GCM128]
 
 MIN_NUMBER_PACKETS = 1
 MAX_NUMBER_PACKETS = 5000
@@ -93,7 +93,7 @@ class AddTunnelErrorsIterator:
 class Tunnel(object):
     def __init__(self, tunnel):
         self.tunnel_proto = tunnel
-        self.tunnel_id = self.tunnel_proto.tunnelId
+        self.tunnel_id = self.tunnel_proto.tunnel_id
         self.match_criteria = self.tunnel_proto.match_criteria
         self.tunnel_type = None
         self.counters = self.generate_random_counters_for_sesssion()
@@ -131,7 +131,7 @@ class Tunnel(object):
 
     @staticmethod
     def validate_ipv6_pair(ipv6_pair):
-        if len(ipv6_pair.sourceIp) != 32:
+        if len(ipv6_pair.source_ip) != 32:
             raise TunnelValidationExcp("IPV6 Source IP Isn't valid")
 
         if len(ipv6_pair.destinationIp) != 32:
@@ -205,27 +205,27 @@ class Tunnel(object):
     def check_ipsec_tunnel_validity(self, ipsec_params):
         ipsec_mode = ipsec_params.WhichOneof("ipsec")
 
-        if ipsec_mode == "ipsecDec":
+        if ipsec_mode == "ipsec_dec":
             self.tunnel_type = 'IPSec Decryption'
-            ipsec_params = ipsec_params.ipsecDec
+            ipsec_params = ipsec_params.ipsec_dec
         else:
             self.tunnel_type = 'IPSEC Encryption'
-            ipsec_params = ipsec_params.ipsecEnc 
+            ipsec_params = ipsec_params.ipsec_enc
 
-        if ipsec_params.encryptionType not in SUPPORTED_IPSEC_ENC:
+        if ipsec_params.encryption_type not in SUPPORTED_IPSEC_ENC:
             raise TunnelValidationExcp("Not encryption type set on tunnel")
 
-        if ipsec_mode == "ipsecEnc":
-            ipsec_sa_params_array = [ipsec_params.ipsecSA]
+        if ipsec_mode == "ipsec_enc":
+            ipsec_sa_params_array = [ipsec_params.ipsec_sa]
         else:
-            ipsec_sa_params_array = ipsec_params.ipsecSAs
+            ipsec_sa_params_array = ipsec_params.ipsec_sas
 
         spi_found = False
 
         for ipsec_sa_params in ipsec_sa_params_array:
             if ipsec_sa_params.spi != 0:
                 spi_found = True
-                if ipsec_sa_params.operation !=  tunneloffload_pb2._DELETE and len(ipsec_sa_params.encryptionKey) != 64: # Checking the key length
+                if ipsec_sa_params.operation !=  tunneloffload_pb2._DELETE and len(ipsec_sa_params.encryption_key) != 64: # Checking the key length
                     raise TunnelValidationExcp("Key used for IPSec isnt in right size of 256-bit")
 
             if not spi_found:
@@ -235,7 +235,7 @@ class Tunnel(object):
 
         TUNNEL_TO_VALIDITY_DICT = {
         'geneve': self.check_geneve_validity,
-        'ipsecTunnel': self.check_ipsec_tunnel_validity,   
+        'ipsec_tunnel': self.check_ipsec_tunnel_validity,
         }
 
         tunnel_type = self.tunnel_proto.WhichOneof("tunnel") 
@@ -261,16 +261,16 @@ def print_tunnel_summary(tunnels):
 
         scanned_tunnels.append(tunnel_id)
 
-        if not tunnel.match_criteria.tunnelId:
+        if not tunnel.match_criteria.tunnel_id:
             sa_tunnels.append(tunnel_id)
             continue
 
-        matched_tunnel_id = tunnel.match_criteria.tunnelId
+        matched_tunnel_id = tunnel.match_criteria.tunnel_id
         if matched_tunnel_id not in tunnels:
             raise TunnelValidationExcp(f"Tunnel id {tunnel_id} is matched traffic from " \
                                        f"tunnel id {matched_tunnel_id} which not exists")
 
-        if tunnel.match_criteria.ipv4Match.sourceIp:
+        if tunnel.match_criteria.ipv4_match.source_ip:
             partial_chaining = True
         
                     
@@ -318,20 +318,20 @@ def print_tunnel_summary(tunnels):
 
 
     
-class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
+class ip_tunnelServiceServicer(tunneloffload_pb2_grpc.IpTunnelServiceServicer):
     """Provides methods that implement functionality of tunnel table server."""
-    """ rpc createIpTunnels(ipTunnel) returns (createIpTunnelResponse) {} """
+    """ rpc CreateIpTunnels(ip_tunnel) returns (createIpTunnelResponse) {} """
 
 
     def __init__(self):
         """do some init stuff"""
         self.tunnels = {} # List of tunnels according to ID's
 
-    def createIpTunnel(self, request_iterator, context):
+    def CreateIpTunnel(self, request_iterator, context):
         tunnelErrors_value=AddTunnelErrors()
         for request in request_iterator:
             if request.operation == tunneloffload_pb2._CREATE:
-                print(f"############ Create Tunnel ID - {request.tunnelId} ##################")
+                print(f"############ Create Tunnel ID - {request.tunnel_id} ##################")
                 print(request)
 
                 print("Checking validity of the request")
@@ -339,66 +339,66 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
                 tunnel.check_tunnel_validity()
 
                 # Adding tunnel to be part of tunnels
-                self.tunnels[request.tunnelId] = tunnel
+                self.tunnels[request.tunnel_id] = tunnel
             elif request.operation == tunneloffload_pb2._UPDATE:
-                print(f"############ Update Tunnel ID - {request.tunnelId} ##################")
+                print(f"############ Update Tunnel ID - {request.tunnel_id} ##################")
                 print(request)
                 # This is just an example of how an update can work, and be enhanced
-                self.tunnels[request.tunnelId].tunnel_proto.ipsecTunnel.CopyFrom(request.ipsecTunnel)
+                self.tunnels[request.tunnel_id].tunnel_proto.ipsec_tunnel.CopyFrom(request.ipsec_tunnel)
             else:
-                print(f"############# Removing tunnel {request.tunnelId} ##############")
+                print(f"############# Removing tunnel {request.tunnel_id} ##############")
                 print(request)
-                self.tunnels.pop(request.tunnelId, None)
+                self.tunnels.pop(request.tunnel_id, None)
             
         print("Printing tunnels summary")
         print_tunnel_summary(self.tunnels)
 
-        return tunneloffload_pb2.createIpTunnelResponse()
+        return tunneloffload_pb2.CreateIpTunnelResponse()
 
     # Get request
-    def getIpTunnel(self, request, context):
+    def GetIpTunnel(self, request, context):
         
-        res = tunneloffload_pb2.ipTunnelResponse()
-        tunnel = self.tunnels[request.tunnelId]
-        print(f"Getting IP Tunnel {request.tunnelId}")
+        res = tunneloffload_pb2.IpTunnelResponse()
+        tunnel = self.tunnels[request.tunnel_id]
+        print(f"Getting IP Tunnel {request.tunnel_id}")
 
         # Filling tunnel id 
-        res.tunnelId = request.tunnelId
+        res.tunnel_id = request.tunnel_id
 
         # Counters
-        res.tunnelCounters.inPackets = tunnel.counters.in_packets
-        res.tunnelCounters.outPackets = tunnel.counters.out_packets
-        res.tunnelCounters.inBytes = tunnel.counters.in_bytes
-        res.tunnelCounters.outBytes = tunnel.counters.out_bytes
-        res.tunnelCounters.inPacketsDrops = tunnel.counters.in_packets_drops
-        res.tunnelCounters.outPacketsDrops = tunnel.counters.out_packets_drops
-        res.tunnelCounters.inBytesDrops = tunnel.counters.in_bytes_drops
-        res.tunnelCounters.outBytesDrops = tunnel.counters.out_bytes_drops
+        res.tunnel_counters.in_packets = tunnel.counters.in_packets
+        res.tunnel_counters.out_packets = tunnel.counters.out_packets
+        res.tunnel_counters.in_bytes = tunnel.counters.in_bytes
+        res.tunnel_counters.out_bytes = tunnel.counters.out_bytes
+        res.tunnel_counters.in_packets_drops = tunnel.counters.in_packets_drops
+        res.tunnel_counters.out_packets_drops = tunnel.counters.out_packets_drops
+        res.tunnel_counters.in_bytes_drops = tunnel.counters.in_bytes_drops
+        res.tunnel_counters.out_bytes_drops = tunnel.counters.out_bytes_drops
 
         # Filling the tunnel proto
-        res.ipTunnel.CopyFrom(tunnel.tunnel_proto)
+        res.ip_tunnel.CopyFrom(tunnel.tunnel_proto)
         print(res)
 
         return res
          
-    def getIpTunnelStats(self, request, context):
+    def GetIpTunnelStats(self, request, context):
         
-        res = tunneloffload_pb2.ipTunnelStatsResponse()
-        tunnel = self.tunnels[request.tunnelId]
-        print(f"Getting IP Tunnel stats {request.tunnelId}")
+        res = tunneloffload_pb2.IpTunnelStatsResponse()
+        tunnel = self.tunnels[request.tunnel_id]
+        print(f"Getting IP Tunnel stats {request.tunnel_id}")
 
         # Filling tunnel id 
-        res.tunnelId = request.tunnelId
+        res.tunnel_id = request.tunnel_id
 
         # Counters
-        res.tunnelCounters.inPackets = tunnel.counters.in_packets
-        res.tunnelCounters.outPackets = tunnel.counters.out_packets
-        res.tunnelCounters.inBytes = tunnel.counters.in_bytes
-        res.tunnelCounters.outBytes = tunnel.counters.out_bytes
-        res.tunnelCounters.inPacketsDrops = tunnel.counters.in_packets_drops
-        res.tunnelCounters.outPacketsDrops = tunnel.counters.out_packets_drops
-        res.tunnelCounters.inBytesDrops = tunnel.counters.in_bytes_drops
-        res.tunnelCounters.outBytesDrops = tunnel.counters.out_bytes_drops
+        res.tunnel_counters.in_packets = tunnel.counters.in_packets
+        res.tunnel_counters.out_packets = tunnel.counters.out_packets
+        res.tunnel_counters.in_bytes = tunnel.counters.in_bytes
+        res.tunnel_counters.out_bytes = tunnel.counters.out_bytes
+        res.tunnel_counters.in_packets_drops = tunnel.counters.in_packets_drops
+        res.tunnel_counters.out_packets_drops = tunnel.counters.out_packets_drops
+        res.tunnel_counters.in_bytes_drops = tunnel.counters.in_bytes_drops
+        res.tunnel_counters.out_bytes_drops = tunnel.counters.out_bytes_drops
         print(res)
 
         return res
@@ -406,42 +406,42 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
     # Capabilities
     def Capabilities(self, request, context):
         res = tunneloffload_pb2.CapabilityResponse()
-        res.matchCapabilities.geneveMatching = True
-        res.matchCapabilities.ingressInterfaceMatching = True
-        res.matchCapabilities.spiMatching = True
+        res.MatchCapabilities.geneve_matching = True
+        res.MatchCapabilities.ingress_interface_matching = True
+        res.MatchCapabilities.spi_matching = True
 
-        res.ipsecCapabilities.tunnelTypeSupported.extend([tunneloffload_pb2.TRANSPORT, tunneloffload_pb2.TUNNEL, tunneloffload_pb2.TRANSPORT_NAT_TRAVERSAL, tunneloffload_pb2.TUNNEL_NAT_TRAVERSAL])
-        res.ipsecCapabilities.encryptionSupported.extend(SUPPORTED_IPSEC_ENC)
+        res.ipsec_capabilities.tunnel_type_supported.extend([tunneloffload_pb2.TRANSPORT, tunneloffload_pb2.TUNNEL, tunneloffload_pb2.TRANSPORT_NAT_TRAVERSAL, tunneloffload_pb2.TUNNEL_NAT_TRAVERSAL])
+        res.ipsec_capabilities.encryption_supported.extend(SUPPORTED_IPSEC_ENC)
 
-        res.geneveCapabilities.numberGeneveOptionsSupported = 5
+        res.geneve_capabilities.number_geneve_options_supported = 5
         
         return res
 
-    def getAllIpTunnelsStats(self, request, context):
+    def GetAllIpTunnelsStats(self, request, context):
 
         print("Got getAllIpTunnelsStats request!")
-        print(f"Number of stats per response: {request.tunnelsPerRequest}")
-        iteration_count = request.tunnelsPerRequest
+        print(f"Number of stats per response: {request.tunnels_per_request}")
+        iteration_count = request.tunnels_per_request
         tunnels_to_iterate = list(self.tunnels.values())
         num_tunnels = len(tunnels_to_iterate)
 
         tunnels_to_send = []
         for i, tunnel in enumerate(tunnels_to_iterate):
             
-            specific_tunnel = tunneloffload_pb2.ipTunnelStatsResponse()
-            specific_tunnel.tunnelId = tunnel.tunnel_id
-            specific_tunnel.tunnelCounters.inPackets = tunnel.counters.in_packets
-            specific_tunnel.tunnelCounters.outPackets = tunnel.counters.out_packets
-            specific_tunnel.tunnelCounters.inBytes = tunnel.counters.in_bytes
-            specific_tunnel.tunnelCounters.outBytes = tunnel.counters.out_bytes
-            specific_tunnel.tunnelCounters.inPacketsDrops = tunnel.counters.in_packets_drops
-            specific_tunnel.tunnelCounters.outPacketsDrops = tunnel.counters.out_packets_drops
-            specific_tunnel.tunnelCounters.inBytesDrops = tunnel.counters.in_bytes_drops
-            specific_tunnel.tunnelCounters.outBytesDrops = tunnel.counters.out_bytes_drops
+            specific_tunnel = tunneloffload_pb2.IpTunnelStatsResponse()
+            specific_tunnel.tunnel_id = tunnel.tunnel_id
+            specific_tunnel.tunnel_counters.in_packets = tunnel.counters.in_packets
+            specific_tunnel.tunnel_counters.out_packets = tunnel.counters.out_packets
+            specific_tunnel.tunnel_counters.in_bytes = tunnel.counters.in_bytes
+            specific_tunnel.tunnel_counters.out_bytes = tunnel.counters.out_bytes
+            specific_tunnel.tunnel_counters.in_packets_drops = tunnel.counters.in_packets_drops
+            specific_tunnel.tunnel_counters.out_packets_drops = tunnel.counters.out_packets_drops
+            specific_tunnel.tunnel_counters.in_bytes_drops = tunnel.counters.in_bytes_drops
+            specific_tunnel.tunnel_counters.out_bytes_drops = tunnel.counters.out_bytes_drops
             tunnels_to_send.append(specific_tunnel)
 
             if len(tunnels_to_send) == iteration_count or i == num_tunnels - 1:
-                msg = tunneloffload_pb2.ipTunnelStatsResponses()
+                msg = tunneloffload_pb2.IpTunnelStatsResponses()
                 msg.responses.extend(tunnels_to_send)
                 tunnels_to_send = []
                 print("Sending response in stream!")
@@ -451,8 +451,8 @@ class ipTunnelServiceServicer(tunneloffload_pb2_grpc.ipTunnelServiceServicer):
 
 def tunnelServe():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
-    tunneloffload_pb2_grpc.add_ipTunnelServiceServicer_to_server(
-        ipTunnelServiceServicer(), server)
+    tunneloffload_pb2_grpc.add_IpTunnelServiceServicer_to_server(
+        ip_tunnelServiceServicer(), server)
     with open('ssl/server.key', 'rb') as f:
          private_key = f.read()
     with open('ssl/server.crt', 'rb') as f:
