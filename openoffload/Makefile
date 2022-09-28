@@ -47,6 +47,7 @@ all: $(PROTO_NAME).pb.go $(PROTO_NAME).pb.py $(PROTO_NAME).pb.cc
 .PHONY: clean
 #
 clean:
-	rm -rf ../protos/python
-	rm -rf ../protos/golang
-	rm -rf ../protos/cpp
+	rm -f python/*.py
+	rm -f golang/*.go
+	rm -f cpp/*.cc
+	rm -f cpp/*.h
