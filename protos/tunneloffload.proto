@@ -48,15 +48,15 @@ option go_package = "github.com/att/sessionOffload/protos";
 //    in the server session table, the client will take corrective action to ensure state is consistent.
 //
 enum AddTunnelStatus {
-  _TUNNEL_ACCEPTED = 0;
-  _TUNNEL_REJECTED = 1;
-  _TUNNEL_TABLE_FULL = 2;
+  _TUNNEL_ACCEPTED          = 0;
+  _TUNNEL_REJECTED          = 1;
+  _TUNNEL_TABLE_FULL        = 2;
   _TUNNEL_TABLE_UNAVAILABLE = 3;
-  _TUNNEL_ALREADY_EXISTS= 4;
+  _TUNNEL_ALREADY_EXISTS    = 4;
 }
 
 enum Operation {
-  _NONE = 0;
+  _NONE   = 0;
   _CREATE = 1;
   _UPDATE = 2;
   _DELETE = 3;
@@ -90,17 +90,17 @@ message CapabilityRequest {
 
 
 enum EncType {
-  _AES256GCM64 = 0;
-  _AES256GCM96 = 1;
+  _AES256GCM64  = 0;
+  _AES256GCM96  = 1;
   _AES256GCM128 = 2;
-  _AES128GCM64 = 3;
-  _AES128GCM96 = 4;
+  _AES128GCM64  = 3;
+  _AES128GCM96  = 4;
   _AES128GCM128 = 5;
-  _AES256CCM64 = 6;
-  _AES256CCM96 = 7;
+  _AES256CCM64  = 6;
+  _AES256CCM96  = 7;
   _AES256CCM128 = 8;
-  _AES128CCM64 = 9;
-  _AES128CCM96 = 10;
+  _AES128CCM64  = 9;
+  _AES128CCM96  = 10;
   _AES128CCM128 = 11;
 
 }
@@ -110,17 +110,17 @@ message CapabilityResponse {
 
   message MatchCapabilities {
     bool ingress_interface_matching = 1; // Is interface can be matched for encapsulation / decapsulation
-    bool vxlan_matching = 2; // Match with VXLAN VNI
-    bool geneve_matching = 3; // Match with geneve can happen
-    bool tunnel_matching = 4; // Matching on tunnel ID
-    bool spi_matching = 5; // Can match on IPSec
+    bool vxlan_matching             = 2; // Match with VXLAN VNI
+    bool geneve_matching            = 3; // Match with geneve can happen
+    bool tunnel_matching            = 4; // Matching on tunnel ID
+    bool spi_matching               = 5; // Can match on IPSec
   }
 
   MatchCapabilities match_capabilities = 1;
 
   message IPSecCapabilities {
     repeated IPSecTunnelType tunnel_type_supported = 1;
-    repeated EncType encryption_supported = 2;
+    repeated EncType encryption_supported          = 2;
   }
 
   IPSecCapabilities ipsec_capabilities = 2;
@@ -134,18 +134,18 @@ message CapabilityResponse {
 }
 
 enum Action {
-  NONE = 0;
+  NONE        = 0;
   // In this action packet will be forwarded right away
-  FORWARD = 1;
+  FORWARD     = 1;
   // In this action packet will continue processing, to other tunnel
   RECIRCULATE = 2;
 }
 
 enum MatchError {
-  MISING_FIELDS = 0; // Some missing fields are misisng in the match statment
-  INVALID_TUNNEL_ID = 1; // Tunnel ID match isn't valid or doesn't exist
+  MISING_FIELDS        = 0; // Some missing fields are misisng in the match statment
+  INVALID_TUNNEL_ID    = 1; // Tunnel ID match isn't valid or doesn't exist
   INVALID_CAPABILITIES = 2; // The match isn't suitable with tunnel capabilities
-  INVALID_FIELD = 3; // Invalid field found in the match (e.g. invalid mac)
+  INVALID_FIELD        = 3; // Invalid field found in the match (e.g. invalid mac)
 }
 
 enum TunnelError {
@@ -153,49 +153,49 @@ enum TunnelError {
 }
 
 enum IPSecError {
-  INVALID_KEY = 0; // Key got into IPSec is not matching the requested size
-  NON_SUPPORTED_ENCRYPTION = 1;  // Encrypted type requested from IPSec is not supported 
+  INVALID_KEY               = 0; // Key got into IPSec is not matching the requested size
+  NON_SUPPORTED_ENCRYPTION  = 1;  // Encrypted type requested from IPSec is not supported 
   NON_SUPPORTED_TUNNEL_TYPE = 2; // Tunnel type requested by IPSec is not valid (TUNNEL mode requested but not valid)
-  IPSEC_MISSING_FIELDS = 3; // Some missing fields in IPSec, e.g. TUNNEL MODE without tunnel IP's provided
+  IPSEC_MISSING_FIELDS      = 3; // Some missing fields in IPSec, e.g. TUNNEL MODE without tunnel IP's provided
 }
 
 enum GeneveError {
-  INVALID_OPTION = 0; // One of the options supported isn't valid
-  TOO_MANY_OPTIONS = 1; // Too many options provided with the geneve tunnel
+  INVALID_OPTION       = 0; // One of the options supported isn't valid
+  TOO_MANY_OPTIONS     = 1; // Too many options provided with the geneve tunnel
   INVALID_GENEVE_FIELD = 2; // One of the fields provided in GENVE isn't valid (e.g. too big VNI)
 }
 
 
 message TunnelAdditionError {
   // Message will only present if there's error in tunnel
-  MatchError match_error = 1; // Error in match of tunnel
+  MatchError match_error   = 1; // Error in match of tunnel
   TunnelError tunnel_error = 2; // General problem in tunnel definition
-  IPSecError ipsec_error = 3; // IPSec Error
+  IPSecError ipsec_error   = 3; // IPSec Error
   GeneveError geneve_error = 4; // Error in geneve
 }
 
 message MatchCriteria {
     // In case it's not present, untagged traffic will be matched
-    string ingress_interface = 1; 
+    string ingress_interface = 1;
 
-    MacPair mac_match = 2; // MAC of the packet itself
+    MacPair mac_match        = 2; // MAC of the packet itself
 
     oneof ip_match {
-      IPV4Match ipv4_match = 3;
-      IPV6Match ipv6_match = 4;
+      IPV4Match ipv4_match   = 3;
+      IPV6Match ipv6_match   = 4;
     }
 
-    uint64 tunnel_id = 5; // Match on specific tunnel
+    uint64 tunnel_id         = 5; // Match on specific tunnel
 
     message IPSecMatch {
       uint32 spi = 1;
-      uint32 sn = 2;
+      uint32 sn  = 2;
     }
 
     message GeneveMatch {
-      uint32 vni = 1;
-      MacPair mac_match = 2; // Inner Match of Geneve Packet
-      uint32 protocol_type = 3; // Currently only "Trans Ether Bridging" is supported (0x6558)
+      uint32 vni             = 1;
+      MacPair mac_match      = 2; // Inner Match of Geneve Packet
+      uint32 protocol_type   = 3; // Currently only "Trans Ether Bridging" is supported (0x6558)
       oneof ip_match {
         IPV4Match ipv4_match = 4;
         IPV6Match ipv6_match = 5;
@@ -203,38 +203,38 @@ message MatchCriteria {
    }
 
    message VXLanMatch {
-      uint32 vni = 1;
-      MacPair mac_match = 2;
+      uint32 vni               = 1;
+      MacPair mac_match        = 2;
       oneof ip_match {
-        IPV4Match ipv4_match = 3;
-        IPV6Match ipv6_match = 4;
+        IPV4Match ipv4_match   = 3;
+        IPV6Match ipv6_match   = 4;
       }
    }
 
     // Tunnel Matching
     oneof match {
-      IPSecMatch ipsec_match = 6;
+      IPSecMatch ipsec_match   = 6;
       GeneveMatch geneve_match = 7;
-      VXLanMatch vxlan_match = 8;
+      VXLanMatch vxlan_match   = 8;
     }
 
 }
 
 message IpTunnelRequest {
 
-  uint64 tunnel_id = 1;
+  uint64 tunnel_id             = 1;
 
-  Operation operation = 2; 
+  Operation operation          = 2;
 
   MatchCriteria match_criteria = 3; // When hitting this match,
 
-  Action next_action = 4; // What we'll do after matching the packet, should we
-                         // keep process it or we'll just forward it
+  Action next_action           = 4; // What we'll do after matching the packet, should we
+                                    // keep process it or we'll just forward it
 
   oneof tunnel {
       IPSecTunnel ipsec_tunnel = 5;  // Tunnel that will be used for encapsulation, can be both
-      Geneve geneve = 6;
-      Nat nat = 7;
+      Geneve geneve            = 6;
+      Nat nat                  = 7;
   };
 
 }
@@ -248,10 +248,10 @@ message Geneve {
 
 message GeneveOption {
   uint32 option_class = 1; // 16 bits
-  uint32 type = 2; // 8 bits
-  uint32 length = 3; // Only 5 bits used
+  uint32 type         = 2; // 8 bits
+  uint32 length       = 3; // Only 5 bits used
   // Length is multiple of 4 bytes (see https://datatracker.ietf.org/doc/html/rfc8926#section-3.5)
-  bytes data = 4; // Only 4-128 bytes are acceptable,
+  bytes data          = 4; // Only 4-128 bytes are acceptable,
   // Number of bytes that's not multiple of 4 will be rejected, and option won't be accepted
 }
 
@@ -269,18 +269,18 @@ message GeneveEncap {
 
   // IP's that will be in the outer IP of encapsulated packet
   oneof ip {
-    IPV4Pair outer_ipv4_pair = 1;
-    IPV6Pair outer_ipv6_pair = 2;
+    IPV4Pair outer_ipv4_pair          = 1;
+    IPV6Pair outer_ipv6_pair          = 2;
   }
 
   // Source & Dest mac of inner Geneve packet
-  MacPair inner_mac_pair = 3;
+  MacPair inner_mac_pair              = 3;
 
-  uint32 option_length = 4; // 6 bits - Multiply of 4 bytes 
-  bool control_packet = 5; // O bit at rfc. True is '1', False is '0'. Default is False.
-  bool critical_option_present = 6; // C bit at rfc. True is '1', False is '0'. Default is False.
-  uint32 vni = 7; // Virtual Network Identifier - 24 bits
-  uint32 protocol_type = 8; // Currently only "Trans Ether Bridging" is supported (0x6558)
+  uint32 option_length                = 4; // 6 bits - Multiply of 4 bytes
+  bool control_packet                 = 5; // O bit at rfc. True is '1', False is '0'. Default is False.
+  bool critical_option_present        = 6; // C bit at rfc. True is '1', False is '0'. Default is False.
+  uint32 vni                          = 7; // Virtual Network Identifier - 24 bits
+  uint32 protocol_type                = 8; // Currently only "Trans Ether Bridging" is supported (0x6558)
   repeated GeneveOption geneve_option = 9;
 }
 
@@ -292,30 +292,30 @@ message GeneveDecap {
 
 message MacPair {
   bytes destination_mac = 1;
-  bytes source_mac = 2;  
+  bytes source_mac      = 2;
 }
 
 message IPV4Pair {
-  fixed32 source_ip = 1;
+  fixed32 source_ip      = 1;
   fixed32 destination_ip = 2;
 }
 
 message IPV6Pair {
-  bytes source_ip = 1;
+  bytes source_ip      = 1;
   bytes destination_ip = 2;
 }
 
 message IPV4Match {
-  fixed32 source_ip = 1;
-  uint32 source_ip_prefix = 2;
-  fixed32 destination_ip = 3;
+  fixed32 source_ip            = 1;
+  uint32 source_ip_prefix      = 2;
+  fixed32 destination_ip       = 3;
   uint32 destination_ip_prefix = 4;
 }
 
 message IPV6Match {
-  bytes source_ip = 1;
-  uint32 source_ip_prefix = 2;
-  bytes destination_ip = 3;
+  bytes source_ip              = 1;
+  uint32 source_ip_prefix      = 2;
+  bytes destination_ip         = 3;
   uint32 destination_ip_prefix = 4;
 }
 
@@ -324,8 +324,8 @@ message Nat {
 }
 
 enum IPSecTunnelType {
-  TRANSPORT = 0;
-  TUNNEL = 1;
+  TRANSPORT               = 0;
+  TUNNEL                  = 1;
   // Nat Traversal is a mechanism to overcome Nat happens between the
   // two IPSec endpoints, by adding a UDP Header after IPSec
   // This mode can happen both in TRANSPORT & TUNNEL Mode
@@ -333,31 +333,31 @@ enum IPSecTunnelType {
   // https://datatracker.ietf.org/doc/html/rfc3947
   // https://datatracker.ietf.org/doc/html/rfc3715
   TRANSPORT_NAT_TRAVERSAL = 2;
-  TUNNEL_NAT_TRAVERSAL = 3;
+  TUNNEL_NAT_TRAVERSAL    = 3;
 }
 
 message IPSecEnc {
   IPSecTunnelType tunnel_type = 1;
-  EncType encryption_type = 2;
-  IPSecSAParams ipsec_sa = 3;
+  EncType encryption_type     = 2;
+  IPSecSAParams ipsec_sa      = 3;
   // In case the ipsec tunnel is with tunnel mode,
   // one of the messages below should present
   oneof tunnelIps {
-    IPV4Pair ipv4_tunnel = 4;
-    IPV6Pair ipv6_tunnel = 5;
+    IPV4Pair ipv4_tunnel      = 4;
+    IPV6Pair ipv6_tunnel      = 5;
   }
 }
 
 message IPSecDec {
-  IPSecTunnelType tunnel_type = 1; // Transport / Tunnel...
-  EncType encryption_type = 2; // AES-256GCM
+  IPSecTunnelType tunnel_type      = 1; // Transport / Tunnel...
+  EncType encryption_type          = 2; // AES-256GCM
   repeated IPSecSAParams ipsec_sas = 3;
 }
 
 message IPSecSAParams {
-  uint32 spi = 1;
+  uint32 spi           = 1;
   bytes encryption_key = 2;
-  Operation operation = 3; // Indicates if removing / updating / creating SA
+  Operation operation  = 3; // Indicates if removing / updating / creating SA
 }
 
 message IPSecTunnel {
@@ -373,20 +373,20 @@ message TunnelId {
 }
 
 message Counters {
-  uint64 in_packets = 1;
-  uint64 out_packets = 2;
-  uint64 in_bytes  = 3;
-  uint64 out_bytes = 4;
-  uint64 in_packets_drops = 5;
+  uint64 in_packets        = 1;
+  uint64 out_packets       = 2;
+  uint64 in_bytes          = 3;
+  uint64 out_bytes         = 4;
+  uint64 in_packets_drops  = 5;
   uint64 out_packets_drops = 6;
-  uint64 in_bytes_drops  = 7;
-  uint64 out_bytes_drops = 8;
+  uint64 in_bytes_drops    = 7;
+  uint64 out_bytes_drops   = 8;
 
 }
 
 message CreateIpTunnelResponses {
-  AddTunnelStatus request_status = 1;
-  uint64 error_status = 2; // bitmask of errors for each of the sesssions sent in a stream (max 64).
+  AddTunnelStatus request_status            = 1;
+  uint64 error_status                       = 2; // bitmask of errors for each of the sesssions sent in a stream (max 64).
   repeated CreateIpTunnelResponse responses = 3;
 }
 
@@ -396,14 +396,14 @@ message CreateIpTunnelResponse {
   uint64 tunnel_id = 1;
 
   // Message appears only if there's error in the response
-  Error error = 2;
+  Error error      = 2;
 }
 
 message Error {
   // Error code describing the error with the request
   TunnelAdditionError error_message = 1;
   // Error string indicating the error
-  string error_string = 2;
+  string error_string               = 2;
 }
 
 message IpTunnelResponses {
@@ -412,16 +412,16 @@ message IpTunnelResponses {
 
 message IpTunnelResponse {
   // Tunnel ID assigned to this tunnel
-  uint64 tunnel_id = 1;
+  uint64 tunnel_id          = 1;
 
   // Information regards the ipTunnel (including match, tunnel information)
   IpTunnelRequest ip_tunnel = 2;
 
   // Counters of the session
-  Counters tunnel_counters = 3;
+  Counters tunnel_counters  = 3;
 
   // Message that appears only if there's a problem in the request
-  Error error = 4;
+  Error error               = 4;
 
 }
 
@@ -431,13 +431,13 @@ message IpTunnelStatsResponses {
 
 message IpTunnelStatsResponse {
   // Tunnel ID assigned to this tunnel
-  uint64 tunnel_id = 1;
+  uint64 tunnel_id         = 1;
 
   // Counters of the session
   Counters tunnel_counters = 2;
 
   // Message that appears only if there's a problem in the request
-  Error error = 3;
+  Error error              = 3;
 }
 
 message TunnelRequestArgs {
