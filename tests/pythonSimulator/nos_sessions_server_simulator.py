@@ -42,11 +42,11 @@ offloadSessionTable = {}
 
 class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
     """Provides methods that implement functionality of session table server."""
-    """ rpc addSession(sessionRequest) returns (addSessionResponse) {} """
-    """ rpc getSession(sessionId) returns (sessionResponse) {}      """
-    """ rpc deleteSession(sessionId) returns (sessionResponse) {}   """
-    """ rpc getAllSessions(sessionStatisticsArgs) returns (sessionResponse) {}   """
-    """ rpc getClosedSessions(sessionStatisticsArgs) returns (sessionResponse) {}   """
+    """ rpc AddSession(sessionRequest) returns (addSessionResponse) {} """
+    """ rpc GetSession(sessionId) returns (sessionResponse) {}      """
+    """ rpc DeleteSession(sessionId) returns (sessionResponse) {}   """
+    """ rpc GetAllSessions(sessionStatisticsArgs) returns (sessionResponse) {}   """
+    """ rpc GetClosedSessions(sessionStatisticsArgs) returns (sessionResponse) {}   """
     global offloadSessionTable
     lastSessionId = 1
 
@@ -77,32 +77,32 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
               return self.lastSessionId
 
 
-    def addSession(self, request_iterator, context):
-        addSessionResponse = openoffload_pb2.addSessionResponse()
+    def AddSession(self, request_iterator, context):
+        addSessionResponse = openoffload_pb2.AddSessionResponse()
 
         for request in request_iterator:
             addNewSession = True
             print("############ ADD SESSION ##################");
-            print("Client Session ID:", request.sessionId)
-            print("IP Version:", openoffload_pb2._IP_VERSION.values_by_number[request.ipVersion].name)
-            if request.ipVersion == openoffload_pb2._IPV4:
-              print("sourceIp:",socket.inet_ntop(socket.AF_INET, request.sourceIp.to_bytes(4,byteorder=sys.byteorder)));
+            print("Client Session ID:", request.session_id)
+            print("IP Version:", openoffload_pb2._IPVERSION.values_by_number[request.ip_version].name)
+            if request.ip_version == openoffload_pb2._IPV4:
+              print("source_ip:",socket.inet_ntop(socket.AF_INET, request.source_ip.to_bytes(4,byteorder=sys.byteorder)));
             else:
-              print("sourceIpV6:",socket.inet_ntop(socket.AF_INET6, request.sourceIpV6));
-            print("sourcePort:", request.sourcePort);
-            if request.ipVersion == openoffload_pb2._IPV4:
-              print("destinationIp:",socket.inet_ntop(socket.AF_INET, request.destinationIp.to_bytes(4,byteorder=sys.byteorder)));
+              print("source_ipv6:",socket.inet_ntop(socket.AF_INET6, request.source_ipv6));
+            print("source_port:", request.source_port);
+            if request.ip_version == openoffload_pb2._IPV4:
+              print("destinationIp:",socket.inet_ntop(socket.AF_INET, request.destination_ip.to_bytes(4,byteorder=sys.byteorder)));
             else:
-              print("destinationIpV6:",socket.inet_ntop(socket.AF_INET6, request.destinationIpV6));
-            print("destinationPort:", request.destinationPort);
-            print("protocolId:", request.protocolId);
-            print("ActionType 0=DROP,1=FORWARD,2=MIRROR,3=SNOOP:" , request.action.actionType)
-            print("ActionNextHop:" , request.action.actionNextHop)
+              print("destination_ipv6:",socket.inet_ntop(socket.AF_INET6, request.destination_ipv6));
+            print("destination_port:", request.destination_port);
+            print("protocol_id:", request.protocol_id);
+            print("ActionType 0=DROP,1=FORWARD,2=MIRROR,3=SNOOP:" , request.action.action_type)
+            print("ActionNextHop:" , request.action.action_next_hop)
 
 
 
             # check that all the required fields were included in the request
-            if request.sessionId is None or request.inLif is None or request.outLif is None or request.ipVersion is None or request.action is None or request.protocolId is None or request.sourceIp is None or request.sourcePort is None or request.destinationIp is None or request.destinationPort is None:
+            if request.session_id is None or request.in_lif is None or request.out_lif is None or request.ip_version is None or request.action is None or request.protocol_id is None or request.source_ip is None or request.source_port is None or request.destination_ip is None or request.destination_port is None:
                 msg = (f"ERROR: Invalid Request")
                 print(msg)
                 # Raise Exception on GRPC client
@@ -117,7 +117,7 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
 
 
             # check that the same 7 tuple doesn't already exist
-            existingSessionId = self.findSessionByTuple(request.inLif, request.outLif, request.sourceIp, request.sourcePort, request.destinationIp, request.destinationPort, request.protocolId)
+            existingSessionId = self.findSessionByTuple(request.in_lif, request.out_lif, request.source_ip, request.source_port, request.destination_ip, request.destination_port, request.protocol_id)
             # RICH DOES a closed session that has not been picked up by the FW count?
             if existingSessionId:
                 msg = (f"ERROR: There already exists a session with the same 7 tuple.")
@@ -135,8 +135,8 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
             if newSessionId < 0:
                 msg = (f"INFO: The session table is full and cannot support any new offload sessions at this time.")
                 print(msg)
-                sessionResponseError = openoffload_pb2.sessionResponseError(sessionId=request.sessionId, errorStatus=openoffload_pb2._SESSION_TABLE_FULL)
-                addSessionResponse.responseError.append(sessionResponseError)
+                sessionResponseError = openoffload_pb2.SessionResponseError(session_id=request.session_id, error_status=openoffload_pb2._SESSION_TABLE_FULL)
+                addSessionResponse.response_error.append(sessionResponseError)
                 addNewSession = False
                 #return openoffload_pb2.addSessionResponse(requestStatus=openoffload_pb2._REJECTED_SESSION_TABLE_FULL)
 
@@ -146,18 +146,18 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
                 timestamp = google.protobuf.timestamp_pb2.Timestamp()
                 timestamp.GetCurrentTime()
                 offloadSessionTable[newSessionId] = {
-                                                "clientSessionId": request.sessionId,
-                                                "inLif": request.inLif,
-                                                "outLif": request.outLif,
-                                                "ipVersion": request.ipVersion,
+                                                "clientSessionId": request.session_id,
+                                                "inLif": request.in_lif,
+                                                "outLif": request.out_lif,
+                                                "ipVersion": request.ip_version,
                                                 "action": request.action,
-                                                "protocolId": request.protocolId,
-                                                "sourceIp": request.sourceIp,
-                                                "sourceIpV6": request.sourceIpV6,
-                                                "sourcePort": request.sourcePort,
-                                                "destinationIp": request.destinationIp,
-                                                "destinationIpV6": request.destinationIpV6,
-                                                "destinationPort": request.destinationPort,
+                                                "protocolId": request.protocol_id,
+                                                "sourceIp": request.source_ip,
+                                                "sourceIpV6": request.source_ipv6,
+                                                "sourcePort": request.source_port,
+                                                "destinationIp": request.destination_ip,
+                                                "destinationIpV6": request.destination_ipv6,
+                                                "destinationPort": request.destination_port,
                                                 "state": openoffload_pb2._ESTABLISHED,
                                                 "inPackets": 0,
                                                 "inBytes": 0,
@@ -175,34 +175,34 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
 
 
     # find and return a single session by the passed in sessionId
-    def getSession(self, request, context):
+    def GetSession(self, request, context):
             global offloadSessionTable
             print("############ GET SESSION ##################");
-            print("request sessionId:",request.sessionId);
+            print("request sessionId:",request.session_id);
 
             try:
               # now find this client session id in our local Session Tablea
               for sessionId, session in offloadSessionTable.items():
-                #print(f"checking our session id:{sessionId} client session id:", session["clientSessionId"], " matches the request sessionId:", request.sessionId )
-                if session["clientSessionId"] == request.sessionId:
-                  return openoffload_pb2.sessionResponse(sessionId=request.sessionId, sessionState=session["state"], requestStatus=openoffload_pb2._ACCEPTED, inPackets=session["inPackets"], inBytes=session["inBytes"], outPackets=session["outPackets"], outBytes=session["outBytes"], startTime=session["startTime"], endTime=session["endTime"], sessionCloseCode=session["sessionCloseCode"]);
+                print(f"checking our session id:{sessionId} client session id:", session["clientSessionId"], " matches the request sessionId:", request.session_id )
+                if session["clientSessionId"] == request.session_id:
+                  return openoffload_pb2.SessionResponse(session_id=request.session_id, session_state=session["state"], request_status=openoffload_pb2._ACCEPTED, in_packets=session["inPackets"], in_bytes=session["inBytes"], out_packets=session["outPackets"], out_bytes=session["outBytes"], start_time=session["startTime"], end_time=session["endTime"], session_close_code=session["sessionCloseCode"]);
 
 
               msg = (f"ERROR: The session was not found.")
               print(msg)
               context.set_details(msg)
               context.set_code(grpc.StatusCode.UNKNOWN)
-              return openoffload_pb2.sessionResponse(requestStatus=openoffload_pb2._REJECTED_SESSION_NONEXISTENT)
+              return openoffload_pb2.SessionResponse(requestStatus=openoffload_pb2._REJECTED_SESSION_NONEXISTENT)
             except: 
               msg = (f"ERROR: The session was not found heer.")
               print(msg)
               context.set_details(msg)
               context.set_code(grpc.StatusCode.UNKNOWN)
-              return openoffload_pb2.sessionResponse(requestStatus=openoffload_pb2._REJECTED_SESSION_NONEXISTENT)
+              return openoffload_pb2.SessionResponse(request_status=openoffload_pb2._REJECTED_SESSION_NONEXISTENT)
 
 
 
-    def deleteSession(self, request, context):
+    def DeleteSession(self, request, context):
             print("############ DELETE SESSION ##################");
             print("sessionId:",request.sessionId);
 
@@ -314,30 +314,30 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
           print(f"----- END simulateSessionsTraffic() total sessions ACTIVE={activeCnt} & CLOSED={closedCnt} -----")
           time.sleep(2)
 
-    def getClosedSessions(self, request, context):
+    def GetClosedSessions(self, request, context):
             print("############ GET CLOSED SESSIONS ##################");
 
             for sessionId in list(offloadSessionTable):
               session = offloadSessionTable[sessionId]
               if session["state"] == openoffload_pb2._CLOSED:
                 del offloadSessionTable[sessionId]
-                yield openoffload_pb2.sessionResponse(sessionId=session["clientSessionId"], sessionState=session["state"], requestStatus=openoffload_pb2._ACCEPTED, inPackets=session["inPackets"], inBytes=session["inBytes"], outPackets=session["outPackets"], outBytes=session["outBytes"], startTime=session["startTime"], endTime=session["endTime"], sessionCloseCode=session["sessionCloseCode"]);
+                yield openoffload_pb2.SessionResponse(session_id=session["clientSessionId"], session_state=session["state"], request_status=openoffload_pb2._ACCEPTED, in_packets=session["inPackets"], in_bytes=session["inBytes"], out_packets=session["outPackets"], out_bytes=session["outBytes"], start_time=session["startTime"], end_time=session["endTime"], session_close_code=session["sessionCloseCode"]);
 
-    def getAllSessions(self, request, context):
+    def GetAllSessions(self, request, context):
             print("############ GET ALL SESSIONS ##################");
-            #print("pageSize:",request.pageSize);
+            #print("page_size:",request.page_size);
             #print("page:",request.page);
     
             sessionCount = len(offloadSessionTable)
 
             print(f"Offload Session Table has {sessionCount} entries.")
-            if request.pageSize and request.page:
+            if request.page_size and request.page:
               if request.page == 1:
                 startIndex = 0
               else:
-                startIndex = request.pageSize * (request.page - 1)
+                startIndex = request.page_size * (request.page - 1)
 
-              endIndex = request.pageSize * request.page - 1
+              endIndex = request.page_size * request.page - 1
               if endIndex > sessionCount - 1:
                 endIndex = sessionCount - 1
 
@@ -347,16 +347,16 @@ class SessionTableServicer(openoffload_pb2_grpc.SessionTableServicer):
 
             #print(f"start index = {startIndex} end index = {endIndex}")
 
-            sessionResponses = openoffload_pb2.sessionResponses()
+            sessionResponses = openoffload_pb2.SessionResponses()
             for x in range(startIndex, endIndex + 1):
               sessionId = list(offloadSessionTable)[x]
               session = offloadSessionTable[sessionId]
               #print(f"index = {x} returning session {sessionId}")
-              sessionResponse = openoffload_pb2.sessionResponse(sessionId=session["clientSessionId"], sessionState=session["state"], requestStatus=openoffload_pb2._ACCEPTED, inPackets=session["inPackets"], inBytes=session["inBytes"], outPackets=session["outPackets"], outBytes=session["outBytes"], startTime=session["startTime"], endTime=session["endTime"], sessionCloseCode=session["sessionCloseCode"])
+              sessionResponse = openoffload_pb2.SessionResponse(session_id=session["clientSessionId"], session_state=session["state"], request_status=openoffload_pb2._ACCEPTED, in_packets=session["inPackets"], in_bytes=session["inBytes"], out_packets=session["outPackets"], out_bytes=session["outBytes"], start_time=session["startTime"], end_time=session["endTime"], session_close_code=session["sessionCloseCode"])
 
-              sessionResponses.sessionInfo.append(sessionResponse)
+              sessionResponses.session_info.append(sessionResponse)
 
-            sessionResponses.nextkey=23333
+            sessionResponses.next_key=23333
             return sessionResponses
                 
 
