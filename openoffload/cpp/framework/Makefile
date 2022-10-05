@@ -23,8 +23,8 @@ PROTO_NAME := openoffload
 DIRECTORIES := directories
 PROTOS := protos
 VERSION=1.0
-SERVER_LIB := libopof_server.a
-CLIENT_LIB := libopof_client.a
+SERVER_LIB := libopof_server.so
+CLIENT_LIB := libopof_client.so
 #
 ROOT_DIR ?= $(HOME)/.local
 MOUNT_PATH := ../../../
@@ -333,12 +333,10 @@ $(SERVER_NAME): opof_server_main.o opof_server_test.o opof_error.o opof_test_uti
 	$(LD) $(LDFLAGS) $(OBJ_DIR)/opof_server_main.o $(OBJ_DIR)/opof_error.o $(OBJ_DIR)/opof_server_test.o $(OBJ_DIR)/opof_test_util.o $(SERVERFLAGS) $(LIBCONFIG) $(LIBS) -o $(BIN_DIR)/$@
 #
 $(SERVER_LIB): 	openoffload.pb.o openoffload.grpc.pb.o opof_session_server.o opof_server.o opof_util.o
-	ar crv $(LIB_DIR)/$@ $(SERVER_OBJS)
-	ranlib $(LIB_DIR)/$@
+	$(CPP) -shared -o $(LIB_DIR)/$(SERVER_LIB) $(SERVER_OBJS)
 #
 $(CLIENT_LIB): openoffload.pb.o openoffload.grpc.pb.o opof_session_client.o opof_clientlib.o opof_util.o
-	ar crv $(LIB_DIR)/$@ $(CLIENT_OBJS)
-	ranlib $(LIB_DIR)/$@
+	$(CPP) -shared -o $(LIB_DIR)/$(CLIENT_LIB) $(CLIENT_OBJS)
 #
 #
 .PHONY: clean all doc
