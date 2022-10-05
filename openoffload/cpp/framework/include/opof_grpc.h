@@ -33,7 +33,6 @@ using namespace std;
 #include <grpcpp/server_builder.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
-#include <grpcpp/channel_impl.h>
 
 #include "openoffload.grpc.pb.h"
 #include "openoffload.pb.h"
@@ -51,20 +50,20 @@ using grpc::ServerWriter;
 using grpc::ClientWriter;
 //
 using openoffload::v1::SessionTable;
-using openoffload::v1::sessionRequest;
-using openoffload::v1::sessionRequestArgs;
-using openoffload::v1::addSessionResponse;
-using openoffload::v1::sessionResponse;
-using openoffload::v1::sessionResponses;
-using openoffload::v1::sessionResponseError;
-using openoffload::v1::sessionId;
-using openoffload::v1::IP_VERSION;
-using openoffload::v1::PROTOCOL_ID;
-using openoffload::v1::ACTION_TYPE;
-using openoffload::v1::REQUEST_STATUS;
-using openoffload::v1::ADD_SESSION_STATUS;
-using openoffload::v1::SESSION_STATE;
-using openoffload::v1::SESSION_CLOSE_CODE;
-using openoffload::v1::actionParameters;
+using openoffload::v1::SessionRequest;
+using openoffload::v1::SessionRequestArgs;
+using openoffload::v1::AddSessionResponse;
+using openoffload::v1::SessionResponse;
+using openoffload::v1::SessionResponses;
+using openoffload::v1::SessionResponseError;
+using openoffload::v1::SessionId;
+using openoffload::v1::IpVersion;
+using openoffload::v1::ProtocolId;
+using openoffload::v1::ActionType;
+using openoffload::v1::RequestStatus;
+using openoffload::v1::AddSessionStatus;
+using openoffload::v1::SessionState;
+using openoffload::v1::SessionCloseCode;
+using openoffload::v1::ActionParameters;
 
 #endif // _OPOF_GRPC_H

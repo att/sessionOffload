@@ -32,10 +32,10 @@ extern "C" {
 
 int get_key(const char *filename, char *key);
 
-void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *request);
-void convertAddSessionResponse2c(addSessionResponse_t *response_c, addSessionResponse *response);
-void convertSessionResponse2c(sessionResponse *responsecpp, sessionResponse_t *responsec);
-void convertSessionResponse2cpp(sessionResponse *responsecpp, sessionResponse_t *responsec);
-void convertSessionRequest2c(sessionRequest request, sessionRequest_t *request_c);
+void convertSessionRequest2cpp(sessionRequest_t *request_c, SessionRequest *request);
+void convertAddSessionResponse2c(addSessionResponse_t *response_c, AddSessionResponse *response);
+void convertSessionResponse2c(SessionResponse *responsecpp, sessionResponse_t *responsec);
+void convertSessionResponse2cpp(SessionResponse *responsecpp, sessionResponse_t *responsec);
+void convertSessionRequest2c(SessionRequest request, sessionRequest_t *request_c);
 
 #endif

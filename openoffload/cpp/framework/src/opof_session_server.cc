@@ -40,15 +40,15 @@ extern "C" {
 * \param reader
 * \param response
 */
-Status SessionTableImpl::addSession(ServerContext* context, ServerReader<sessionRequest>* reader, addSessionResponse* response) {
+Status SessionTableImpl::AddSession(ServerContext* context, ServerReader<SessionRequest>* reader, AddSessionResponse* response) {
   int status;
   //int index=0;
   //ADD_SESSION_STATUS reqStatus = ADD_SESSION_STATUS::_SESSION_ACCEPTED;
   addSessionResponse_t addResponse_c;
-  sessionResponseError *errorMessage;
+  SessionResponseError *errorMessage;
   sessionRequest_t request_c;
-  sessionRequest request;
-  response->clear_responseerror();
+  SessionRequest request;
+  response->clear_response_error();
   //std::cout << "response size: " << response->responseerror_size() << std::endl;
   //if (context->IsCancelled()) {
   //  return Status(StatusCode::CANCELLED, "Deadline exceeded or Client cancelled, abandoning.");
@@ -63,9 +63,9 @@ Status SessionTableImpl::addSession(ServerContext* context, ServerReader<session
     }
     status = opof_add_session_server(&request_c, &addResponse_c);
     if (status != _OK){
-      errorMessage = response->add_responseerror();
-      errorMessage->set_sessionid(request.sessionid());
-      errorMessage->set_errorstatus(status);
+      errorMessage = response->add_response_error();
+      errorMessage->set_session_id(request.session_id());
+      errorMessage->set_error_status(status);
     }
     //index++;
   }
@@ -80,15 +80,15 @@ Status SessionTableImpl::addSession(ServerContext* context, ServerReader<session
 * \param reader
 * \param response
 */
-Status SessionTableImpl::getSession(ServerContext* context, const sessionId* sid,
-  sessionResponse* response) {
+Status SessionTableImpl::GetSession(ServerContext* context, const SessionId* sid,
+  SessionResponse* response) {
   sessionResponse_t response_c;
   int status;
   uint64_t session;
   if (context->IsCancelled()) {
       return Status(StatusCode::CANCELLED, "Deadline exceeded or Client cancelled, abandoning.");
   }
-  session = sid->sessionid();
+  session = sid->session_id();
   status = opof_get_session_server(session, &response_c);
   if (status == _OK){
     convertSessionResponse2cpp(response, &response_c);
@@ -107,14 +107,14 @@ Status SessionTableImpl::getSession(ServerContext* context, const sessionId* sid
 * \param reader
 * \param response
 */
-Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* sid,
-  sessionResponse* response) {
+Status SessionTableImpl::DeleteSession(ServerContext* context, const SessionId* sid,
+  SessionResponse* response) {
   int status;
   sessionResponse_t response_c;
   if (context->IsCancelled()) {
     return Status(StatusCode::CANCELLED, "Deadline exceeded or Client cancelled, abandoning.");
   }
-  status = opof_del_session_server(sid->sessionid(), &response_c);
+  status = opof_del_session_server(sid->session_id(), &response_c);
   if (status == _OK){
     convertSessionResponse2cpp(response, &response_c);
     return Status::OK;
@@ -132,12 +132,12 @@ Status SessionTableImpl::deleteSession(ServerContext* context, const sessionId* 
 * \param reader
 * \param response
 */
-Status SessionTableImpl::getAllSessions(ServerContext* context, const sessionRequestArgs* request, sessionResponses *responses) {
+Status SessionTableImpl::GetAllSessions(ServerContext* context, const SessionRequestArgs* request, SessionResponses *responses) {
   
   Status status;
   sessionResponse_t **allSessions= NULL;
   sessionResponse_t *closedResponse;
-  sessionResponse *response;
+  SessionResponse *response;
   int sessionCount;
   int pageCount = 0;
   
@@ -146,7 +146,7 @@ Status SessionTableImpl::getAllSessions(ServerContext* context, const sessionReq
   if (context->IsCancelled()) {
       return Status(StatusCode::CANCELLED, "Deadline exceeded or Client cancelled, abandoning.");
   }
-  start_session = request->startsession();
+  start_session = request->start_session();
   
   allSessions = (sessionResponse_t **)malloc(nresponses * sizeof(sessionResponse_t *));
   for (int i = 0; i < nresponses; i++){
@@ -155,21 +155,21 @@ Status SessionTableImpl::getAllSessions(ServerContext* context, const sessionReq
   
   sessionCount = opof_get_all_sessions_server(nresponses, &start_session, pageCount, allSessions);
 
-  responses->set_nextkey(start_session);
+  responses->set_next_key(start_session);
   
   if (sessionCount > 0){
     pageCount++;
     for (int i=0; i < sessionCount; i++){
       closedResponse = allSessions[i];
-      response = responses->add_sessioninfo();
-      response->set_sessionid(closedResponse->sessionId);
-      response->set_sessionstate((SESSION_STATE)closedResponse->sessionState);
-      response->set_inpackets(closedResponse->inPackets);
-      response->set_outpackets(closedResponse->outPackets);
-      response->set_inbytes(closedResponse->inBytes);
-      response->set_outbytes(closedResponse->outBytes);
-      response->set_sessionclosecode((SESSION_CLOSE_CODE)closedResponse->sessionCloseCode);
-      response->set_requeststatus((REQUEST_STATUS)closedResponse->requestStatus);
+      response = responses->add_session_info();
+      response->set_session_id(closedResponse->sessionId);
+      response->set_session_state((SessionState)closedResponse->sessionState);
+      response->set_in_packets(closedResponse->inPackets);
+      response->set_out_packets(closedResponse->outPackets);
+      response->set_in_bytes(closedResponse->inBytes);
+      response->set_out_bytes(closedResponse->outBytes);
+      response->set_session_close_code((SessionCloseCode)closedResponse->sessionCloseCode);
+      response->set_request_status((RequestStatus)closedResponse->requestStatus);
     }
   }
   for (int i=0; i <nresponses; i++){
@@ -186,9 +186,9 @@ Status SessionTableImpl::getAllSessions(ServerContext* context, const sessionReq
 * \param reader
 * \param response
 */
-Status SessionTableImpl::getClosedSessions(ServerContext* context, const sessionRequestArgs* request, ServerWriter<sessionResponse>* writer) {
+Status SessionTableImpl::GetClosedSessions(ServerContext* context, const SessionRequestArgs* request, ServerWriter<SessionResponse>* writer) {
   
-  sessionResponse response;
+  SessionResponse response;
   sessionResponse_t closedResponse;
   statisticsRequestArgs_t request_c;
   int sessionCount = 0;
@@ -196,7 +196,7 @@ Status SessionTableImpl::getClosedSessions(ServerContext* context, const session
   if (context->IsCancelled()) {
       return Status(StatusCode::CANCELLED, "Deadline exceeded or Client cancelled, abandoning.");
   }
-  int nresponses = request->pagesize();
+  int nresponses = request->page_size();
   request_c.pageSize = nresponses;
   sessionResponse_t closedSessions[BUFFER_MAX];
 #ifdef TESTS
@@ -208,14 +208,14 @@ Status SessionTableImpl::getClosedSessions(ServerContext* context, const session
   }
   for (int i=0; i < sessionCount; i++){
     closedResponse = closedSessions[i];
-    response.set_sessionid(closedResponse.sessionId);
-    response.set_sessionstate((SESSION_STATE)closedResponse.sessionState);
-    response.set_inpackets(closedResponse.inPackets);
-    response.set_outpackets(closedResponse.outPackets);
-    response.set_inbytes(closedResponse.inBytes);
-    response.set_outbytes(closedResponse.outBytes);
-    response.set_sessionclosecode((SESSION_CLOSE_CODE)closedResponse.sessionCloseCode);
-    response.set_requeststatus(REQUEST_STATUS::_ACCEPTED);
+    response.set_session_id(closedResponse.sessionId);
+    response.set_session_state((SessionState)closedResponse.sessionState);
+    response.set_in_packets(closedResponse.inPackets);
+    response.set_out_packets(closedResponse.outPackets);
+    response.set_in_bytes(closedResponse.inBytes);
+    response.set_out_bytes(closedResponse.outBytes);
+    response.set_session_close_code((SessionCloseCode)closedResponse.sessionCloseCode);
+    response.set_request_status(RequestStatus::_ACCEPTED);
     writer->Write(response);
     
   }

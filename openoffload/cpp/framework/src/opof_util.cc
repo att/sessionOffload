@@ -41,37 +41,37 @@ extern "C" {
 *
 * \return void
 */
-void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *request){
-    actionParameters action;
+void convertSessionRequest2cpp(sessionRequest_t *request_c, SessionRequest *request){
+    ActionParameters action;
     std::string s;
-    request->set_sessionid(request_c->sessId);
-    request->set_inlif(request_c->inlif);
-    request->set_outlif(request_c->outlif);
-    request->set_ipversion((IP_VERSION)request_c->ipver);
-    request->set_sourceport((unsigned int)request_c->srcPort);
+    request->set_session_id(request_c->sessId);
+    request->set_in_lif(request_c->inlif);
+    request->set_out_lif(request_c->outlif);
+    request->set_ip_version((IpVersion)request_c->ipver);
+    request->set_source_port((unsigned int)request_c->srcPort);
     if (request_c->ipver == _IPV6){
        s.assign(request_c->srcIPV6.s6_addr, request_c->srcIPV6.s6_addr+ 16);
-      request->set_sourceipv6(s);
+      request->set_source_ipv6(s);
     } else {
-      request->set_sourceip(request_c->srcIP.s_addr);
+      request->set_source_ip(request_c->srcIP.s_addr);
     } 
     if (request_c->ipver == _IPV6){
       s.assign(request_c->dstIPV6.s6_addr, request_c->dstIPV6.s6_addr+ 16);
-      request->set_destinationipv6(s);
+      request->set_destination_ipv6(s);
     } else {
-      request->set_destinationip(request_c->dstIP.s_addr);
+      request->set_destination_ip(request_c->dstIP.s_addr);
     } 
-    request->set_destinationport((unsigned int)request_c->dstPort);
-    request->set_protocolid((PROTOCOL_ID)request_c->proto);
-    action.set_actiontype((ACTION_TYPE)request_c->actType);
+    request->set_destination_port((unsigned int)request_c->dstPort);
+    request->set_protocol_id((ProtocolId)request_c->proto);
+    action.set_action_type((ActionType)request_c->actType);
     if (request_c->ipver == _IPV6){
       s.assign(request_c->nextHopV6.s6_addr, request_c->nextHopV6.s6_addr+ 16);
-      action.set_actionnexthopv6(s);
+      action.set_action_next_hop_v6(s);
     } else {
-      action.set_actionnexthop(request_c->nextHop.s_addr);
+      action.set_action_next_hop(request_c->nextHop.s_addr);
     }
     request->mutable_action()->CopyFrom(action);
-    request->set_cachetimeout(request_c->cacheTimeout);
+    request->set_cache_timeout(request_c->cacheTimeout);
 
 }
 /** \ingroup utilities
@@ -84,15 +84,15 @@ void convertSessionRequest2cpp(sessionRequest_t *request_c, sessionRequest *requ
 *
 * \return void
 */
-void convertAddSessionResponse2c(addSessionResponse_t *response_c, addSessionResponse *response){
-  sessionResponseError responseError;
+void convertAddSessionResponse2c(addSessionResponse_t *response_c, AddSessionResponse *response){
+  SessionResponseError responseError;
   //response_c->requestStatus = (REQUEST_STATUS_T)response->requeststatus();
-  if (response->responseerror_size() > 0){
-    response_c->number_errors = response->responseerror_size();
+  if (response->response_error_size() > 0){
+    response_c->number_errors = response->response_error_size();
     for (int i=0; i< response_c->number_errors; i++){
-      responseError = response->responseerror(i);
-      response_c->sessionErrors[i].sessionId = responseError.sessionid();
-      response_c->sessionErrors[i].errorStatus = responseError.errorstatus();
+      responseError = response->response_error(i);
+      response_c->sessionErrors[i].sessionId = responseError.session_id();
+      response_c->sessionErrors[i].errorStatus = responseError.error_status();
     }
   } else {
     response_c->number_errors = 0;
@@ -108,57 +108,57 @@ void convertAddSessionResponse2c(addSessionResponse_t *response_c, addSessionRes
 *
 * \return void
 */
-void convertSessionResponse2c(sessionResponse *responsecpp, sessionResponse_t *responsec){
+void convertSessionResponse2c(SessionResponse *responsecpp, sessionResponse_t *responsec){
 
-  responsec->sessionId = responsecpp->sessionid();
-  responsec->requestStatus = (REQUEST_STATUS_T)responsecpp->requeststatus();
-  responsec->sessionState = (SESSION_STATE_T)responsecpp->sessionstate();
-  responsec->sessionCloseCode = (SESSION_CLOSE_T)responsecpp->sessionclosecode();
-  responsec->inPackets = responsecpp->inpackets();
-  responsec->outPackets = responsecpp->outpackets();
-  responsec->inBytes = responsecpp->inbytes();
-  responsec->outBytes = responsecpp->outbytes();
+  responsec->sessionId = responsecpp->session_id();
+  responsec->requestStatus = (REQUEST_STATUS_T)responsecpp->request_status();
+  responsec->sessionState = (SESSION_STATE_T)responsecpp->session_state();
+  responsec->sessionCloseCode = (SESSION_CLOSE_T)responsecpp->session_close_code();
+  responsec->inPackets = responsecpp->in_packets();
+  responsec->outPackets = responsecpp->out_packets();
+  responsec->inBytes = responsecpp->in_bytes();
+  responsec->outBytes = responsecpp->out_bytes();
 }
 
-void convertSessionResponse2cpp(sessionResponse *responsecpp, sessionResponse_t *responsec){
-  responsecpp->set_sessionid(responsec->sessionId);
-  responsecpp->set_requeststatus((REQUEST_STATUS)responsec->requestStatus);
-  responsecpp->set_sessionstate((SESSION_STATE)responsec->sessionState);
-  responsecpp->set_sessionclosecode((SESSION_CLOSE_CODE)responsec->sessionCloseCode);
-  responsecpp->set_inpackets(responsec->inPackets);
-  responsecpp->set_outpackets(responsec->outPackets);
-  responsecpp->set_inbytes(responsec->inBytes);
-  responsecpp->set_outbytes(responsec->outBytes);
+void convertSessionResponse2cpp(SessionResponse *responsecpp, sessionResponse_t *responsec){
+  responsecpp->set_session_id(responsec->sessionId);
+  responsecpp->set_request_status((RequestStatus)responsec->requestStatus);
+  responsecpp->set_session_state((SessionState)responsec->sessionState);
+  responsecpp->set_session_close_code((SessionCloseCode)responsec->sessionCloseCode);
+  responsecpp->set_in_packets(responsec->inPackets);
+  responsecpp->set_out_packets(responsec->outPackets);
+  responsecpp->set_in_bytes(responsec->inBytes);
+  responsecpp->set_out_bytes(responsec->outBytes);
 }
-void convertSessionRequest2c(sessionRequest request, sessionRequest_t *request_c){
-    actionParameters action;
+void convertSessionRequest2c(SessionRequest request, sessionRequest_t *request_c){
+    ActionParameters action;
     std::vector<uint8_t> char_array(16, 0);
-    request_c->sessId = request.sessionid();
-    request_c->inlif = request.inlif();
-    request_c->outlif = request.outlif();
-    request_c->ipver = (IP_VERSION_T)request.ipversion();
+    request_c->sessId = request.session_id();
+    request_c->inlif = request.in_lif();
+    request_c->outlif = request.out_lif();
+    request_c->ipver = (IP_VERSION_T)request.ip_version();
     if (request_c->ipver == _IPV6){
-      char_array.assign(request.sourceipv6().begin(), request.sourceipv6().end());
+      char_array.assign(request.source_ipv6().begin(), request.source_ipv6().end());
       memcpy(request_c->srcIPV6.s6_addr,&char_array[0],16);
     } else {
-      request_c->srcIP.s_addr = request.sourceip();
+      request_c->srcIP.s_addr = request.source_ip();
     }
     if (request_c->ipver == _IPV6){
-      char_array.assign(request.destinationipv6().begin(), request.destinationipv6().end());
+      char_array.assign(request.destination_ipv6().begin(), request.destination_ipv6().end());
        memcpy(request_c->dstIPV6.s6_addr,&char_array[0],16);
     } else {
-      request_c->dstIP.s_addr = request.destinationip();
+      request_c->dstIP.s_addr = request.destination_ip();
     }
-    request_c->srcPort = (unsigned short)request.sourceport();
-    request_c->dstPort = (unsigned short)request.destinationport();
-    request_c->proto = (PROTOCOL_ID_T)request.protocolid();
+    request_c->srcPort = (unsigned short)request.source_port();
+    request_c->dstPort = (unsigned short)request.destination_port();
+    request_c->proto = (PROTOCOL_ID_T)request.protocol_id();
     action = request.action();
-    request_c->actType= (ACTION_VALUE_T)action.actiontype();
-    request_c->cacheTimeout = request.cachetimeout();
+    request_c->actType= (ACTION_VALUE_T)action.action_type();
+    request_c->cacheTimeout = request.cache_timeout();
      if (request_c->ipver == _IPV6){
-      char_array.assign(action.actionnexthopv6().begin(), action.actionnexthopv6().end());
+      char_array.assign(action.action_next_hop_v6().begin(), action.action_next_hop_v6().end());
       memcpy(request_c->nextHopV6.s6_addr,&char_array[0],16);
     } else {
-      request_c->nextHop.s_addr = action.actionnexthop();
+      request_c->nextHop.s_addr = action.action_next_hop();
     }
  }
