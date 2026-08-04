@@ -28,9 +28,8 @@ Developed for AT&T by Brian Freeman and Richard Bowman, June 2020
 
 Current maintainers:
 
- * Brian Freeman (at&t)
  * Richard Bowman (at&t)
- * John McDowall (palo alto networks)
+ * tbd (palo alto networks)
  * Omri Peri (drivenets) 
 
 
