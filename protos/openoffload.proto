@@ -20,7 +20,7 @@ syntax = "proto3";
 // will move to v1 at release 
 // increment beta1 to beta2 , etc for changes during development
 
-package openoffload.v1;
+package openoffload.v1beta1;
 
 option go_package = ".;openoffload_v1beta1";
 
@@ -113,8 +113,13 @@ enum REQUEST_STATUS{
 enum ACTION_TYPE{
    _DROP = 0;
    _FORWARD = 1;
-   _MIRROR = 2;
-   _SNOOP = 3;
+   _MIRROR = 2; // deprecated
+   _SNOOP = 3; // deprecated
+}
+
+enum TUNNEL_TYPE{
+  _NONE = 0;
+  _GTPU = 1;
 }
 
 //
@@ -122,6 +127,10 @@ enum ACTION_TYPE{
 // in v1alpha4 to simplfy the code.
 //
 service SessionTable {
+rpc getServiceVersion(versionRequest) returns (versionResponse) {}
+//
+// Resets all session/vlan/nexthop state in the service
+rpc reset(resetRequest) returns (sessionResponse) {}
 //
 // Adds a session
 // This was changed in v1alpha4 to be a streaming API, for performance
@@ -141,8 +150,37 @@ rpc getAllSessions(sessionRequestArgs) returns (sessionResponses) {}
 // statistics as a outgoing session from the WB to Applications ?
 // grpc seems to need a request input streamId is a placeholder
 rpc getClosedSessions(sessionRequestArgs) returns (stream sessionResponse) {}
+//
+// Create a next-hop parameter specification to be referenced
+// by one or more sessions, for its inLif and/or outLif.
+// If the nextHopId is already in use, the new definition
+// will replace it, affecting all sessions which reference it.
+rpc setNextHop(nextHopParameters) returns (nextHopResponse) {}
+//
+// Destroys a next-hop parameter specification, as well as
+// any sessions which reference it, for either inLif or
+// outLif nextHopID.
+rpc destroyNextHop(nextHopParameters) returns (nextHopResponse) {}
+//
+// Destroys all next-hop objects and all sessions which
+// reference them.
+rpc clearNextHops(nextHopParameters) returns (nextHopResponse) {}
+//
+// Assigns forwarding to an interface based on vlan tag.
+// Each VLAN ID must be unique.
+rpc addVlanFlow(vlanFlowDef) returns (sessionResponse) {}
+//
+// Removes a vlan flow assignment by its VLAN ID.
+rpc removeVlanFlow(vlanFlowDef) returns (sessionResponse) {}
+//
+// assigns forwarding to an interface based on vlan tag
+rpc getVlanFlows(vlanFlowListRequest) returns (vlanFlowList) {}
+//
+// removes all vlan flows
+rpc clearVlanFlows(vlanFlowListRequest) returns (sessionResponse) {}
+}
 
-
+message resetRequest{
 }
 
 // should the Application assign the sessionID on AddSession and avoid conflicts
@@ -152,14 +190,61 @@ message sessionId{
   uint64 sessionId = 1;
 }
 
-// MIRROR and SNOOP require an actionNextHop
-// DROP and FORWARD do not have an actionNextHop
-// The IPV4 nextHop definition maps to the V4 struct returned by inet_pton whcih is a uint32_t.
-// The IPV6 nextHop definition maps to the V6 struct returned by inet_ptoN which is a uint8_t s6_addr[16]
+// Packet header overwrite values
+message MACRewrite{
+  bytes srcMac = 1;
+  bytes dstMac = 2;
+}
+
+// Packet header overwrite values
+// These fields may apply to either the source or destionation fields
+// of the packet header, depending on the context.
+message NAT{
+  IP_VERSION ipVersion = 5;
+  uint32 ipv4 = 1;
+  bytes ipv6 = 2;
+  PROTOCOL_ID protocolId = 6;
+  uint32 port = 3;
+}
+
+message nextHopParameters{
+  // Uniquely identifies a next-hop parameter specification.
+  uint32 nextHopId = 1;
+
+  // L3 Support: overwrite src/dst MAC for each link interface
+  // - The presense of MAC rewrite fields implies a TTL decrement for TCP flows.
+  // - For encapsulated traffic, the rewrite action applies to outermost packet header.
+  MACRewrite macRewrite = 2;
+
+  // ipVersion is required to offload TTL decrement
+  IP_VERSION ipVersion = 3;
+}
+
+message perLinkActionParameters{
+  uint32 nextHopId = 1;
+
+  // NAT Support: overwrite src/dst L3/L4 fields
+  // - For encapsulated traffic, applies to outermost packet header.
+  NAT snat = 2;
+  NAT dnat = 3;
+
+  // VLAN Mapping: re-write VLAN tags, if present
+  // - If non-zero, overwrite VLAN tag as specified for each link interface
+  // - The sessionRequest vlan fields must also be present (this command does
+  //   not create a VLAN tag if one is not already present).
+  // - For encapsulated traffic, applies to outermost packet header.
+  uint32 vlan = 4;
+}
+
 message actionParameters{
      ACTION_TYPE  actionType = 1;
-     uint32 actionNextHop = 2;
-     bytes actionNextHopV6 = 3;
+
+     // The per-link ActionParams only apply when actionType==_FORWARD
+     perLinkActionParameters actionParams_inLif = 19;
+     perLinkActionParameters actionParams_outLif = 20;
+
+     uint32 actionNextHop = 2; // deprecated
+     bytes actionNextHopV6 = 3; // deprecated
 }
 
 // sessionId is returned by server side upon successful addSession
@@ -169,6 +254,18 @@ message sessionRequest{
   uint64  sessionId = 1 ;
   int32  inLif = 2;
   int32  outLif = 3;
+  TUNNEL_TYPE encapType = 14;
+
+  // VLAN matching applies only to outer-most packet header.
+  // Used in conjunction with actionParameters.vlan fields to
+  // implement VLAN re-write actions.
+  // VLAN fields should be either all zero (untagged) or all non-zero.
+  uint32 vlan_inLif = 15;
+  uint32 vlan_outLif = 16;
+
+  //
+  // For encapsulated traffic, these match patterns apply to the inner-layer packet header.
+  //
   IP_VERSION ipVersion = 4;
   uint32 sourceIp = 5;
   bytes sourceIpV6 =6;
@@ -177,7 +274,9 @@ message sessionRequest{
   bytes destinationIpV6 =9;
   uint32 destinationPort = 10;
   PROTOCOL_ID protocolId = 11;
+
   actionParameters action = 12;
+
   uint32 cacheTimeout = 13;
 }
 
@@ -186,6 +285,10 @@ message sessionResponseError {
   int32 errorStatus = 2;
 }
 
+message nextHopResponse {
+  uint32 nextHopId = 1;
+  int32 errorStatus = 2;
+}
 
 message sessionResponses {
   repeated sessionResponse sessionInfo = 1;
@@ -223,4 +326,24 @@ message sessionRequestArgs{
   uint32  page=2;
   uint64  startSession=3;
   //  what other arguments make sense for retrieving or filtering streams 
+}
+
+message versionRequest {}
+
+message versionResponse {
+  string vendor = 1;
+  string name = 2;
+  string version = 3;
+  string copyright = 4;
+}
+
+message vlanFlowDef{
+  uint32 vlanId = 1;
+  uint32 internalLif = 2;
+}
+
+message vlanFlowListRequest{}
+
+message vlanFlowList{
+  repeated vlanFlowDef flowDefs = 1;
 }
