@@ -45,7 +45,7 @@ jobs:
         find $GITHUB_WORKSPACE/tests/robot/target/robotframework-reports -type f -name 'output.xml' -exec rm {} +
       if: always() 
     - name: Archive acceptances test results
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
           name: robot-results
           path: tests/robot/target/robotframework-reports
